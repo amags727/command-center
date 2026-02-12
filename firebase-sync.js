@@ -21,6 +21,7 @@ const FirebaseSync = (() => {
   let _importing = false;  // guard: true while importing remote data (suppresses push-back)
   let _importCooldown = 0; // timestamp: suppress pushes until this time
   let _lastPushTs = 0;     // track last push timestamp to ignore self-triggered listener
+  let _lastPushFingerprint = ''; // fingerprint of last pushed data — skip if unchanged
 
   // SHA-256 hash
   async function hash(str) {
@@ -163,17 +164,22 @@ const FirebaseSync = (() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       if (Date.now() < _importCooldown || _importing) return;  // re-check at fire time
-      setStatus('syncing');
       const data = {};
-      const ts = Date.now();
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         // Skip internal keys
         if (k === 'sync_passphrase' || k === '_lastSync') continue;
         data[k] = localStorage.getItem(k);
       }
+      // Fingerprint check — skip push if data unchanged
+      const fingerprint = JSON.stringify(data);
+      if (fingerprint === _lastPushFingerprint) return;  // nothing changed
+      
+      setStatus('syncing');
+      const ts = Date.now();
       data._lastSync = ts;
       _lastPushTs = ts;
+      _lastPushFingerprint = fingerprint;
       localStorage.setItem('_lastSync', String(ts));
       
       db.ref(userPath + '/data').set(data)
