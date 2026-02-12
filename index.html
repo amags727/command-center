@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>Command Center</title>
+<style>
+:root{--bg:#fafaf8;--text:#1a1a1a;--muted:#6b7280;--border:#e5e5e3;--blue:#3b82f6;--bl:#dbeafe;--green:#22c55e;--gl:#dcfce7;--orange:#f97316;--ol:#ffedd5;--purple:#8b5cf6;--pl:#ede9fe;--pink:#ec4899;--pkl:#fce7f3;--red:#ef4444;--rl:#fee2e2;--yellow:#eab308;--yl:#fef9c3;--card:#fff;--sh:0 1px 3px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+h1{font-size:1.4em;font-weight:600}h2{font-size:1.2em;margin-bottom:10px;font-weight:600}h3{font-size:1.05em;margin-bottom:8px;font-weight:600}
+button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
+.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);position:sticky;top:0;z-index:100;overflow-x:auto}
+.nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12px}
+.sync-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;width:180px}
+.sync-bar button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:var(--card);cursor:pointer}
+.sync-bar .btn-sync{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sync-bar .btn-disc{background:var(--red);color:#fff;border-color:var(--red);font-size:10px}
+.nav button.active{color:var(--text);border-bottom-color:var(--blue);font-weight:600}
+.nav button:hover{background:var(--bl)}
+.tab{display:none;max-width:880px;margin:0 auto;padding:20px 16px}.tab.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.label{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.l-work{background:var(--bl);color:var(--blue)}.l-gym{background:var(--gl);color:var(--green)}.l-ital{background:var(--ol);color:var(--orange)}.l-diss{background:var(--pl);color:var(--purple)}.l-social{background:var(--pkl);color:var(--pink)}.l-misc{background:var(--yl);color:var(--yellow)}
+.tblock{display:flex;border-left:3px solid var(--border);padding:7px 12px;margin:3px 0;border-radius:0 4px 4px 0;font-size:14px}
+.tblock .tm{min-width:85px;font-weight:600;color:var(--muted);font-size:13px}
+.tblock.work{border-left-color:var(--blue);background:var(--bl)}.tblock.gym{border-left-color:var(--green);background:var(--gl)}.tblock.italian{border-left-color:var(--orange);background:var(--ol)}.tblock.dissertation{border-left-color:var(--purple);background:var(--pl)}.tblock.social{border-left-color:var(--pink);background:var(--pkl)}
+.hrow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--border)}.hrow:last-child{border-bottom:none}
+.hchk{width:20px;height:20px;flex-shrink:0;margin-top:2px;accent-color:var(--green)}
+.hinfo{flex:1}.hname{font-weight:600;font-size:13px}.hdet{font-size:12px;color:var(--muted)}
+.hev{margin-top:5px}.hev input,.hev textarea{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px}.hev textarea{min-height:50px;resize:vertical}
+.ewarn{color:var(--red);font-size:11px;font-weight:600;display:none}
+.timer-d{font-size:2.8em;font-family:'Courier New',monospace;text-align:center;padding:16px;letter-spacing:3px}
+.timer-c{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.timer-c button{padding:7px 18px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:13px}
+.timer-c .pri{background:var(--blue);color:#fff;border-color:var(--blue)}.timer-c .dan{background:var(--red);color:#fff;border-color:var(--red)}
+.timer-c button:disabled{opacity:.4;cursor:not-allowed}
+.sgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-width:280px}
+.scell{width:100%;aspect-ratio:1;border-radius:3px;background:#eee}.scell.done{background:var(--green)}.scell.partial{background:var(--yellow)}.scell.today{outline:2px solid var(--blue);outline-offset:1px}
+.iinput{display:flex;gap:8px;margin-bottom:14px}.iinput input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:6px;font-size:14px}.iinput button{padding:9px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px}
+.iitem{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:5px;background:var(--card);font-size:13px}
+.iitem .itxt{flex:1}.iitem select,.iitem button{padding:3px 7px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:none}.iitem .del{color:var(--red);border-color:var(--red)}
+.lentry{padding:7px 10px;border-left:3px solid var(--border);margin:3px 0;font-size:12px;background:#fafafa}
+.lentry .lt{color:var(--muted);font-size:10px;font-family:monospace}
+.lentry.action{border-left-color:var(--blue)}.lentry.warning{border-left-color:var(--orange)}.lentry.sealed{border-left-color:var(--red);background:var(--rl)}.lentry.confession{border-left-color:var(--purple);background:var(--pl)}
+.pgb{background:linear-gradient(135deg,var(--pl),var(--pkl));border:2px solid var(--purple);border-radius:8px;padding:14px;margin-bottom:14px}
+.pgb h3{color:var(--purple)}
+.rarea textarea{width:100%;min-height:140px;padding:11px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;resize:vertical}
+.wc{font-size:11px;color:var(--muted);text-align:right;margin-top:3px}.wc.bad{color:var(--red);font-weight:600}
+.chatc{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.chatm{max-height:350px;overflow-y:auto;padding:14px;background:#fafafa}
+.cmsg{margin-bottom:10px}.cmsg.user{text-align:right}
+.cmsg .bbl{display:inline-block;max-width:80%;padding:7px 12px;border-radius:11px;font-size:13px;text-align:left}
+.cmsg.user .bbl{background:var(--blue);color:#fff;border-bottom-right-radius:3px}
+.cmsg.ai .bbl{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:3px}
+.chatia{display:flex;gap:8px;padding:10px;background:var(--card);border-top:1px solid var(--border)}
+.chatia input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.chatia button{padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px}
+.apikey{margin-bottom:14px;padding:10px;background:var(--yl);border-radius:8px;font-size:13px}
+.apikey input{width:100%;padding:7px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:12px;margin-top:4px}
+.intention{padding:7px 10px;background:var(--yl);border-left:3px solid var(--yellow);margin:3px 0;border-radius:0 4px 4px 0;font-size:12px;font-style:italic}
+.bundle{padding:7px 10px;background:var(--gl);border-left:3px solid var(--green);margin:3px 0;border-radius:0 4px 4px 0;font-size:12px}
+.pbar{width:100%;height:10px;background:#eee;border-radius:5px;overflow:hidden;margin:3px 0}
+.pfill{height:100%;background:var(--purple);border-radius:5px;transition:width .3s}
+.rprompt{margin-bottom:10px}.rprompt label{display:block;font-weight:600;margin-bottom:3px;font-size:13px}
+.rprompt textarea{width:100%;min-height:70px;padding:7px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px}
+.atable{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.atable th,.atable td{border:1px solid var(--border);padding:5px 8px;text-align:left}.atable th{background:#f5f5f5;font-weight:600}
+@media(max-width:600px){.nav button{padding:7px 9px;font-size:11px}.timer-d{font-size:2em}.tblock{flex-direction:column}.tblock .tm{min-width:auto}}
+.flex{display:flex;gap:8px}.flex-1{flex:1}
+.btn{padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:var(--card);font-size:13px}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-d{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-s{background:var(--bl);font-size:12px;padding:5px 10px}
+.mt8{margin-top:8px}.mb8{margin-bottom:8px}.mb4{margin-bottom:4px}
+.fin{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;width:100%}
+</style>
+</head>
+<body>
+<div class="sync-bar" id="sync-bar">
+<span id="sync-status">⚪ <span style="font-size:11px">Local only</span></span>
+<span style="color:var(--muted)">|</span>
+<input type="password" id="sync-pass" placeholder="Sync passphrase...">
+<button class="btn-sync" onclick="doSync()">Sync</button>
+<button class="btn-disc" onclick="doDisconnect()" style="display:none" id="sync-disc">Disconnect</button>
+</div>
+<nav class="nav" id="nav">
+<button class="active" onclick="switchTab('today')">📅 Today</button>
+<button onclick="switchTab('week')">📊 Week</button>
+<button onclick="switchTab('habits')">🔥 Habits</button>
+<button onclick="switchTab('dissertation')">📝 Dissertation</button>
+<button onclick="switchTab('inbox')">📥 Inbox</button>
+<button onclick="switchTab('focus')">🔒 Focus</button>
+<button onclick="switchTab('claude')">🤖 Claude</button>
+<button onclick="switchTab('log')">📋 Log</button>
+</nav>
+
+<!-- TODAY -->
+<div class="tab active" id="tab-today">
+<h1 id="today-date"></h1>
+<p style="color:var(--muted);font-size:12px;margin-bottom:14px" id="today-label"></p>
+<div class="pgb" id="pgb" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="pg-text"></p><p style="font-size:11px;color:var(--muted)" id="pg-countdown"></p></div>
+<div class="card"><h3>⚡ Implementation Intentions</h3><div id="int-list"></div><div class="flex mt8"><input class="fin flex-1" id="int-in" placeholder="When X, I will Y..." onkeydown="if(event.key==='Enter')addInt()"><button class="btn-s btn" onclick="addInt()">Add</button></div></div>
+<div class="card"><h3>🗓 Schedule</h3><div id="sched"></div><div class="flex mt8"><input type="time" id="bl-time" class="btn" style="width:100px"><input class="fin flex-1" id="bl-desc" placeholder="Block description"><select id="bl-cat" class="btn"><option value="work">Work</option><option value="dissertation">Diss.</option><option value="italian">Italian</option><option value="gym">Gym</option><option value="social">Social</option></select><button class="btn btn-s" onclick="addBlock()">Add</button></div></div>
+<div class="card"><h3>🎯 Top 3 Priorities</h3><div id="top3"></div><div class="flex mt8"><input class="fin flex-1" id="t3-in" placeholder="Priority..." onkeydown="if(event.key==='Enter')addT3()"><button class="btn btn-s" onclick="addT3()">Add</button></div></div>
+<div class="card"><h3>✅ Daily Non-Negotiables</h3>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-anki" onchange="gateHabit('anki')"><div class="hinfo"><div class="hname"><span class="label l-ital">Italian</span> Anki — 300 Reps</div><div class="hev"><input type="number" id="anki-ct" class="fin" placeholder="Enter actual rep count" min="0"><div class="ewarn" id="anki-w">⚠ Less than 300 — doesn't count</div></div></div></div>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-art1" onchange="gateHabit('art1')"><div class="hinfo"><div class="hname"><span class="label l-ital">Italian</span> Article 1</div><div class="hev"><input class="fin" id="art1-t" placeholder="Article title/source"><textarea class="fin" id="art1-th" placeholder="Thoughts (min 50 chars)" onkeyup="valArt(1)"></textarea><div class="ewarn" id="art1-w">⚠ Need ≥50 chars of thoughts</div></div></div></div>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-art2" onchange="gateHabit('art2')"><div class="hinfo"><div class="hname"><span class="label l-ital">Italian</span> Article 2</div><div class="hev"><input class="fin" id="art2-t" placeholder="Article title/source"><textarea class="fin" id="art2-th" placeholder="Thoughts (min 50 chars)" onkeyup="valArt(2)"></textarea><div class="ewarn" id="art2-w">⚠ Need ≥50 chars of thoughts</div></div></div></div>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-gym"><div class="hinfo"><div class="hname"><span class="label l-gym">Gym</span> Workout</div><div class="hdet">Simple check</div></div></div>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-diss" disabled><div class="hinfo"><div class="hname"><span class="label l-diss">Dissertation</span> Writing Session</div><div class="hdet">Timer-verified — use Dissertation tab. <span id="diss-td">0 min today</span></div></div></div>
+<div class="hrow"><input type="checkbox" class="hchk" id="h-convo" onchange="gateHabit('convo')"><div class="hinfo"><div class="hname"><span class="label l-ital">Italian</span> Conversation Practice <span style="font-size:11px;color:var(--muted)">(2x/week)</span></div><div class="hev"><input class="fin" id="convo-who" placeholder="Who?"><input class="fin" id="convo-det" placeholder="What/how long?"></div></div></div>
+</div>
+<div class="card"><h3>🔗 Temptation Bundles</h3><div id="bun-list"></div><div class="flex mt8"><input class="fin flex-1" id="bun-in" placeholder="I only get [X] during/after [Y]..." onkeydown="if(event.key==='Enter')addBun()"><button class="btn btn-s" onclick="addBun()">Add</button></div></div>
+<div class="card"><h3>🇮🇹 Riflessione Giornaliera</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Write in Italian. Any format. Min 200 words. Submitted to Claude for correction + Anki cards.</p><div class="rarea"><textarea id="refl-txt" placeholder="Scrivi qui in italiano..." onkeyup="updRC()"></textarea></div><div class="wc" id="refl-wc">0 / 200 words</div><div class="flex mt8"><button class="btn btn-p" onclick="submitRefl()">Submit for Correction + Cards</button></div><div id="refl-res" style="display:none" class="mt8"></div></div>
+<div class="card"><h3>📥 Quick Capture</h3><div class="iinput"><input id="qcap" placeholder="Capture a thought or task..." onkeydown="if(event.key==='Enter')qCapture()"><button onclick="qCapture()">Capture</button></div></div>
+<div class="card" style="text-align:center"><button class="btn btn-d" onclick="sealDay()">🔒 Seal Today (Cannot Undo)</button><p style="font-size:11px;color:var(--muted);margin-top:4px">Locks all entries for today. Auto-seals at midnight.</p></div>
+</div>
+
+<!-- WEEK -->
+<div class="tab" id="tab-week">
+<h1>📊 Week of <span id="wk-date"></span></h1>
+<div class="card"><h3>🎯 Weekly Targets</h3>
+<div class="hrow"><span class="label l-gym">Gym</span><div class="hinfo"><b>5x</b> — <span id="wk-gym">0</span>/5</div></div>
+<div class="hrow"><span class="label l-ital">Anki</span><div class="hinfo"><b>Daily 300 (7/7)</b> — <span id="wk-anki">0</span>/7</div></div>
+<div class="hrow"><span class="label l-ital">Articles</span><div class="hinfo"><b>2/day (14/wk)</b> — <span id="wk-art">0</span>/14</div></div>
+<div class="hrow"><span class="label l-ital">Conversation</span><div class="hinfo"><b>2x/week</b> — <span id="wk-convo">0</span>/2</div></div>
+<div class="hrow"><span class="label l-ital">Reflection</span><div class="hinfo"><b>Daily (7/7)</b> — <span id="wk-refl">0</span>/7</div></div>
+<div class="hrow"><span class="label l-diss">Dissertation</span><div class="hinfo"><b>10hr min</b> — <span id="wk-diss">0</span>hr</div></div>
+<div class="hrow"><span class="label l-social">Social</span><div class="hinfo"><b>1 event/person</b> — <span id="wk-soc">0</span>/1</div></div>
+</div>
+<div class="card"><h3>📝 Custom Weekly Goals</h3><div id="cw-goals"></div><div class="flex mt8"><input class="fin flex-1" id="cw-in" placeholder="Custom goal..." onkeydown="if(event.key==='Enter')addCWG()"><select id="cw-cat" class="btn"><option value="work">Work</option><option value="dissertation">Diss.</option><option value="italian">Italian</option><option value="social">Social</option><option value="misc">Misc</option></select><button class="btn btn-s" onclick="addCWG()">Add</button></div></div>
+<div class="card"><h3>📅 Week at a Glance</h3><div id="wk-glance" style="font-size:13px">
+<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="padding:4px;border:1px solid var(--border)">Day</th><th style="padding:4px;border:1px solid var(--border)">Morning</th><th style="padding:4px;border:1px solid var(--border)">Work</th><th style="padding:4px;border:1px solid var(--border)">Evening</th></tr></thead><tbody>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Mon</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-ital">Italian 7am</span> → <span class="label l-diss">Thesis 2hr</span></td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-work">9-5</span></td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles</td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Tue</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-gym">Gym</span></td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-work">9-5</span></td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles + <span class="label l-diss">Thesis</span></td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Wed</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-gym">Gym</span></td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-work">9-5</span></td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles</td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Thu</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-gym">Gym</span></td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-work">9-5</span></td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles + <span class="label l-diss">Thesis</span></td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Fri</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-ital">Italian 7am</span> → <span class="label l-diss">Thesis 2hr</span></td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-work">9-5</span></td><td style="padding:4px;border:1px solid var(--border)">Free / <span class="label l-social">Social</span></td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Sat</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-gym">Gym</span> + <span class="label l-diss">Thesis 3hr</span></td><td style="padding:4px;border:1px solid var(--border)">—</td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles + <span class="label l-social">Social</span></td></tr>
+<tr><td style="padding:4px;border:1px solid var(--border);font-weight:600">Sun</td><td style="padding:4px;border:1px solid var(--border)"><span class="label l-gym">Gym</span> + <span class="label l-diss">Thesis 3hr</span></td><td style="padding:4px;border:1px solid var(--border)">—</td><td style="padding:4px;border:1px solid var(--border)">Anki + Articles + Weekly Review</td></tr>
+</tbody></table></div></div>
+<div class="card"><h3>🔍 Weekly Review</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">Complete all prompts to unlock next week's planning.</p>
+<div class="rprompt"><label>What went well this week?</label><textarea id="wr-well" class="fin"></textarea></div>
+<div class="rprompt"><label>What didn't go as planned?</label><textarea id="wr-bad" class="fin"></textarea></div>
+<div class="rprompt"><label>What's the #1 thing to improve next week?</label><textarea id="wr-imp" class="fin"></textarea></div>
+<div class="rprompt"><label>Push Goal result — did you complete it? Evidence:</label><textarea id="wr-push" class="fin"></textarea></div>
+<button class="btn btn-p mt8" onclick="submitWR()">Submit Weekly Review</button>
+<div id="wr-res" class="mt8" style="display:none"></div>
+</div>
+</div>
+
+<!-- HABITS -->
+<div class="tab" id="tab-habits">
+<h1>🔥 Habit Tracker</h1>
+<div id="habit-grids"></div>
+<div class="card"><h3>🛡 Failure Mode If-Thens</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Pre-register what you'll do when things go wrong.</p><div id="ifthen-list"></div><div class="flex mt8"><input class="fin flex-1" id="ift-in" placeholder="If I miss [X], then I will [Y]..." onkeydown="if(event.key==='Enter')addIFT()"><button class="btn btn-s" onclick="addIFT()">Add</button></div></div>
+</div>
+
+<!-- DISSERTATION -->
+<div class="tab" id="tab-dissertation">
+<h1>📝 Dissertation</h1>
+<div class="card"><h3>📊 Overall Progress</h3><div class="pbar"><div class="pfill" id="diss-pbar" style="width:0%"></div></div><p style="font-size:12px;color:var(--muted)" id="diss-total">0 / 0 words</p></div>
+<div class="card"><h3>📑 Chapter Outline</h3><div id="ch-list"></div><div class="flex mt8"><input class="fin" id="ch-name" placeholder="Chapter/section name" style="width:200px"><input type="number" class="fin" id="ch-target" placeholder="Target words" style="width:120px"><button class="btn btn-s" onclick="addCh()">Add Chapter</button></div></div>
+<div class="card"><h3>⏱ Deep Work Timer</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">90-min blocks with forced break. Pauses when tab is hidden. Only logged time counts.</p>
+<div class="timer-d" id="diss-timer">00:00:00</div>
+<p style="text-align:center;font-size:12px;color:var(--muted)" id="diss-timer-status">Ready</p>
+<div class="timer-c mt8">
+<button class="pri" id="diss-start" onclick="dissTimer('start')">▶ Start 90min</button>
+<button id="diss-5min" onclick="dissTimer('5min')">Just 5 Minutes</button>
+<button class="dan" id="diss-stop" onclick="dissTimer('stop')" disabled>⏹ Stop & Log</button>
+</div>
+<div class="mt8"><select class="fin" id="diss-ch-sel"><option value="">Working on...</option></select></div>
+</div>
+<div class="card"><h3>📋 Session Log</h3><div id="diss-log" style="max-height:300px;overflow-y:auto"></div></div>
+</div>
+
+<!-- INBOX -->
+<div class="tab" id="tab-inbox">
+<h1>📥 Inbox</h1>
+<div class="card"><h3>Capture</h3><div class="iinput"><input id="inbox-in" placeholder="Add task, thought, or idea..." onkeydown="if(event.key==='Enter')addInbox()"><button onclick="addInbox()">Add</button></div></div>
+<div class="card"><h3>Unsorted</h3><div id="inbox-unsorted"></div></div>
+<div class="card"><h3>Scheduled</h3><div id="inbox-scheduled"></div></div>
+<div class="card"><h3>Someday/Maybe</h3><div id="inbox-someday"></div></div>
+</div>
+
+<!-- FOCUS -->
+<div class="tab" id="tab-focus">
+<h1>🔒 Focus Mode</h1>
+<div class="card"><h3>⏱ Focus Timer</h3>
+<div class="timer-d" id="focus-timer">25:00</div>
+<p style="text-align:center;font-size:12px;color:var(--muted)" id="focus-status">Pomodoro — 25 min</p>
+<div class="timer-c mt8">
+<button class="pri" onclick="focusTimer('start')">▶ Start</button>
+<button onclick="focusTimer('pause')">⏸ Pause</button>
+<button class="dan" onclick="focusTimer('reset')">↺ Reset</button>
+</div>
+<div class="flex mt8" style="justify-content:center"><button class="btn btn-s" onclick="setFocus(25)">25min</button><button class="btn btn-s" onclick="setFocus(50)">50min</button><button class="btn btn-s" onclick="setFocus(90)">90min</button></div>
+</div>
+<div class="card"><h3>📵 Distraction Log</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Each time you catch yourself getting distracted, log it here. Awareness is the first step.</p><div id="distraction-log"></div><div class="flex mt8"><input class="fin flex-1" id="dist-in" placeholder="What distracted you?" onkeydown="if(event.key==='Enter')addDist()"><button class="btn btn-s" onclick="addDist()">Log</button></div></div>
+<div class="card"><h3>🧠 Energy Level</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Track your energy to learn your peak hours.</p>
+<div class="flex"><select class="fin" id="energy-level" style="width:120px"><option value="5">🔥 Peak</option><option value="4">⚡ High</option><option value="3" selected>😐 Medium</option><option value="2">😴 Low</option><option value="1">💀 Drained</option></select><button class="btn btn-s" onclick="logEnergy()">Log Now</button></div>
+<div id="energy-log" class="mt8" style="font-size:12px"></div></div>
+</div>
+
+<!-- CLAUDE -->
+<div class="tab" id="tab-claude">
+<h1>🤖 Claude Integration</h1>
+<div class="apikey"><b>Anthropic API Key</b> (stored locally only, never sent anywhere except Anthropic)<input type="password" id="api-key" placeholder="sk-ant-..." onchange="saveKey()"></div>
+<div class="card"><h3>💬 Chat</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">Claude has context about your habits, goals, and progress.</p>
+<div class="chatc"><div class="chatm" id="chat-msgs"></div><div class="chatia"><input id="chat-in" placeholder="Ask Claude anything..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">Send</button></div></div></div>
+<div class="card"><h3>📝 Italian Corrections</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Results from your daily reflection submissions appear here.</p><div id="corrections-area" style="max-height:400px;overflow-y:auto"><p style="color:var(--muted);font-size:13px;font-style:italic">No corrections yet. Submit your daily Italian reflection from the Today tab.</p></div></div>
+<div class="card"><h3>🃏 Generated Anki Cards</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Cards follow your C2 ruleset. Copy or download.</p><div id="anki-area"><p style="color:var(--muted);font-size:13px;font-style:italic">No cards generated yet.</p></div><div class="flex mt8"><button class="btn btn-s" onclick="copyAnki()">📋 Copy All Cards</button><button class="btn btn-s" onclick="dlAnki()">⬇ Download .txt</button></div></div>
+</div>
+
+<!-- LOG -->
+<div class="tab" id="tab-log">
+<h1>📋 Activity Log</h1>
+<div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
+<div class="card"><h3>📖 Confession / Note</h3><div class="flex"><textarea class="fin flex-1" id="confess-in" placeholder="Honest note to future self..." rows="2"></textarea><button class="btn btn-s" onclick="addConfession()">Log</button></div></div>
+<div id="log-entries" style="max-height:500px;overflow-y:auto"></div>
+<div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
+</div>
+
+<!-- Firebase SDK (compat for simple script-tag usage) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="firebase-sync.js"></script>
+<script src="app.js"></script>
+<script>
+// Initialize Firebase Sync after app loads
+FirebaseSync.init();
+
+// Show disconnect button if already connected
+if (FirebaseSync.isConnected()) {
+  document.getElementById('sync-disc').style.display = '';
+  document.getElementById('sync-pass').style.display = 'none';
+  document.querySelector('.sync-bar .btn-sync').style.display = 'none';
+}
+
+function doSync() {
+  const p = document.getElementById('sync-pass').value.trim();
+  if (!p || p.length < 4) { alert('Passphrase must be at least 4 characters'); return; }
+  FirebaseSync.connect(p).then(ok => {
+    if (ok) {
+      document.getElementById('sync-disc').style.display = '';
+      document.getElementById('sync-pass').style.display = 'none';
+      document.querySelector('.sync-bar .btn-sync').style.display = 'none';
+    }
+  });
+}
+
+function doDisconnect() {
+  if (confirm('Disconnect sync? Data stays on this device but stops syncing.')) {
+    FirebaseSync.disconnect();
+    document.getElementById('sync-disc').style.display = 'none';
+    document.getElementById('sync-pass').style.display = '';
+    document.getElementById('sync-pass').value = '';
+    document.querySelector('.sync-bar .btn-sync').style.display = '';
+  }
+}
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW reg failed:', e));
+}
+</script>
+</body>
+</html>
