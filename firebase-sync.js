@@ -171,11 +171,12 @@ const FirebaseSync = (() => {
         if (k === 'sync_passphrase' || k === '_lastSync') continue;
         data[k] = localStorage.getItem(k);
       }
-      // Fingerprint check — skip push if data unchanged
-      const fingerprint = JSON.stringify(data);
+      // Fingerprint check — sort keys for stable comparison, skip if unchanged
+      const sortedKeys = Object.keys(data).sort();
+      const fingerprint = sortedKeys.map(k => k + '=' + data[k]).join('\n');
       if (fingerprint === _lastPushFingerprint) return;  // nothing changed
       
-      setStatus('syncing');
+      // Don't flash "Syncing..." for background saves — keep status as-is
       const ts = Date.now();
       data._lastSync = ts;
       _lastPushTs = ts;
