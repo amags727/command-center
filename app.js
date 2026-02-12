@@ -858,16 +858,35 @@ function saveCardSettings() {
   document.getElementById('cards-review-cap').textContent = v * 10;
   renderCards();
 }
+function getAnkiDailyTarget() {
+  // Snapshot: compute once per day, then store so it doesn't shrink as you review
+  const key = 'anki_target_' + today();
+  const cached = localStorage.getItem(key);
+  if (cached) return parseInt(cached);
+  const d = getCards(), now = todayDayNum();
+  const settings = d.cardSettings || { newPerDay: 20 };
+  const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
+  const newLimit = settings.newPerDay + dailyBonus;
+  const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0).length;
+  const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
+  const target = dueReviews + availableNew;
+  if (d.cards.length > 0) localStorage.setItem(key, target);
+  return target;
+}
+
 function updateAnkiHabitFromCards(totalReviewedToday) {
   // Auto-update the Anki habit based on cards studied today
   const dd = dayData(today());
   const day = dd.days[today()];
-  // Update the displayed count
+  const target = getAnkiDailyTarget();
+  // Update the displayed count and target
   const ctEl = document.getElementById('anki-ct');
   if (ctEl) ctEl.textContent = totalReviewedToday;
-  // Auto-check/uncheck habit
+  const tgtEl = document.getElementById('anki-target');
+  if (tgtEl) tgtEl.textContent = target;
+  // Auto-check/uncheck habit: done when all due cards are completed
   const chk = document.getElementById('h-anki');
-  if (totalReviewedToday >= 300) {
+  if (target > 0 && totalReviewedToday >= target) {
     if (chk) chk.checked = true;
     day.habits.anki = true;
     day.habits.ankiCount = totalReviewedToday;
