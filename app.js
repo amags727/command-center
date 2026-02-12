@@ -640,6 +640,10 @@ function rateCard(quality) {
     studyQueue.push(updated);
   }
   studyIdx++;
+  // Live-update the reviewed-today counter
+  const reviewedNow = getTotalReviewedToday();
+  document.getElementById('cards-reviewed-today').textContent = reviewedNow;
+  updateAnkiHabitFromCards(reviewedNow);
   showStudyCard();
 }
 
