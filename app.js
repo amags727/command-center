@@ -149,12 +149,15 @@ function renderCal() {
   const isToday = vd === today();
   const totalH = CAL.END_HOUR - CAL.START_HOUR;
   const totalPx = totalH * CAL.PX_PER_HOUR;
-  // Date nav header
-  let html = '<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 0;font-size:14px">';
-  html += '<button class="btn" style="padding:3px 10px;font-size:16px" onclick="calSetDate(-1)">‹</button>';
-  html += '<span style="font-weight:600;cursor:pointer' + (isToday ? '' : ';color:var(--blue)') + '" onclick="calGoToday()">📅 ' + dayNames[vDate.getDay()] + ', ' + monNames[vDate.getMonth()] + ' ' + vDate.getDate() + (isToday ? ' (today)' : '') + '</span>';
-  html += '<button class="btn" style="padding:3px 10px;font-size:16px" onclick="calSetDate(1)">›</button>';
+  const collapsed = CAL._collapsed || false;
+  // Date nav header — collapsible
+  let html = '<div class="cal-header" onclick="calToggleCollapse(event)">';
+  html += '<button class="btn" style="padding:3px 10px;font-size:16px" onclick="event.stopPropagation();calSetDate(-1)">‹</button>';
+  html += '<span style="font-weight:600' + (isToday ? '' : ';color:var(--blue)') + '">📅 ' + dayNames[vDate.getDay()] + ', ' + monNames[vDate.getMonth()] + ' ' + vDate.getDate() + (isToday ? ' (today)' : '') + '</span>';
+  html += '<button class="btn" style="padding:3px 10px;font-size:16px" onclick="event.stopPropagation();calSetDate(1)">›</button>';
+  html += '<span class="cal-toggle' + (collapsed ? ' collapsed' : '') + '">▼</span>';
   html += '</div>';
+  html += '<div class="cal-body' + (collapsed ? ' collapsed' : '') + '" id="cal-body" style="max-height:' + (collapsed ? '0' : (Math.min(totalPx + 20, 340) + 60) + 'px') + '">';
   html += '<div class="cal-wrap" id="cal-wrap" style="height:' + Math.min(totalPx + 20, 340) + 'px">';
   // Hour lines + labels
   for (let h = CAL.START_HOUR; h <= CAL.END_HOUR; h++) {
@@ -184,6 +187,7 @@ function renderCal() {
     html += '<div class="cal-now-line" id="cal-now" style="top:' + calMinToY(nowMin) + 'px"></div>';
   }
   html += '</div>'; // cal-wrap
+  html += '</div>'; // cal-body
   container.innerHTML = html;
   // Scroll to now or 8am
   const wrap = document.getElementById('cal-wrap');
@@ -251,6 +255,101 @@ function calBindEvents() {
       const block = effective.find(b => (b.id || b.recurId) === id);
       if (block) calShowPopover(block, block.startMin, block.endMin, e);
     });
+  });
+  // Touch events for mobile
+  calBindTouchEvents();
+}
+
+function calToggleCollapse(event) {
+  // Don't collapse when clicking nav buttons
+  if (event.target.tagName === 'BUTTON') return;
+  CAL._collapsed = !CAL._collapsed;
+  renderCal();
+}
+
+function calTouchY(e) {
+  return e.touches ? e.touches[0].clientY : e.clientY;
+}
+
+function calBindTouchEvents() {
+  const grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  let touchStart = null, touchPreview = null, touchMoved = false;
+  let touchDragBlock = null, touchDragStartY = 0, touchDragOrigTop = 0;
+
+  grid.addEventListener('touchstart', function(e) {
+    const blockEl = e.target.closest('.cal-block');
+    if (blockEl) {
+      // Touch on existing block — start drag
+      const id = blockEl.dataset.id;
+      const { effective } = getCalBlocks(calViewDate());
+      const block = effective.find(b => (b.id || b.recurId) === id);
+      if (!block) return;
+      touchDragBlock = { el: blockEl, block, startY: calTouchY(e), origTop: parseInt(blockEl.style.top) };
+      touchMoved = false;
+      return;
+    }
+    // Touch on empty grid — start creating block
+    const rect = grid.getBoundingClientRect();
+    const y = calTouchY(e) - rect.top;
+    touchStart = calYToMin(y);
+    touchPreview = document.createElement('div');
+    touchPreview.className = 'cal-drag-preview';
+    touchPreview.style.top = calMinToY(touchStart) + 'px';
+    touchPreview.style.height = (CAL.SNAP_MIN * CAL.PX_PER_HOUR / 60) + 'px';
+    grid.appendChild(touchPreview);
+    touchMoved = false;
+  }, { passive: true });
+
+  grid.addEventListener('touchmove', function(e) {
+    touchMoved = true;
+    if (touchDragBlock) {
+      e.preventDefault();
+      const dy = calTouchY(e) - touchDragBlock.startY;
+      touchDragBlock.el.style.top = (touchDragBlock.origTop + dy) + 'px';
+      touchDragBlock.el.style.opacity = '0.7';
+      return;
+    }
+    if (touchStart !== null && touchPreview) {
+      const rect = grid.getBoundingClientRect();
+      const y = calTouchY(e) - rect.top;
+      const curMin = calYToMin(y);
+      const top = Math.min(touchStart, curMin), bot = Math.max(touchStart, curMin) + CAL.SNAP_MIN;
+      touchPreview.style.top = calMinToY(top) + 'px';
+      touchPreview.style.height = Math.max(CAL.SNAP_MIN * CAL.PX_PER_HOUR / 60, calMinToY(bot) - calMinToY(top)) + 'px';
+    }
+  }, { passive: false });
+
+  grid.addEventListener('touchend', function(e) {
+    if (touchDragBlock) {
+      const el = touchDragBlock.el, block = touchDragBlock.block;
+      el.style.opacity = '';
+      if (touchMoved) {
+        const newStart = calYToMin(parseInt(el.style.top));
+        const duration = block.endMin - block.startMin;
+        calUpdateBlock(block, { startMin: newStart, endMin: newStart + duration });
+      } else {
+        // Tap on block — show popover
+        calShowPopover(block, block.startMin, block.endMin, { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY });
+      }
+      touchDragBlock = null;
+      return;
+    }
+    if (touchStart !== null && touchPreview) {
+      if (touchMoved) {
+        const rect = grid.getBoundingClientRect();
+        const y = e.changedTouches[0].clientY - rect.top;
+        const endMin = calYToMin(y);
+        const startMin = Math.min(touchStart, endMin), finalEnd = Math.max(touchStart, endMin) + CAL.SNAP_MIN;
+        if (finalEnd - startMin >= CAL.SNAP_MIN) {
+          calShowPopover(null, startMin, finalEnd, { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY });
+        }
+      } else {
+        // Simple tap on empty area — create 30-min block
+        calShowPopover(null, touchStart, touchStart + 30, { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY });
+      }
+      touchPreview.remove(); touchPreview = null; touchStart = null;
+    }
   });
 }
 
