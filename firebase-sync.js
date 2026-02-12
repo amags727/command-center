@@ -19,6 +19,7 @@ const FirebaseSync = (() => {
   let statusEl = null;
   let listening = false;
   let _importing = false;  // guard: true while importing remote data (suppresses push-back)
+  let _importCooldown = 0; // timestamp: suppress pushes until this time
   let _lastPushTs = 0;     // track last push timestamp to ignore self-triggered listener
 
   // SHA-256 hash
@@ -104,6 +105,8 @@ const FirebaseSync = (() => {
           // Reload UI
           if (typeof loadAll === 'function') loadAll();
           _importing = false;
+          clearTimeout(debounceTimer);  // cancel any push queued during import
+          _importCooldown = Date.now() + 2000;  // suppress pushes for 2s after import
         } else {
           // Local is newer — push to remote
           pushAll();
@@ -136,6 +139,8 @@ const FirebaseSync = (() => {
             localStorage.setItem('_lastSync', String(remoteTs));
             if (typeof loadAll === 'function') loadAll();
             _importing = false;
+            clearTimeout(debounceTimer);  // cancel any push queued during import
+            _importCooldown = Date.now() + 2000;  // suppress pushes for 2s after import
           }
           setStatus(navigator.onLine ? 'synced' : 'offline');
         });
@@ -152,10 +157,12 @@ const FirebaseSync = (() => {
 
   function pushAll() {
     if (!syncEnabled || !db || !userPath || _importing) return;
+    if (Date.now() < _importCooldown) return;  // still in post-import cooldown
     
     // Debounce — don't push more than once per second
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
+      if (Date.now() < _importCooldown || _importing) return;  // re-check at fire time
       setStatus('syncing');
       const data = {};
       const ts = Date.now();
