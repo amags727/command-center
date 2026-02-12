@@ -71,6 +71,9 @@ function initToday() {
     document.getElementById('pg-countdown').textContent = Math.max(0, Math.ceil((endOfWeek - new Date()) / 86400000)) + ' days left this week';
   }
   if (day.sealed) lockToday();
+  // Populate Anki count/target from cards data
+  const totalReviewed = getTotalReviewedToday();
+  updateAnkiHabitFromCards(totalReviewed);
 }
 
 function lockToday() {
