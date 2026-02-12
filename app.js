@@ -1283,24 +1283,71 @@ async function trFetchURL() {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const status = document.getElementById('tr-status');
-  status.textContent = '⏳ Fetching article via Claude...';
+  status.textContent = '⏳ Fetching article...';
   try {
-    const prompt = `The user wants to read this Italian article: ${url}
-
-Since you cannot fetch URLs, please ask the user to paste the article text. However, if you recognize this as a well-known source, provide any context you can about it.
-
-Actually, let me reframe: The user will paste text separately. For now, please respond with:
-"Please paste the article text in the 'paste text directly' section below, and I'll translate it for you."`;
-    status.textContent = '⚠️ Cannot fetch URLs directly. Please paste the article text using the "Or paste text directly" section below.';
-    document.querySelector('#tab-translate details').open = true;
+    // Try multiple CORS proxies in order
+    const proxies = [
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      'https://corsproxy.io/?' + encodeURIComponent(url),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url)
+    ];
+    let html = null;
+    for (const proxyUrl of proxies) {
+      try {
+        status.textContent = '⏳ Fetching article...';
+        const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+        if (resp.ok) { html = await resp.text(); break; }
+      } catch (e) { continue; }
+    }
+    if (!html) {
+      status.textContent = '⚠️ Could not fetch URL (CORS blocked). Paste the article text below instead.';
+      document.querySelector('#tab-translate details').open = true;
+      return;
+    }
+    // Extract article text from HTML
+    status.textContent = '⏳ Extracting article text...';
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    // Remove scripts, styles, nav, footer, ads
+    doc.querySelectorAll('script,style,nav,footer,header,aside,iframe,.ad,.ads,.sidebar,.menu,.nav,.cookie,.banner,figure,figcaption').forEach(el => el.remove());
+    // Try common article selectors
+    let articleEl = doc.querySelector('article') || doc.querySelector('[role="main"]') || doc.querySelector('.post-content') || doc.querySelector('.article-body') || doc.querySelector('.entry-content') || doc.querySelector('.story-body') || doc.querySelector('main');
+    let text = '';
+    if (articleEl) {
+      // Get paragraphs from article element
+      const paras = articleEl.querySelectorAll('p, h1, h2, h3, blockquote');
+      text = Array.from(paras).map(p => p.textContent.trim()).filter(t => t.length > 20).join('\n\n');
+    }
+    if (!text || text.length < 100) {
+      // Fallback: get all paragraphs from body
+      const allParas = doc.querySelectorAll('p');
+      text = Array.from(allParas).map(p => p.textContent.trim()).filter(t => t.length > 30).join('\n\n');
+    }
+    if (!text || text.length < 50) {
+      status.textContent = '⚠️ Could not extract article text. Paste it manually below.';
+      document.querySelector('#tab-translate details').open = true;
+      return;
+    }
+    // Try to get title
+    const titleEl = doc.querySelector('h1') || doc.querySelector('title');
+    const title = titleEl ? titleEl.textContent.trim() : '';
+    status.textContent = '✅ Fetched! ' + text.split(/\s+/).length + ' words extracted. Sending to Claude...';
+    // Put text in the raw textarea for reference
+    document.getElementById('tr-raw').value = text;
+    // Now translate it
+    await trTranslateText(text, title);
   } catch (e) {
-    status.textContent = '❌ Error: ' + e.message;
+    status.textContent = '❌ Fetch error: ' + e.message + '. Try pasting the text below.';
+    document.querySelector('#tab-translate details').open = true;
   }
 }
 
 async function trTranslateRaw() {
   const raw = document.getElementById('tr-raw').value.trim();
   if (!raw || raw.length < 50) { alert('Paste at least a paragraph of Italian text.'); return; }
+  await trTranslateText(raw);
+}
+
+async function trTranslateText(raw, fetchedTitle) {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const status = document.getElementById('tr-status');
