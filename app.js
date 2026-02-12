@@ -1533,6 +1533,11 @@ async function trSubmitReflection(num) {
     const thoughtsEl = document.getElementById('art' + num + '-th');
     if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     if (thoughtsEl) thoughtsEl.value = txt;
+    // Update Italian Work checkmarks on Today tab
+    const chk = document.getElementById('h-art' + num);
+    if (chk) chk.checked = true;
+    const st = document.getElementById('art' + num + '-status');
+    if (st) st.textContent = '✅ ' + title;
     // Log to reading history
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
