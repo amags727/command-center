@@ -1391,8 +1391,12 @@ ${raw}`;
     ).join('');
     document.getElementById('tr-result-card').style.display = 'block';
     trArticleCards = [];
-    document.getElementById('tr-cards-card').style.display = 'none';
-    status.textContent = '✅ Translation complete! Select Italian words to create flashcards.';
+    trCollectedWords = [];
+    const collCard = document.getElementById('tr-collected-card');
+    if (collCard) collCard.style.display = 'none';
+    const reflCard = document.getElementById('tr-reflection-card');
+    if (reflCard) reflCard.style.display = 'none';
+    status.textContent = '✅ Translation complete! Highlight Italian words to collect them for flashcards.';
     // Store current article data for logging
     CAL._currentArticle = { title: data.title, difficulty: data.difficulty, text: raw.slice(0, 200) };
     // Bind text selection for card creation
@@ -1402,6 +1406,8 @@ ${raw}`;
     status.textContent = '❌ Error: ' + e.message;
   }
 }
+
+let trCollectedWords = [];
 
 function trBindSelection() {
   const tbody = document.getElementById('tr-tbody');
@@ -1416,79 +1422,129 @@ function trHandleSelection(e) {
   const sel = window.getSelection();
   const text = sel.toString().trim();
   if (!text || text.length < 2 || text.length > 100) return;
-  // Show popup to create card
-  trShowCardPopup(text, e);
+  // Add to collected words (no popup — just collect)
+  if (trCollectedWords.some(w => w.toLowerCase() === text.toLowerCase())) return; // skip dupes
+  trCollectedWords.push(text);
+  trRenderCollected();
+  // Brief visual feedback
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.style.cssText = 'background:var(--ol);border-radius:2px;padding:0 2px;transition:background .5s';
+  range.surroundContents(span);
+  sel.removeAllRanges();
 }
 
-function trShowCardPopup(word, evt) {
-  // Remove existing popup
-  document.querySelectorAll('.tr-sel-popup').forEach(p => p.remove());
-  const popup = document.createElement('div');
-  popup.className = 'tr-sel-popup';
-  popup.innerHTML = '<p style="font-weight:600;margin-bottom:6px">🃏 Create card from:</p>' +
-    '<p style="font-size:15px;margin-bottom:8px;color:var(--orange)">"' + escHtml(word) + '"</p>' +
-    '<label style="font-size:11px;color:var(--muted)">English meaning:</label>' +
-    '<input id="tr-card-back" placeholder="Translation / meaning...">' +
-    '<div class="flex mt8"><button class="btn btn-p" onclick="trAddCard()">Add Card</button>' +
-    '<button class="btn btn-s" onclick="trAutoCard(\'' + escHtml(word).replace(/'/g, "\\'") + '\')">🤖 Auto-translate</button>' +
-    '<button class="btn" onclick="this.closest(\'.tr-sel-popup\').remove()">Cancel</button></div>';
-  popup.style.left = Math.min(evt.clientX || evt.changedTouches[0].clientX, window.innerWidth - 300) + 'px';
-  popup.style.top = Math.min((evt.clientY || evt.changedTouches[0].clientY) + 10, window.innerHeight - 200) + 'px';
-  popup.dataset.front = word;
-  document.body.appendChild(popup);
-  document.getElementById('tr-card-back').focus();
-  document.getElementById('tr-card-back').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') trAddCard();
-  });
+function trRenderCollected() {
+  const card = document.getElementById('tr-collected-card');
+  const list = document.getElementById('tr-collected-list');
+  const ct = document.getElementById('tr-coll-ct');
+  if (!card || !list) return;
+  card.style.display = trCollectedWords.length > 0 ? 'block' : 'none';
+  // Also show reflection card when words are collected
+  const reflCard = document.getElementById('tr-reflection-card');
+  if (reflCard) reflCard.style.display = trCollectedWords.length > 0 ? 'block' : 'none';
+  ct.textContent = trCollectedWords.length;
+  list.innerHTML = trCollectedWords.map((w, i) =>
+    '<div class="tr-card-item"><span class="front" style="flex:1">' + escHtml(w) + '</span>' +
+    '<button class="btn" style="font-size:11px;padding:2px 6px;color:var(--red);border-color:var(--red)" onclick="trRemoveWord(' + i + ')">✕</button></div>'
+  ).join('');
 }
 
-async function trAutoCard(word) {
+function trRemoveWord(i) {
+  trCollectedWords.splice(i, 1);
+  trRenderCollected();
+}
+
+function trClearCollected() {
+  if (trCollectedWords.length && !confirm('Clear all ' + trCollectedWords.length + ' collected words?')) return;
+  trCollectedWords = [];
+  trRenderCollected();
+  document.getElementById('tr-created-cards').style.display = 'none';
+}
+
+async function trSubmitWords() {
+  if (!trCollectedWords.length) { alert('Highlight some Italian words first.'); return; }
   const key = localStorage.getItem('cc_apikey');
-  if (!key) { alert('Set API key in Claude tab.'); return; }
-  const backInput = document.getElementById('tr-card-back');
-  if (backInput) backInput.value = '⏳ Translating...';
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const status = document.getElementById('tr-words-status');
+  status.textContent = '⏳ Translating ' + trCollectedWords.length + ' words with Claude...';
   try {
-    const resp = await callClaude(key, 'Translate this Italian word/phrase to English. Give ONLY the translation, nothing else: "' + word + '"');
-    if (backInput) backInput.value = resp.trim();
+    const prompt = 'Translate each Italian word/phrase to English. Return ONLY a JSON array of objects with "it" and "en" fields.\n\nWords:\n' +
+      trCollectedWords.map(w => '- ' + w).join('\n');
+    const resp = await callClaude(key, prompt);
+    let translations;
+    try {
+      const jsonMatch = resp.match(/\[[\s\S]*\]/);
+      translations = JSON.parse(jsonMatch ? jsonMatch[0] : resp);
+    } catch {
+      // Fallback: one translation per line
+      const lines = resp.split('\n').filter(l => l.trim());
+      translations = trCollectedWords.map((w, i) => ({ it: w, en: lines[i] || '...' }));
+    }
+    // Create cards
+    trArticleCards = [];
+    translations.forEach(t => {
+      const front = t.it || t.front || '';
+      const back = t.en || t.back || '';
+      if (front && back) {
+        addCard(front, back, 'reading');
+        trArticleCards.push({ front, back });
+      }
+    });
+    status.textContent = '✅ Created ' + trArticleCards.length + ' flashcards!';
+    // Show created cards
+    const createdDiv = document.getElementById('tr-created-cards');
+    const createdList = document.getElementById('tr-created-list');
+    if (createdDiv && createdList) {
+      createdDiv.style.display = 'block';
+      createdList.innerHTML = trArticleCards.map(c =>
+        '<div class="tr-card-item"><span class="front">' + escHtml(c.front) + '</span><span class="back">' + escHtml(c.back) + '</span></div>'
+      ).join('');
+    }
+    addLog('action', 'Created ' + trArticleCards.length + ' cards from reading');
   } catch (e) {
-    if (backInput) backInput.value = '(error)';
+    status.textContent = '❌ Error: ' + e.message;
   }
 }
 
-function trAddCard() {
-  const popup = document.querySelector('.tr-sel-popup');
-  if (!popup) return;
-  const front = popup.dataset.front;
-  const back = document.getElementById('tr-card-back').value.trim();
-  if (!front || !back) { alert('Enter a translation.'); return; }
-  // Add to flashcard deck
-  addCard(front, back, 'reading');
-  trArticleCards.push({ front, back });
-  popup.remove();
-  // Show cards created section
-  document.getElementById('tr-cards-card').style.display = 'block';
-  document.getElementById('tr-cards-list').innerHTML = trArticleCards.map(c =>
-    '<div class="tr-card-item"><span class="front">' + escHtml(c.front) + '</span><span class="back">' + escHtml(c.back) + '</span></div>'
-  ).join('');
-  document.getElementById('tr-cards-ct').textContent = trArticleCards.length + ' card(s) created from this article';
+function trUpdReflWC() {
+  const txt = document.getElementById('tr-refl-txt').value.trim();
+  const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
+  const el = document.getElementById('tr-refl-wc');
+  el.textContent = wc + ' / 50 words';
+  el.className = 'wc' + (wc < 50 ? ' bad' : '');
 }
 
-function trMarkAsArticle(num) {
+async function trSubmitReflection(num) {
+  const txt = document.getElementById('tr-refl-txt').value.trim();
+  const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
+  if (wc < 50) { alert('Write at least 50 words in Italian.'); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const article = CAL._currentArticle || {};
   const title = article.title || document.getElementById('tr-title').textContent || 'Untitled';
-  // Fill in the article habit on Today tab
-  const titleEl = document.getElementById('art' + num + '-t');
-  const thoughtsEl = document.getElementById('art' + num + '-th');
-  if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
-  if (thoughtsEl && !thoughtsEl.value) thoughtsEl.value = 'Read and translated via Reading tab. ' + trArticleCards.length + ' cards created.';
-  // Log to reading history
-  const d = load();
-  if (!d.readingHistory) d.readingHistory = [];
-  d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: trArticleCards.length });
-  save(d);
-  renderTranslate();
-  addLog('action', 'Article ' + num + ' logged: ' + title);
-  alert('✅ Logged as Article ' + num + '! Go to Today tab to mark the habit complete.');
+  const status = document.getElementById('tr-refl-status');
+  status.textContent = '⏳ Sending reflection to Claude for feedback...';
+  try {
+    const prompt = `The student read an Italian article titled "${title}" and wrote this reflection in Italian:\n\n"${txt}"\n\nPlease:\n1. Correct any grammar/spelling errors (show original → corrected)\n2. Give 2-3 suggestions to improve naturalness\n3. Rate their Italian level (A2/B1/B2/C1/C2)\n4. Give a brief encouraging comment\n\nFormat your response clearly with headers.`;
+    const resp = await callClaude(key, prompt);
+    document.getElementById('tr-refl-result').style.display = 'block';
+    document.getElementById('tr-refl-feedback').innerHTML = resp.replace(/\n/g, '<br>');
+    // Log as article on Today tab
+    const titleEl = document.getElementById('art' + num + '-t');
+    const thoughtsEl = document.getElementById('art' + num + '-th');
+    if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+    if (thoughtsEl) thoughtsEl.value = txt;
+    // Log to reading history
+    const d = load();
+    if (!d.readingHistory) d.readingHistory = [];
+    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: trArticleCards.length, reflectionWords: wc });
+    save(d);
+    status.textContent = '✅ Feedback received! Logged as Article ' + num + '.';
+    addLog('action', 'Article ' + num + ' logged with reflection: ' + title);
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
 }
 
 // ============ LOG TAB ============
