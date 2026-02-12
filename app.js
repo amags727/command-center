@@ -44,7 +44,7 @@ function initToday() {
     if (el && day.habits[h]) el.checked = true;
     if (day.sealed) el && (el.disabled = true);
   });
-  if (day.habits.ankiCount) document.getElementById('anki-ct').value = day.habits.ankiCount;
+  if (day.habits.ankiCount) document.getElementById('anki-ct').textContent = day.habits.ankiCount;
   if (day.habits.art1Title) document.getElementById('art1-t').value = day.habits.art1Title;
   if (day.habits.art1Thoughts) document.getElementById('art1-th').value = day.habits.art1Thoughts;
   if (day.habits.art2Title) document.getElementById('art2-t').value = day.habits.art2Title;
@@ -77,7 +77,7 @@ function lockToday() {
 function gateHabit(type) {
   const dd = dayData(today()); const day = dd.days[today()];
   if (type === 'anki') {
-    const ct = parseInt(document.getElementById('anki-ct').value) || 0;
+    const ct = parseInt(document.getElementById('anki-ct').textContent) || 0;
     if (ct < 300) { document.getElementById('anki-w').style.display = 'block'; document.getElementById('h-anki').checked = false; return; }
     document.getElementById('anki-w').style.display = 'none'; day.habits.anki = true; day.habits.ankiCount = ct;
   } else if (type === 'art1' || type === 'art2') {
@@ -391,19 +391,17 @@ function updateAnkiHabitFromCards(totalReviewedToday) {
   // Auto-update the Anki habit based on cards studied today
   const dd = dayData(today());
   const day = dd.days[today()];
-  if (day.sealed) return;
-  // Update the rep count field
+  // Update the displayed count
   const ctEl = document.getElementById('anki-ct');
-  if (ctEl && !ctEl.disabled) ctEl.value = totalReviewedToday;
+  if (ctEl) ctEl.textContent = totalReviewedToday;
   // Auto-check/uncheck habit
   const chk = document.getElementById('h-anki');
   if (totalReviewedToday >= 300) {
-    if (chk && !chk.disabled) chk.checked = true;
+    if (chk) chk.checked = true;
     day.habits.anki = true;
     day.habits.ankiCount = totalReviewedToday;
-    document.getElementById('anki-w').style.display = 'none';
   } else {
-    if (chk && !chk.disabled) chk.checked = false;
+    if (chk) chk.checked = false;
     day.habits.anki = false;
     day.habits.ankiCount = totalReviewedToday;
   }
