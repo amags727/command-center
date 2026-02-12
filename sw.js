@@ -1,4 +1,4 @@
-const CACHE = 'cc-v2';
+const CACHE = 'cc-v3';
 const ASSETS = ['./index.html', './app.js', './firebase-sync.js', './manifest.json'];
 
 self.addEventListener('install', e => {
