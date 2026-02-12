@@ -536,9 +536,18 @@ function bulkImport() {
 }
 
 async function seedAnkiDeck() {
-  if (!confirm('Import 3,663 Anki cards with full scheduling data? This will merge with any existing cards (no duplicates).')) return;
   const btn = document.getElementById('seed-anki-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Importing...'; }
+  if (!btn) return;
+  // Two-click confirmation pattern (no confirm() dialog needed)
+  if (!btn.dataset.ready) {
+    btn.dataset.ready = '1';
+    btn.textContent = '⚠️ Click again to import 3,663 cards';
+    btn.style.background = '#e74c3c'; btn.style.color = '#fff';
+    setTimeout(() => { delete btn.dataset.ready; btn.textContent = '📦 Seed Anki Deck'; btn.style.background = ''; btn.style.color = ''; }, 5000);
+    return;
+  }
+  delete btn.dataset.ready;
+  btn.disabled = true; btn.textContent = '⏳ Importing...'; btn.style.background = ''; btn.style.color = '';
   try {
     const resp = await fetch('anki_cards.json');
     if (!resp.ok) throw new Error('Failed to fetch anki_cards.json: ' + resp.status);
