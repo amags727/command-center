@@ -508,6 +508,9 @@ function renderCards() {
   document.getElementById('cards-learning-ct').textContent = learningCards.length;
   document.getElementById('cards-review-remaining').textContent = availableReviews.length;
 
+  // Count cards reviewed today
+  document.getElementById('cards-reviewed-today').textContent = totalReviewedToday;
+
   // Limit status message
   const statusEl = document.getElementById('cards-limit-status');
   if (totalAvailable === 0 && (allNew.length > 0 || dueReviews.length > 0)) {
