@@ -865,7 +865,7 @@ function getAnkiDailyTarget() {
   // Snapshot: compute once per day, then store so it doesn't shrink as you review
   const key = 'anki_target_' + today();
   const cached = localStorage.getItem(key);
-  if (cached) return parseInt(cached);
+  if (cached !== null && parseInt(cached) > 0) return parseInt(cached);
   const d = getCards(), now = todayDayNum();
   const settings = d.cardSettings || { newPerDay: 20 };
   const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
@@ -873,7 +873,7 @@ function getAnkiDailyTarget() {
   const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0).length;
   const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
   const target = dueReviews + availableNew;
-  if (d.cards.length > 0) localStorage.setItem(key, target);
+  if (d.cards.length > 0 && target > 0) localStorage.setItem(key, target);
   return target;
 }
 
