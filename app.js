@@ -379,8 +379,46 @@ function dlAnki() {
 }
 
 // ============ CARDS TAB (SM-2 Spaced Repetition) ============
-function getCards() { const d = load(); if (!d.cards) d.cards = []; return d; }
+function getCards() { const d = load(); if (!d.cards) d.cards = []; if (!d.cardSettings) d.cardSettings = { newPerDay: 20 }; return d; }
 function todayDayNum() { return Math.floor(Date.now() / 86400000); }
+function saveCardSettings() {
+  const v = parseInt(document.getElementById('cards-new-limit').value) || 20;
+  const d = getCards(); d.cardSettings = { newPerDay: Math.max(1, Math.min(200, v)) }; save(d);
+  document.getElementById('cards-review-cap').textContent = v * 10;
+  renderCards();
+}
+function updateAnkiHabitFromCards(totalReviewedToday) {
+  // Auto-update the Anki habit based on cards studied today
+  const dd = dayData(today());
+  const day = dd.days[today()];
+  if (day.sealed) return;
+  // Update the rep count field
+  const ctEl = document.getElementById('anki-ct');
+  if (ctEl && !ctEl.disabled) ctEl.value = totalReviewedToday;
+  // Auto-check/uncheck habit
+  const chk = document.getElementById('h-anki');
+  if (totalReviewedToday >= 300) {
+    if (chk && !chk.disabled) chk.checked = true;
+    day.habits.anki = true;
+    day.habits.ankiCount = totalReviewedToday;
+    document.getElementById('anki-w').style.display = 'none';
+  } else {
+    if (chk && !chk.disabled) chk.checked = false;
+    day.habits.anki = false;
+    day.habits.ankiCount = totalReviewedToday;
+  }
+  save(dd);
+}
+
+function getNewIntroducedToday() {
+  // Count cards that were new (queue===0) and got their first review today
+  const d = getCards();
+  return d.cards.filter(c => c.queue !== 0 && c.firstReviewDate === today()).length;
+}
+function getTotalReviewedToday() {
+  const d = getCards();
+  return d.cards.filter(c => c.reviewedToday === today()).length;
+}
 
 function sm2(card, quality) {
   // SM-2 algorithm: quality 1=Again, 2=Hard, 3=Good, 4=Easy
@@ -390,6 +428,8 @@ function sm2(card, quality) {
   c.ease = c.ease || 2500; // factor * 1000
   c.ivl = c.ivl || 0;
   c.reviewedToday = today();
+  // Track when a new card gets its first review
+  if (card.queue === 0 && !c.firstReviewDate) c.firstReviewDate = today();
 
   if (quality === 1) { // Again
     c.lapses++; c.reps = 0; c.ivl = 0; c.ease = Math.max(1300, c.ease - 200);
@@ -428,18 +468,74 @@ function getNewCards() { const d = getCards(); return d.cards.filter(c => c.queu
 function renderCards() {
   const d = getCards(), now = todayDayNum();
   // Auto-seed on first visit if deck is empty
+  // BUT skip if sync is configured and initial pull hasn't finished yet
   if (d.cards.length === 0 && !renderCards._seeding) {
+    const syncConfigured = !!localStorage.getItem('sync_passphrase');
+    const pullDone = typeof FirebaseSync !== 'undefined' && FirebaseSync.isInitialPullDone ? FirebaseSync.isInitialPullDone() : true;
+    if (syncConfigured && !pullDone) {
+      // Sync not ready yet — show waiting message, don't auto-seed
+      const el = document.getElementById('cards-limit-status');
+      if (el) { el.innerHTML = '🟡 Waiting for sync...'; el.style.color = 'var(--yellow)'; }
+      return;
+    }
     renderCards._seeding = true;
     seedAnkiDeckAuto();
     return;
   }
-  const due = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
-  const newC = d.cards.filter(c => c.queue === 0);
-  const reviewedToday = d.cards.filter(c => c.reviewedToday === today()).length;
-  document.getElementById('cards-due-ct').textContent = due.length + newC.length;
-  document.getElementById('cards-new-ct').textContent = newC.length;
-  document.getElementById('cards-total-ct').textContent = d.cards.length;
-  document.getElementById('cards-reviewed-ct').textContent = reviewedToday;
+  const settings = d.cardSettings || { newPerDay: 20 };
+  const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
+  const newLimit = settings.newPerDay + dailyBonus;
+  const reviewCap = newLimit * 10;
+
+  // Load setting into UI
+  document.getElementById('cards-new-limit').value = settings.newPerDay;
+  document.getElementById('cards-review-cap').textContent = reviewCap;
+
+  const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
+  const allNew = d.cards.filter(c => c.queue === 0);
+  const newIntroducedToday = getNewIntroducedToday();
+  const totalReviewedToday = getTotalReviewedToday();
+  const newRemaining = Math.max(0, newLimit - newIntroducedToday);
+  const reviewRemaining = Math.max(0, reviewCap - totalReviewedToday);
+
+  // What's actually available this session
+  const availableReviews = dueReviews.slice(0, reviewRemaining);
+  const availableNew = allNew.slice(0, Math.min(newRemaining, Math.max(0, reviewRemaining - availableReviews.length)));
+  const totalAvailable = availableReviews.length + availableNew.length;
+
+  const learningCards = d.cards.filter(c => c.queue === 1 && (c.due || 0) <= now);
+  document.getElementById('cards-new-remaining').textContent = Math.min(newRemaining, allNew.length);
+  document.getElementById('cards-learning-ct').textContent = learningCards.length;
+  document.getElementById('cards-review-remaining').textContent = availableReviews.length;
+
+  // Limit status message
+  const statusEl = document.getElementById('cards-limit-status');
+  if (totalAvailable === 0 && (allNew.length > 0 || dueReviews.length > 0)) {
+    if (totalReviewedToday >= reviewCap) {
+      statusEl.innerHTML = '🎉 <b>Review cap reached!</b> Done for today.';
+    } else if (newIntroducedToday >= newLimit && dueReviews.length === 0) {
+      statusEl.innerHTML = '✅ All reviews done. New card limit reached (' + newLimit + '/' + newLimit + ').';
+    }
+    statusEl.style.color = 'var(--green)';
+  } else if (totalAvailable === 0) {
+    statusEl.innerHTML = '🎉 No cards due!';
+    statusEl.style.color = 'var(--green)';
+  } else {
+    statusEl.innerHTML = '';
+  }
+
+  // Show "Add more" button whenever there are new cards available
+  const addMoreBtn = document.getElementById('cards-add-more-btn');
+  if (allNew.length > 0) {
+    addMoreBtn.style.display = '';
+    addMoreBtn.textContent = '➕ Add ' + Math.min(5, allNew.length) + ' more new cards';
+  } else {
+    addMoreBtn.style.display = 'none';
+  }
+
+  // Auto-update Anki habit based on cards studied today
+  updateAnkiHabitFromCards(totalReviewedToday);
+
   renderPendingCards(); renderCardBrowse();
 }
 
@@ -464,14 +560,46 @@ async function seedAnkiDeckAuto() {
 
 function startStudy() {
   const d = getCards(), now = todayDayNum();
-  // Queue: due reviews first, then new cards (max 20 new per session)
-  const due = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
-  const newC = d.cards.filter(c => c.queue === 0).slice(0, 20);
-  studyQueue = [...due, ...newC];
-  if (studyQueue.length === 0) { alert('No cards due! 🎉'); return; }
+  const settings = d.cardSettings || { newPerDay: 20 };
+  const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
+  const newLimit = settings.newPerDay + dailyBonus;
+  const reviewCap = newLimit * 10;
+  const newIntroducedToday = getNewIntroducedToday();
+  const totalReviewedToday = getTotalReviewedToday();
+  const reviewRemaining = Math.max(0, reviewCap - totalReviewedToday);
+
+  if (reviewRemaining === 0) { alert('Review cap reached (' + reviewCap + ')! You\'re done for today. 🎉'); return; }
+
+  // Due reviews first (respect review cap)
+  const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
+  const newRemaining = Math.max(0, newLimit - newIntroducedToday);
+  const newC = d.cards.filter(c => c.queue === 0).slice(0, newRemaining);
+
+  // Cap total queue to remaining review budget
+  let queue = [...dueReviews, ...newC];
+  if (queue.length > reviewRemaining) queue = queue.slice(0, reviewRemaining);
+
+  if (queue.length === 0) { alert('No cards due! 🎉'); return; }
+  // Shuffle to avoid always starting from the same place
+  for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
+  studyQueue = queue;
   studyIdx = 0; studyFlipped = false;
   document.getElementById('study-area').style.display = 'block';
   showStudyCard();
+}
+
+function addMoreCards() {
+  const d = getCards();
+  const settings = d.cardSettings || { newPerDay: 20 };
+  const bump = 5;
+  // Temporarily increase today's allowance by bumping the setting
+  // We track via a daily override instead
+  if (!d.cardSettings.dailyBonusNew) d.cardSettings.dailyBonusNew = {};
+  const existing = d.cardSettings.dailyBonusNew[today()] || 0;
+  d.cardSettings.dailyBonusNew[today()] = existing + bump;
+  save(d);
+  renderCards();
+  addLog('action', 'Added ' + bump + ' bonus new cards for today');
 }
 
 function showStudyCard() {
@@ -481,7 +609,11 @@ function showStudyCard() {
   document.getElementById('study-back-content').innerHTML = escHtml(card.back);
   document.getElementById('study-back').style.display = 'none';
   document.getElementById('study-hint').style.display = '';
-  document.getElementById('study-progress').textContent = (studyIdx + 1) + ' / ' + studyQueue.length + (card.queue === 0 ? ' (NEW)' : '');
+  const remaining = studyQueue.slice(studyIdx);
+  const newLeft = remaining.filter(c => c.queue === 0).length;
+  const learnLeft = remaining.filter(c => c.queue === 1).length;
+  const revLeft = remaining.length - newLeft - learnLeft;
+  document.getElementById('study-progress').innerHTML = '<span style="color:#3b82f6;font-weight:700">' + newLeft + '</span> + <span style="color:#ef4444;font-weight:700">' + learnLeft + '</span> + <span style="color:#22c55e;font-weight:700">' + revLeft + '</span>';
   document.getElementById('hard-ivl').textContent = previewIvl(card, 2);
   document.getElementById('good-ivl').textContent = previewIvl(card, 3);
   document.getElementById('easy-ivl').textContent = previewIvl(card, 4);

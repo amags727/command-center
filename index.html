@@ -223,11 +223,16 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h1>🃏 Flashcards</h1>
 <div class="card" id="cards-summary">
 <div class="flex" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<div><b id="cards-due-ct">0</b> <span style="color:var(--muted);font-size:13px">due today</span></div>
-<div><b id="cards-new-ct">0</b> <span style="color:var(--muted);font-size:13px">new</span></div>
-<div><b id="cards-total-ct">0</b> <span style="color:var(--muted);font-size:13px">total</span></div>
-<div><b id="cards-reviewed-ct">0</b> <span style="color:var(--muted);font-size:13px">reviewed today</span></div>
+<div><b id="cards-new-remaining" style="color:#3b82f6">0</b> <span style="color:var(--muted);font-size:13px">new</span></div>
+<div><b id="cards-learning-ct" style="color:#ef4444">0</b> <span style="color:var(--muted);font-size:13px">learning</span></div>
+<div><b id="cards-review-remaining" style="color:#22c55e">0</b> <span style="color:var(--muted);font-size:13px">to review</span></div>
+<div style="margin-top:8px;font-size:12px;color:var(--muted)">
+  <label>New/day: <input type="number" id="cards-new-limit" class="fin" style="width:55px;font-size:12px" value="20" min="1" max="200" onchange="saveCardSettings()"></label>
+  <span style="margin-left:8px">Review cap: <b id="cards-review-cap">200</b></span>
+</div>
+<div id="cards-limit-status" style="margin-top:4px;font-size:12px"></div>
 <button class="btn btn-p" onclick="startStudy()">▶ Study Now</button>
+<button class="btn btn-s" id="cards-add-more-btn" style="display:none" onclick="addMoreCards()">➕ Add 5 more new cards</button>
 </div>
 </div>
 

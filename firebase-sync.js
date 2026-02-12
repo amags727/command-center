@@ -22,6 +22,7 @@ const FirebaseSync = (() => {
   let _importCooldown = 0; // timestamp: suppress pushes until this time
   let _lastPushTs = 0;     // track last push timestamp to ignore self-triggered listener
   let _lastPushFingerprint = ''; // fingerprint of last pushed data — skip if unchanged
+  let _initialPullDone = false; // true once the first pull (or no-remote-data) has resolved
 
   // SHA-256 hash
   async function hash(str) {
@@ -66,8 +67,9 @@ const FirebaseSync = (() => {
     // Check saved passphrase
     const saved = localStorage.getItem('sync_passphrase');
     if (saved) {
-      connect(saved);
+      await connect(saved);
     } else {
+      _initialPullDone = true; // no sync configured — safe to proceed
       setStatus('off');
     }
 
@@ -147,13 +149,19 @@ const FirebaseSync = (() => {
         });
       }
 
+      _initialPullDone = true;
       setStatus(navigator.onLine ? 'synced' : 'offline');
       return true;
     } catch (e) {
       console.error('Sync connect error:', e);
+      _initialPullDone = true; // mark done even on error so UI isn't stuck
       setStatus('error');
       return false;
     }
+  }
+
+  function isInitialPullDone() {
+    return _initialPullDone;
   }
 
   function pushAll() {
@@ -209,5 +217,5 @@ const FirebaseSync = (() => {
     if (syncEnabled) pushAll();
   }
 
-  return { init, connect, disconnect, onChange, isConnected, pushAll };
+  return { init, connect, disconnect, onChange, isConnected, isInitialPullDone, pushAll };
 })();
