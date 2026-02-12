@@ -15,7 +15,7 @@ function switchTab(id) {
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   const btns = document.querySelectorAll('.nav button');
-  const names = ['today','week','habits','dissertation','inbox','focus','cards','claude','log'];
+  const names = ['today','week','habits','dissertation','inbox','focus','cards','translate','claude','log'];
   const idx = names.indexOf(id);
   if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
   if (id === 'habits') renderHabits();
@@ -25,6 +25,7 @@ function switchTab(id) {
   if (id === 'inbox') renderInbox();
   if (id === 'focus') renderFocus();
   if (id === 'cards') renderCards();
+  if (id === 'translate') renderTranslate();
   if (id === 'claude') initClaude();
 }
 
@@ -1262,6 +1263,185 @@ function renderCardBrowse() {
 function deleteCard(id) {
   if (!confirm('Delete this card?')) return;
   const d = getCards(); d.cards = d.cards.filter(c => c.id !== id); save(d); renderCardBrowse();
+}
+
+// ============ TRANSLATE TAB ============
+let trArticleCards = [];
+function renderTranslate() {
+  const d = load();
+  const history = d.readingHistory || [];
+  const el = document.getElementById('tr-history');
+  if (el) {
+    el.innerHTML = history.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">No articles read yet.</p>' :
+      history.slice(-20).reverse().map(h => '<div class="lentry action"><span class="lt">' + h.date + '</span> ' + escHtml(h.title || 'Untitled') + (h.cardCount ? ' — <b>' + h.cardCount + ' cards</b>' : '') + '</div>').join('');
+  }
+}
+
+async function trFetchURL() {
+  const url = document.getElementById('tr-url').value.trim();
+  if (!url) { alert('Paste a URL first.'); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const status = document.getElementById('tr-status');
+  status.textContent = '⏳ Fetching article via Claude...';
+  try {
+    const prompt = `The user wants to read this Italian article: ${url}
+
+Since you cannot fetch URLs, please ask the user to paste the article text. However, if you recognize this as a well-known source, provide any context you can about it.
+
+Actually, let me reframe: The user will paste text separately. For now, please respond with:
+"Please paste the article text in the 'paste text directly' section below, and I'll translate it for you."`;
+    status.textContent = '⚠️ Cannot fetch URLs directly. Please paste the article text using the "Or paste text directly" section below.';
+    document.querySelector('#tab-translate details').open = true;
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+async function trTranslateRaw() {
+  const raw = document.getElementById('tr-raw').value.trim();
+  if (!raw || raw.length < 50) { alert('Paste at least a paragraph of Italian text.'); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const status = document.getElementById('tr-status');
+  status.textContent = '⏳ Translating with Claude... (this may take a moment)';
+  try {
+    const prompt = `You are a professional Italian-English translator. Translate the following Italian text paragraph by paragraph. 
+
+Return ONLY a JSON array where each element is an object with "it" (Italian paragraph) and "en" (English translation). Keep paragraphs aligned. Preserve the original paragraph breaks.
+
+Also include a "title" field at the top level if you can infer the article title, and a "difficulty" field (A2/B1/B2/C1/C2).
+
+Return format:
+{"title": "...", "difficulty": "...", "paragraphs": [{"it": "...", "en": "..."}, ...]}
+
+Italian text:
+${raw}`;
+
+    const resp = await callClaude(key, prompt);
+    // Try to parse JSON from response
+    let data;
+    try {
+      const jsonMatch = resp.match(/\{[\s\S]*\}/);
+      data = JSON.parse(jsonMatch ? jsonMatch[0] : resp);
+    } catch {
+      // Fallback: treat as plain text, split by double newlines
+      const paras = raw.split(/\n\n+/).filter(p => p.trim());
+      data = { title: 'Untitled Article', difficulty: '?', paragraphs: paras.map(p => ({ it: p.trim(), en: '(translation pending)' })) };
+      // Try a simpler translation request
+      status.textContent = '⏳ Retrying with simpler format...';
+      const resp2 = await callClaude(key, 'Translate each paragraph from Italian to English. Return one English paragraph per line, separated by |||.\n\n' + paras.map(p => p.trim()).join('\n\n'));
+      const translations = resp2.split('|||').map(t => t.trim());
+      data.paragraphs = paras.map((p, i) => ({ it: p.trim(), en: translations[i] || '...' }));
+    }
+
+    // Render the result
+    document.getElementById('tr-title').textContent = data.title || 'Article';
+    document.getElementById('tr-meta').textContent = 'Difficulty: ' + (data.difficulty || '?') + ' | ' + data.paragraphs.length + ' paragraphs';
+    const tbody = document.getElementById('tr-tbody');
+    tbody.innerHTML = data.paragraphs.map(p =>
+      '<tr><td class="it-col">' + escHtml(p.it) + '</td><td>' + escHtml(p.en) + '</td></tr>'
+    ).join('');
+    document.getElementById('tr-result-card').style.display = 'block';
+    trArticleCards = [];
+    document.getElementById('tr-cards-card').style.display = 'none';
+    status.textContent = '✅ Translation complete! Select Italian words to create flashcards.';
+    // Store current article data for logging
+    CAL._currentArticle = { title: data.title, difficulty: data.difficulty, text: raw.slice(0, 200) };
+    // Bind text selection for card creation
+    trBindSelection();
+    addLog('action', 'Translated article: ' + (data.title || 'Untitled'));
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+function trBindSelection() {
+  const tbody = document.getElementById('tr-tbody');
+  if (!tbody) return;
+  tbody.querySelectorAll('.it-col').forEach(td => {
+    td.addEventListener('mouseup', trHandleSelection);
+    td.addEventListener('touchend', trHandleSelection);
+  });
+}
+
+function trHandleSelection(e) {
+  const sel = window.getSelection();
+  const text = sel.toString().trim();
+  if (!text || text.length < 2 || text.length > 100) return;
+  // Show popup to create card
+  trShowCardPopup(text, e);
+}
+
+function trShowCardPopup(word, evt) {
+  // Remove existing popup
+  document.querySelectorAll('.tr-sel-popup').forEach(p => p.remove());
+  const popup = document.createElement('div');
+  popup.className = 'tr-sel-popup';
+  popup.innerHTML = '<p style="font-weight:600;margin-bottom:6px">🃏 Create card from:</p>' +
+    '<p style="font-size:15px;margin-bottom:8px;color:var(--orange)">"' + escHtml(word) + '"</p>' +
+    '<label style="font-size:11px;color:var(--muted)">English meaning:</label>' +
+    '<input id="tr-card-back" placeholder="Translation / meaning...">' +
+    '<div class="flex mt8"><button class="btn btn-p" onclick="trAddCard()">Add Card</button>' +
+    '<button class="btn btn-s" onclick="trAutoCard(\'' + escHtml(word).replace(/'/g, "\\'") + '\')">🤖 Auto-translate</button>' +
+    '<button class="btn" onclick="this.closest(\'.tr-sel-popup\').remove()">Cancel</button></div>';
+  popup.style.left = Math.min(evt.clientX || evt.changedTouches[0].clientX, window.innerWidth - 300) + 'px';
+  popup.style.top = Math.min((evt.clientY || evt.changedTouches[0].clientY) + 10, window.innerHeight - 200) + 'px';
+  popup.dataset.front = word;
+  document.body.appendChild(popup);
+  document.getElementById('tr-card-back').focus();
+  document.getElementById('tr-card-back').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') trAddCard();
+  });
+}
+
+async function trAutoCard(word) {
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set API key in Claude tab.'); return; }
+  const backInput = document.getElementById('tr-card-back');
+  if (backInput) backInput.value = '⏳ Translating...';
+  try {
+    const resp = await callClaude(key, 'Translate this Italian word/phrase to English. Give ONLY the translation, nothing else: "' + word + '"');
+    if (backInput) backInput.value = resp.trim();
+  } catch (e) {
+    if (backInput) backInput.value = '(error)';
+  }
+}
+
+function trAddCard() {
+  const popup = document.querySelector('.tr-sel-popup');
+  if (!popup) return;
+  const front = popup.dataset.front;
+  const back = document.getElementById('tr-card-back').value.trim();
+  if (!front || !back) { alert('Enter a translation.'); return; }
+  // Add to flashcard deck
+  addCard(front, back, 'reading');
+  trArticleCards.push({ front, back });
+  popup.remove();
+  // Show cards created section
+  document.getElementById('tr-cards-card').style.display = 'block';
+  document.getElementById('tr-cards-list').innerHTML = trArticleCards.map(c =>
+    '<div class="tr-card-item"><span class="front">' + escHtml(c.front) + '</span><span class="back">' + escHtml(c.back) + '</span></div>'
+  ).join('');
+  document.getElementById('tr-cards-ct').textContent = trArticleCards.length + ' card(s) created from this article';
+}
+
+function trMarkAsArticle(num) {
+  const article = CAL._currentArticle || {};
+  const title = article.title || document.getElementById('tr-title').textContent || 'Untitled';
+  // Fill in the article habit on Today tab
+  const titleEl = document.getElementById('art' + num + '-t');
+  const thoughtsEl = document.getElementById('art' + num + '-th');
+  if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+  if (thoughtsEl && !thoughtsEl.value) thoughtsEl.value = 'Read and translated via Reading tab. ' + trArticleCards.length + ' cards created.';
+  // Log to reading history
+  const d = load();
+  if (!d.readingHistory) d.readingHistory = [];
+  d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: trArticleCards.length });
+  save(d);
+  renderTranslate();
+  addLog('action', 'Article ' + num + ' logged: ' + title);
+  alert('✅ Logged as Article ' + num + '! Go to Today tab to mark the habit complete.');
 }
 
 // ============ LOG TAB ============

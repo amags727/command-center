@@ -139,6 +139,18 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .btn-s{background:var(--bl);font-size:12px;padding:5px 10px}
 .mt8{margin-top:8px}.mb8{margin-bottom:8px}.mb4{margin-bottom:4px}
 .fin{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;width:100%}
+/* Translation tab */
+.tr-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.7}
+.tr-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tr-table td:first-child{border-right:1px solid var(--border)}
+.tr-table thead th{padding:8px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.tr-table thead th:first-child{border-right:1px solid var(--border)}
+.tr-table tbody tr:hover{background:#fafaf8}
+.tr-table .it-col{cursor:text;position:relative}
+.tr-sel-popup{position:fixed;z-index:300;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:12px;width:280px;font-size:13px}
+.tr-sel-popup input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:6px}
+.tr-card-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;background:var(--card);font-size:13px}
+.tr-card-item .front{font-weight:600;flex:1}.tr-card-item .back{color:var(--muted);flex:1}
 </style>
 </head>
 <body>
@@ -157,6 +169,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <button onclick="switchTab('inbox')">📥 Inbox</button>
 <button onclick="switchTab('focus')">🔒 Focus</button>
 <button onclick="switchTab('cards')">🃏 Cards</button>
+<button onclick="switchTab('translate')">🇮🇹 Read</button>
 <button onclick="switchTab('claude')">🤖 Claude</button>
 <button onclick="switchTab('log')">📋 Log</button>
 </nav>
@@ -336,6 +349,50 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="card"><h3>🔍 Browse Deck</h3>
 <div class="flex mb8"><input class="fin flex-1" id="card-search" placeholder="Search cards..." oninput="renderCardBrowse()"><select class="fin" id="card-filter" onchange="renderCardBrowse()" style="width:120px"><option value="all">All</option><option value="new">New</option><option value="learning">Learning</option><option value="review">Review</option><option value="due">Due</option></select></div>
 <div id="card-browse" style="max-height:400px;overflow-y:auto"></div>
+</div>
+</div>
+
+<!-- TRANSLATE / READ -->
+<div class="tab" id="tab-translate">
+<h1>🇮🇹 Italian Reading</h1>
+<div class="card">
+<h3>📰 Fetch & Translate Article</h3>
+<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Paste an Italian article URL or text. Claude will produce a side-by-side translation. Select any Italian word/phrase to create a flashcard.</p>
+<div class="flex mb8">
+<input class="fin flex-1" id="tr-url" placeholder="Paste URL (e.g. from Corriere, Repubblica, Internazionale...)">
+<button class="btn btn-p" onclick="trFetchURL()">Fetch & Translate</button>
+</div>
+<details class="mb8"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">Or paste text directly</summary>
+<textarea class="fin mt8" id="tr-raw" rows="6" placeholder="Paste Italian article text here..."></textarea>
+<button class="btn btn-p mt8" onclick="trTranslateRaw()">Translate</button>
+</details>
+<div id="tr-status" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+</div>
+
+<div class="card" id="tr-result-card" style="display:none">
+<h3 id="tr-title" style="margin-bottom:4px"></h3>
+<p style="font-size:11px;color:var(--muted);margin-bottom:10px" id="tr-meta"></p>
+<div style="overflow-x:auto">
+<table class="tr-table" id="tr-table">
+<thead><tr><th style="width:50%">🇮🇹 Italiano</th><th style="width:50%">🇬🇧 English</th></tr></thead>
+<tbody id="tr-tbody"></tbody>
+</table>
+</div>
+<div class="flex mt8" style="gap:8px;flex-wrap:wrap">
+<button class="btn btn-s" onclick="trMarkAsArticle(1)">✅ Log as Article 1</button>
+<button class="btn btn-s" onclick="trMarkAsArticle(2)">✅ Log as Article 2</button>
+</div>
+</div>
+
+<div class="card" id="tr-cards-card" style="display:none">
+<h3>🃏 Cards Created from This Article</h3>
+<div id="tr-cards-list"></div>
+<p style="font-size:11px;color:var(--muted);margin-top:6px" id="tr-cards-ct"></p>
+</div>
+
+<div class="card">
+<h3>📚 Reading History</h3>
+<div id="tr-history" style="max-height:300px;overflow-y:auto"></div>
 </div>
 </div>
 
