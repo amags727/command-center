@@ -67,6 +67,48 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .bundle{padding:7px 10px;background:var(--gl);border-left:3px solid var(--green);margin:3px 0;border-radius:0 4px 4px 0;font-size:12px}
 .pbar{width:100%;height:10px;background:#eee;border-radius:5px;overflow:hidden;margin:3px 0}
 .pfill{height:100%;background:var(--purple);border-radius:5px;transition:width .3s}
+
+/* ===== DAY CALENDAR ===== */
+.cal-wrap{position:relative;height:1020px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:#fff;user-select:none;-webkit-user-select:none}
+.cal-grid{position:relative;margin-left:52px;height:1020px}
+.cal-hour-label{position:absolute;left:0;width:48px;text-align:right;font-size:11px;color:var(--muted);font-family:monospace;padding-right:6px;transform:translateY(-7px);pointer-events:none;z-index:2}
+.cal-hour-line{position:absolute;left:52px;right:0;height:1px;background:var(--border);pointer-events:none;z-index:1}
+.cal-quarter-line{position:absolute;left:52px;right:0;height:1px;background:#f0f0ee;pointer-events:none;z-index:0}
+.cal-now-line{position:absolute;left:44px;right:0;height:2px;background:var(--red);z-index:15;pointer-events:none}
+.cal-now-line::before{content:'';position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--red)}
+.cal-block{position:absolute;left:4px;right:4px;border-radius:5px;padding:4px 8px;font-size:12px;cursor:pointer;z-index:10;overflow:hidden;border-left:3px solid;transition:box-shadow .15s}
+.cal-block:hover{box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:12}
+.cal-block .cb-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-block .cb-desc{font-size:10px;opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-block .cb-time{font-size:10px;opacity:.7}
+.cal-block .cb-recur{position:absolute;top:3px;right:5px;font-size:10px;opacity:.5}
+.cal-block.work{background:var(--bl);border-left-color:var(--blue);color:#1e40af}
+.cal-block.gym{background:var(--gl);border-left-color:var(--green);color:#166534}
+.cal-block.italian{background:var(--ol);border-left-color:var(--orange);color:#9a3412}
+.cal-block.dissertation{background:var(--pl);border-left-color:var(--purple);color:#5b21b6}
+.cal-block.social{background:var(--pkl);border-left-color:var(--pink);color:#9d174d}
+.cal-block.misc{background:var(--yl);border-left-color:var(--yellow);color:#854d0e}
+.cal-drag-preview{position:absolute;left:4px;right:4px;border-radius:5px;background:rgba(59,130,246,.15);border:2px dashed var(--blue);z-index:8;pointer-events:none}
+.cal-resize-handle{position:absolute;bottom:0;left:0;right:0;height:6px;cursor:s-resize;z-index:11}
+.cal-resize-handle:hover{background:rgba(0,0,0,.1);border-radius:0 0 5px 5px}
+
+/* Calendar popover */
+.cal-popover{position:fixed;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:16px;width:300px;font-size:13px}
+.cal-popover .cp-row{margin-bottom:10px}
+.cal-popover .cp-row label{display:block;font-weight:600;font-size:11px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.cal-popover .cp-row input,.cal-popover .cp-row select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:13px}
+.cal-popover .cp-time-row{display:flex;gap:8px;align-items:center}
+.cal-popover .cp-time-row input{width:auto;flex:1}
+.cal-popover .cp-time-row span{color:var(--muted);font-size:12px}
+.cal-popover .cp-cats{display:flex;gap:4px;flex-wrap:wrap}
+.cal-popover .cp-cat{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:2px solid transparent;opacity:.6;transition:all .15s}
+.cal-popover .cp-cat:hover{opacity:.85}
+.cal-popover .cp-cat.sel{opacity:1;border-color:currentColor}
+.cal-popover .cp-recur-opts{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.cal-popover .cp-recur-opt{padding:3px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:#f3f4f6;border:1px solid var(--border)}
+.cal-popover .cp-recur-opt.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cal-popover .cp-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:12px}
+.cal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:199;background:transparent}
 .rprompt{margin-bottom:10px}.rprompt label{display:block;font-weight:600;margin-bottom:3px;font-size:13px}
 .rprompt textarea{width:100%;min-height:70px;padding:7px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px}
 .atable{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
@@ -106,7 +148,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px" id="today-label"></p>
 <div class="pgb" id="pgb" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="pg-text"></p><p style="font-size:11px;color:var(--muted)" id="pg-countdown"></p></div>
 <div class="card"><h3>⚡ Implementation Intentions</h3><div id="int-list"></div><div class="flex mt8"><input class="fin flex-1" id="int-in" placeholder="When X, I will Y..." onkeydown="if(event.key==='Enter')addInt()"><button class="btn-s btn" onclick="addInt()">Add</button></div></div>
-<div class="card"><h3>🗓 Schedule</h3><div id="sched"></div><div class="flex mt8"><input type="time" id="bl-time" class="btn" style="width:100px"><input class="fin flex-1" id="bl-desc" placeholder="Block description"><select id="bl-cat" class="btn"><option value="work">Work</option><option value="dissertation">Diss.</option><option value="italian">Italian</option><option value="gym">Gym</option><option value="social">Social</option></select><button class="btn btn-s" onclick="addBlock()">Add</button></div></div>
+<div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px"><button class="btn btn-s" onclick="exportICS()">📤 Export to Outlook (.ics)</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🎯 Top 3 Priorities</h3><div id="top3"></div><div class="flex mt8"><input class="fin flex-1" id="t3-in" placeholder="Priority..." onkeydown="if(event.key==='Enter')addT3()"><button class="btn btn-s" onclick="addT3()">Add</button></div></div>
 <div class="card"><h3>✅ Daily Non-Negotiables</h3>
 <div class="hrow"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><div class="hinfo"><div class="hname"><span class="label l-ital">Italian</span> Anki — <span id="anki-ct" style="font-weight:700">0</span>/300 Reps</div><input type="hidden" id="anki-ct-val"><div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div></div></div>
