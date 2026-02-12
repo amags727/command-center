@@ -181,13 +181,17 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="pgb" id="pgb" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="pg-text"></p><p style="font-size:11px;color:var(--muted)" id="pg-countdown"></p></div>
 <div class="card"><h3>⚡ Implementation Intentions</h3><div id="int-list"></div><div class="flex mt8"><input class="fin flex-1" id="int-in" placeholder="When X, I will Y..." onkeydown="if(event.key==='Enter')addInt()"><button class="btn-s btn" onclick="addInt()">Add</button></div></div>
 <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
+<div class="card" style="flex:0 0 40%;min-width:280px"><h3>🎯 Top 3 Priorities</h3><div id="top3"></div><div class="flex mt8"><input class="fin flex-1" id="t3-in" placeholder="Priority..." onkeydown="if(event.key==='Enter')addT3()"><button class="btn btn-s" onclick="addT3()">Add</button></div></div>
 <div class="card" style="flex:1;min-width:300px"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px"><button class="btn btn-s" onclick="exportICS()">📤 Export to Outlook (.ics)</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
-<div class="card" style="flex:0 0 280px;min-width:250px"><h3>🎯 Top 3 Priorities</h3><div id="top3"></div><div class="flex mt8"><input class="fin flex-1" id="t3-in" placeholder="Priority..." onkeydown="if(event.key==='Enter')addT3()"><button class="btn btn-s" onclick="addT3()">Add</button></div></div>
 </div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
-<div class="hrow"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><div class="hinfo"><div class="hname">Anki — <span id="anki-ct" style="font-weight:700">0</span>/300 Reps</div><input type="hidden" id="anki-ct-val"><div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div></div></div>
-<div class="hrow"><input type="checkbox" class="hchk" id="h-art1" disabled style="pointer-events:none"><div class="hinfo"><div class="hname">📰 Article 1 <span id="art1-status" style="font-size:12px;color:var(--muted)">— not submitted</span></div><div class="hdet">Submit from the <b>Read</b> tab</div><input type="hidden" id="art1-t"><input type="hidden" id="art1-th"></div></div>
-<div class="hrow"><input type="checkbox" class="hchk" id="h-art2" disabled style="pointer-events:none"><div class="hinfo"><div class="hname">📰 Article 2 <span id="art2-status" style="font-size:12px;color:var(--muted)">— not submitted</span></div><div class="hdet">Submit from the <b>Read</b> tab</div><input type="hidden" id="art2-t"><input type="hidden" id="art2-th"></div></div>
+<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
+<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span>/300</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
+</div>
+<div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div>
+<input type="hidden" id="anki-ct-val"><input type="hidden" id="art1-t"><input type="hidden" id="art1-th"><input type="hidden" id="art2-t"><input type="hidden" id="art2-th"><span id="art1-status" style="display:none"></span><span id="art2-status" style="display:none"></span>
 <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
 <h3 style="margin-bottom:6px">📝 Riflessione Giornaliera</h3>
 <p style="font-size:12px;color:var(--muted);margin-bottom:6px">Write in Italian. Any format. Min 200 words. Submitted to Claude for correction + Anki cards.</p>

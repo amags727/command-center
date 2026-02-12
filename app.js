@@ -40,7 +40,7 @@ function initToday() {
   document.getElementById('today-label').textContent = labels[dayNum] || '';
   const dd = dayData(today());
   const day = dd.days[today()];
-  ['anki','art1','art2','gym','convo'].forEach(h => {
+  ['anki','art1','art2'].forEach(h => {
     const el = document.getElementById('h-' + h);
     if (el && day.habits[h]) el.checked = true;
     if (day.sealed) el && (el.disabled = true);
@@ -50,14 +50,17 @@ function initToday() {
   if (day.habits.art1Thoughts) document.getElementById('art1-th').value = day.habits.art1Thoughts;
   if (day.habits.art2Title) document.getElementById('art2-t').value = day.habits.art2Title;
   if (day.habits.art2Thoughts) document.getElementById('art2-th').value = day.habits.art2Thoughts;
-  if (day.habits.convoWho) document.getElementById('convo-who').value = day.habits.convoWho;
-  if (day.habits.convoDet) document.getElementById('convo-det').value = day.habits.convoDet;
+  // Update article status labels from stored data
+  if (day.habits.art1) {
+    const st = document.getElementById('art1-status');
+    if (st) st.textContent = '✅ ' + (day.habits.art1Title || 'Completed');
+  }
+  if (day.habits.art2) {
+    const st = document.getElementById('art2-status');
+    if (st) st.textContent = '✅ ' + (day.habits.art2Title || 'Completed');
+  }
   if (day.reflection) document.getElementById('refl-txt').value = day.reflection;
   updRC();
-  const d2 = getGlobal();
-  const todayMins = (d2.dissSessions || []).filter(s => s.date === today()).reduce((a, s) => a + s.minutes, 0);
-  document.getElementById('diss-td').textContent = todayMins + ' min today';
-  if (todayMins >= 30) document.getElementById('h-diss').checked = true;
   renderBlocks(); renderTop3(); renderIntentions(); renderBundles();
   const wk = weekId();
   const wd = weekData(wk);
