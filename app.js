@@ -535,6 +535,34 @@ function bulkImport() {
   else { alert('No cards found. Use TSV (tab-separated) or Front:/Back: format.'); }
 }
 
+async function seedAnkiDeck() {
+  if (!confirm('Import 3,663 Anki cards with full scheduling data? This will merge with any existing cards (no duplicates).')) return;
+  const btn = document.getElementById('seed-anki-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Importing...'; }
+  try {
+    const resp = await fetch('anki_cards.json');
+    if (!resp.ok) throw new Error('Failed to fetch anki_cards.json: ' + resp.status);
+    const imported = await resp.json();
+    const d = getCards();
+    const existingIds = new Set(d.cards.map(c => c.id));
+    let added = 0, skipped = 0;
+    imported.forEach(c => {
+      if (existingIds.has(c.id)) { skipped++; return; }
+      d.cards.push(c); added++;
+    });
+    save(d);
+    renderCards();
+    alert('✅ Imported ' + added + ' cards! (' + skipped + ' duplicates skipped)\n\n📊 Due now: ' +
+      d.cards.filter(c => (c.due || 0) <= todayDayNum() && c.queue === 2).length +
+      ' | New: ' + d.cards.filter(c => c.queue === 0).length +
+      ' | Total: ' + d.cards.length);
+  } catch (e) {
+    alert('❌ Import failed: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📦 Seed Anki Deck'; }
+  }
+}
+
 function renderPendingCards() {
   const d = getGlobal();
   const pending = (d.ankiCards || []).filter(c => !c.added);
