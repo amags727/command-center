@@ -1390,12 +1390,11 @@ ${raw}`;
       '<tr><td class="it-col">' + escHtml(p.it) + '</td><td>' + escHtml(p.en) + '</td></tr>'
     ).join('');
     document.getElementById('tr-result-card').style.display = 'block';
+    document.getElementById('tr-reflection-card').style.display = 'block';
     trArticleCards = [];
     trCollectedWords = [];
     const collCard = document.getElementById('tr-collected-card');
     if (collCard) collCard.style.display = 'none';
-    const reflCard = document.getElementById('tr-reflection-card');
-    if (reflCard) reflCard.style.display = 'none';
     status.textContent = '✅ Translation complete! Highlight Italian words to collect them for flashcards.';
     // Store current article data for logging
     CAL._currentArticle = { title: data.title, difficulty: data.difficulty, text: raw.slice(0, 200) };
@@ -1441,8 +1440,7 @@ function trRenderCollected() {
   if (!card || !list) return;
   card.style.display = trCollectedWords.length > 0 ? 'block' : 'none';
   // Also show reflection card when words are collected
-  const reflCard = document.getElementById('tr-reflection-card');
-  if (reflCard) reflCard.style.display = trCollectedWords.length > 0 ? 'block' : 'none';
+  // Reflection card visibility is now controlled when article loads, not by collected words
   ct.textContent = trCollectedWords.length;
   list.innerHTML = trCollectedWords.map((w, i) =>
     '<div class="tr-card-item"><span class="front" style="flex:1">' + escHtml(w) + '</span>' +
@@ -1526,7 +1524,7 @@ async function trSubmitReflection(num) {
   const status = document.getElementById('tr-refl-status');
   status.textContent = '⏳ Sending reflection to Claude for feedback...';
   try {
-    const prompt = `The student read an Italian article titled "${title}" and wrote this reflection in Italian:\n\n"${txt}"\n\nPlease:\n1. Correct any grammar/spelling errors (show original → corrected)\n2. Give 2-3 suggestions to improve naturalness\n3. Rate their Italian level (A2/B1/B2/C1/C2)\n4. Give a brief encouraging comment\n\nFormat your response clearly with headers.`;
+    const prompt = `The student read an Italian article titled "${title}" and wrote this reflection in Italian:\n\n"${txt}"\n\nPlease:\n1. First, output the FULL corrected version of the text (the entire text rewritten correctly, not just fragments)\n2. Then list each error: original → corrected, with a brief explanation IN ITALIAN of why it was wrong\n3. Rate their level (A2/B1/B2/C1/C2)\n\nBe direct and factual. No encouragement, no compliments, no softening. Just corrections and explanations.\n\nFormat your response clearly with headers.`;
     const resp = await callClaude(key, prompt);
     document.getElementById('tr-refl-result').style.display = 'block';
     document.getElementById('tr-refl-feedback').innerHTML = resp.replace(/\n/g, '<br>');
