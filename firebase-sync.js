@@ -18,6 +18,8 @@ const FirebaseSync = (() => {
   let debounceTimer = null;
   let statusEl = null;
   let listening = false;
+  let _importing = false;  // guard: true while importing remote data (suppresses push-back)
+  let _lastPushTs = 0;     // track last push timestamp to ignore self-triggered listener
 
   // SHA-256 hash
   async function hash(str) {
@@ -92,6 +94,7 @@ const FirebaseSync = (() => {
         const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
         if (remoteTs > localTs) {
           // Remote is newer — import it
+          _importing = true;
           Object.keys(remote).forEach(k => {
             if (k !== '_lastSync') {
               localStorage.setItem(k, typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
@@ -100,6 +103,7 @@ const FirebaseSync = (() => {
           localStorage.setItem('_lastSync', String(remoteTs));
           // Reload UI
           if (typeof loadAll === 'function') loadAll();
+          _importing = false;
         } else {
           // Local is newer — push to remote
           pushAll();
@@ -116,8 +120,14 @@ const FirebaseSync = (() => {
           const remote = snap.val();
           if (!remote) return;
           const remoteTs = remote._lastSync || 0;
+          // Ignore events triggered by our own push
+          if (remoteTs === _lastPushTs) {
+            setStatus(navigator.onLine ? 'synced' : 'offline');
+            return;
+          }
           const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
           if (remoteTs > localTs) {
+            _importing = true;
             Object.keys(remote).forEach(k => {
               if (k !== '_lastSync') {
                 localStorage.setItem(k, typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
@@ -125,6 +135,7 @@ const FirebaseSync = (() => {
             });
             localStorage.setItem('_lastSync', String(remoteTs));
             if (typeof loadAll === 'function') loadAll();
+            _importing = false;
           }
           setStatus(navigator.onLine ? 'synced' : 'offline');
         });
@@ -140,7 +151,7 @@ const FirebaseSync = (() => {
   }
 
   function pushAll() {
-    if (!syncEnabled || !db || !userPath) return;
+    if (!syncEnabled || !db || !userPath || _importing) return;
     
     // Debounce — don't push more than once per second
     clearTimeout(debounceTimer);
@@ -155,6 +166,7 @@ const FirebaseSync = (() => {
         data[k] = localStorage.getItem(k);
       }
       data._lastSync = ts;
+      _lastPushTs = ts;
       localStorage.setItem('_lastSync', String(ts));
       
       db.ref(userPath + '/data').set(data)
