@@ -15,7 +15,7 @@ function switchTab(id) {
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   const btns = document.querySelectorAll('.nav button');
-  const names = ['today','week','habits','dissertation','inbox','focus','claude','log'];
+  const names = ['today','week','habits','dissertation','inbox','focus','cards','claude','log'];
   const idx = names.indexOf(id);
   if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
   if (id === 'habits') renderHabits();
@@ -24,6 +24,7 @@ function switchTab(id) {
   if (id === 'dissertation') renderDiss();
   if (id === 'inbox') renderInbox();
   if (id === 'focus') renderFocus();
+  if (id === 'cards') renderCards();
   if (id === 'claude') initClaude();
 }
 
@@ -377,6 +378,226 @@ function dlAnki() {
   a.href = URL.createObjectURL(blob); a.download = 'anki-cards-' + today() + '.txt'; a.click();
 }
 
+// ============ CARDS TAB (SM-2 Spaced Repetition) ============
+function getCards() { const d = load(); if (!d.cards) d.cards = []; return d; }
+function todayDayNum() { return Math.floor(Date.now() / 86400000); }
+
+function sm2(card, quality) {
+  // SM-2 algorithm: quality 1=Again, 2=Hard, 3=Good, 4=Easy
+  const c = Object.assign({}, card);
+  c.reps = (c.reps || 0);
+  c.lapses = (c.lapses || 0);
+  c.ease = c.ease || 2500; // factor * 1000
+  c.ivl = c.ivl || 0;
+  c.reviewedToday = today();
+
+  if (quality === 1) { // Again
+    c.lapses++; c.reps = 0; c.ivl = 0; c.ease = Math.max(1300, c.ease - 200);
+    c.due = todayDayNum(); // re-show today (end of queue)
+    c.queue = 1; // learning
+  } else if (quality === 2) { // Hard
+    if (c.ivl === 0) { c.ivl = 1; } else { c.ivl = Math.max(1, Math.round(c.ivl * 1.2)); }
+    c.ease = Math.max(1300, c.ease - 150);
+    c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
+  } else if (quality === 3) { // Good
+    if (c.ivl === 0) { c.ivl = 1; } else if (c.ivl === 1) { c.ivl = 6; } else { c.ivl = Math.round(c.ivl * c.ease / 1000); }
+    c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
+  } else if (quality === 4) { // Easy
+    if (c.ivl === 0) { c.ivl = 4; } else { c.ivl = Math.round(c.ivl * c.ease / 1000 * 1.3); }
+    c.ease += 150; c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
+  }
+  return c;
+}
+
+function fmtIvl(days) {
+  if (days === 0) return '<1d'; if (days === 1) return '1d';
+  if (days < 30) return days + 'd'; if (days < 365) return Math.round(days / 30.4) + 'mo';
+  return (days / 365).toFixed(1) + 'y';
+}
+
+function previewIvl(card, quality) { return fmtIvl(sm2(card, quality).ivl); }
+
+let studyQueue = [], studyIdx = 0, studyFlipped = false;
+
+function getDueCards() {
+  const d = getCards(), now = todayDayNum();
+  return d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1);
+}
+function getNewCards() { const d = getCards(); return d.cards.filter(c => c.queue === 0); }
+
+function renderCards() {
+  const d = getCards(), now = todayDayNum();
+  const due = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
+  const newC = d.cards.filter(c => c.queue === 0);
+  const reviewedToday = d.cards.filter(c => c.reviewedToday === today()).length;
+  document.getElementById('cards-due-ct').textContent = due.length + newC.length;
+  document.getElementById('cards-new-ct').textContent = newC.length;
+  document.getElementById('cards-total-ct').textContent = d.cards.length;
+  document.getElementById('cards-reviewed-ct').textContent = reviewedToday;
+  renderPendingCards(); renderCardBrowse();
+}
+
+function startStudy() {
+  const d = getCards(), now = todayDayNum();
+  // Queue: due reviews first, then new cards (max 20 new per session)
+  const due = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
+  const newC = d.cards.filter(c => c.queue === 0).slice(0, 20);
+  studyQueue = [...due, ...newC];
+  if (studyQueue.length === 0) { alert('No cards due! 🎉'); return; }
+  studyIdx = 0; studyFlipped = false;
+  document.getElementById('study-area').style.display = 'block';
+  showStudyCard();
+}
+
+function showStudyCard() {
+  if (studyIdx >= studyQueue.length) { endStudy(); alert('Session complete! 🎉 Reviewed ' + studyQueue.length + ' cards.'); return; }
+  const card = studyQueue[studyIdx];
+  document.getElementById('study-front').innerHTML = escHtml(card.front);
+  document.getElementById('study-back-content').innerHTML = escHtml(card.back);
+  document.getElementById('study-back').style.display = 'none';
+  document.getElementById('study-hint').style.display = '';
+  document.getElementById('study-progress').textContent = (studyIdx + 1) + ' / ' + studyQueue.length + (card.queue === 0 ? ' (NEW)' : '');
+  document.getElementById('hard-ivl').textContent = previewIvl(card, 2);
+  document.getElementById('good-ivl').textContent = previewIvl(card, 3);
+  document.getElementById('easy-ivl').textContent = previewIvl(card, 4);
+  studyFlipped = false;
+}
+
+function flipCard() {
+  if (studyFlipped) return;
+  studyFlipped = true;
+  document.getElementById('study-back').style.display = 'block';
+  document.getElementById('study-hint').style.display = 'none';
+}
+
+function rateCard(quality) {
+  const d = getCards();
+  const card = studyQueue[studyIdx];
+  const idx = d.cards.findIndex(c => c.id === card.id);
+  if (idx === -1) return;
+  const updated = sm2(d.cards[idx], quality);
+  d.cards[idx] = updated;
+  save(d);
+  if (quality === 1) { // Again: re-queue at end
+    studyQueue.push(updated);
+  }
+  studyIdx++;
+  showStudyCard();
+}
+
+function endStudy() {
+  document.getElementById('study-area').style.display = 'none';
+  studyQueue = []; studyIdx = 0;
+  renderCards();
+  addLog('action', 'Flashcard study session');
+}
+
+function addCard(front, back, tags) {
+  front = front || document.getElementById('card-front').value.trim();
+  back = back || document.getElementById('card-back').value.trim();
+  tags = tags || document.getElementById('card-tags').value.trim();
+  if (!front || !back) return;
+  const d = getCards();
+  d.cards.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), front, back, tags: tags ? tags.split(',').map(t => t.trim()) : [], queue: 0, due: todayDayNum(), ivl: 0, ease: 2500, reps: 0, lapses: 0, created: today(), reviewedToday: null });
+  save(d);
+  document.getElementById('card-front').value = '';
+  document.getElementById('card-back').value = '';
+  document.getElementById('card-tags').value = '';
+  renderCards();
+  addLog('action', 'Card added: ' + front);
+}
+
+function toggleBulkImport() { const el = document.getElementById('bulk-import'); el.style.display = el.style.display === 'none' ? 'block' : 'none'; }
+
+function bulkImport() {
+  const txt = document.getElementById('bulk-text').value.trim();
+  if (!txt) return;
+  let count = 0;
+  // Try Front:/Back: pairs first
+  const fbPairs = txt.match(/Front:\s*(.+?)[\n\r]+Back:\s*(.+?)(?=\nFront:|\n*$)/gs);
+  if (fbPairs && fbPairs.length > 0) {
+    fbPairs.forEach(pair => {
+      const fm = pair.match(/Front:\s*(.+)/i);
+      const bm = pair.match(/Back:\s*(.+)/i);
+      if (fm && bm) { addCard(fm[1].trim(), bm[1].trim(), ''); count++; }
+    });
+  } else {
+    // TSV: front\tback per line
+    txt.split('\n').forEach(line => {
+      const parts = line.split('\t');
+      if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
+        addCard(parts[0].trim(), parts[1].trim(), ''); count++;
+      }
+    });
+  }
+  document.getElementById('bulk-text').value = '';
+  if (count > 0) { alert('Imported ' + count + ' cards!'); renderCards(); }
+  else { alert('No cards found. Use TSV (tab-separated) or Front:/Back: format.'); }
+}
+
+function renderPendingCards() {
+  const d = getGlobal();
+  const pending = (d.ankiCards || []).filter(c => !c.added);
+  const el = document.getElementById('pending-cards');
+  if (!el) return;
+  if (pending.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;font-style:italic">No pending cards. Submit Italian reflections to generate cards.</p>'; return; }
+  el.innerHTML = pending.map((c, i) => {
+    const realIdx = d.ankiCards.indexOf(c);
+    // Try to parse Front:/Back:
+    const fm = c.card.match(/Front:\s*(.+)/i);
+    const bm = c.card.match(/Back:\s*(.+)/i);
+    const front = fm ? fm[1].trim() : c.card.split('\n')[0];
+    const back = bm ? bm[1].trim() : '';
+    return '<div class="iitem"><div class="itxt"><b>' + escHtml(front) + '</b>' + (back ? '<br><span style="color:var(--muted);font-size:12px">' + escHtml(back) + '</span>' : '') + '</div><button class="btn btn-s" onclick="acceptPending(' + realIdx + ')">✅ Add</button><button class="btn" style="font-size:10px;color:var(--red)" onclick="dismissPending(' + realIdx + ')">✕</button></div>';
+  }).join('');
+}
+
+function acceptPending(idx) {
+  const d = getGlobal();
+  const c = d.ankiCards[idx];
+  if (!c) return;
+  const fm = c.card.match(/Front:\s*(.+)/i);
+  const bm = c.card.match(/Back:\s*(.+)/i);
+  const front = fm ? fm[1].trim() : c.card.split('\n')[0];
+  const back = bm ? bm[1].trim() : c.card;
+  d.ankiCards[idx].added = true;
+  save(d);
+  addCard(front, back, 'reflection');
+}
+
+function dismissPending(idx) {
+  const d = getGlobal();
+  d.ankiCards[idx].added = true; // mark as handled
+  save(d);
+  renderPendingCards();
+}
+
+function renderCardBrowse() {
+  const d = getCards(), el = document.getElementById('card-browse');
+  if (!el) return;
+  const search = (document.getElementById('card-search') || {}).value || '';
+  const filter = (document.getElementById('card-filter') || {}).value || 'all';
+  const now = todayDayNum();
+  let cards = d.cards;
+  if (search) { const s = search.toLowerCase(); cards = cards.filter(c => c.front.toLowerCase().includes(s) || c.back.toLowerCase().includes(s)); }
+  if (filter === 'new') cards = cards.filter(c => c.queue === 0);
+  else if (filter === 'learning') cards = cards.filter(c => c.queue === 1);
+  else if (filter === 'review') cards = cards.filter(c => c.queue === 2);
+  else if (filter === 'due') cards = cards.filter(c => (c.due || 0) <= now);
+  if (cards.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;font-style:italic">No cards match.</p>'; return; }
+  el.innerHTML = cards.slice(0, 100).map(c => {
+    const status = c.queue === 0 ? '<span class="label l-ital">New</span>' : c.queue === 1 ? '<span class="label l-gym">Learning</span>' : '<span class="label l-diss">Review</span>';
+    const dueIn = (c.due || 0) - now;
+    const dueStr = dueIn <= 0 ? '<span style="color:var(--red);font-weight:600">Due</span>' : fmtIvl(dueIn);
+    return '<div class="iitem"><div class="itxt"><b>' + escHtml(c.front) + '</b><br><span style="font-size:12px;color:var(--muted)">' + escHtml(c.back) + '</span></div>' + status + '<span style="font-size:11px;color:var(--muted)">' + dueStr + '</span><button class="btn" style="font-size:10px;padding:2px 6px;color:var(--red)" onclick="deleteCard(\'' + c.id + '\')">✕</button></div>';
+  }).join('');
+}
+
+function deleteCard(id) {
+  if (!confirm('Delete this card?')) return;
+  const d = getCards(); d.cards = d.cards.filter(c => c.id !== id); save(d); renderCardBrowse();
+}
+
 // ============ LOG TAB ============
 function renderLog() {
   const d = getGlobal(), filter = document.getElementById('log-filter').value, dateF = document.getElementById('log-date-filter').value;
@@ -429,6 +650,7 @@ function loadAll() {
     if (id === 'dissertation') renderDiss();
     if (id === 'inbox') renderInbox();
     if (id === 'focus') renderFocus();
+    if (id === 'cards') renderCards();
     if (id === 'claude') initClaude();
   }
 }

@@ -95,6 +95,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <button onclick="switchTab('dissertation')">📝 Dissertation</button>
 <button onclick="switchTab('inbox')">📥 Inbox</button>
 <button onclick="switchTab('focus')">🔒 Focus</button>
+<button onclick="switchTab('cards')">🃏 Cards</button>
 <button onclick="switchTab('claude')">🤖 Claude</button>
 <button onclick="switchTab('log')">📋 Log</button>
 </nav>
@@ -215,6 +216,60 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="chatc"><div class="chatm" id="chat-msgs"></div><div class="chatia"><input id="chat-in" placeholder="Ask Claude anything..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">Send</button></div></div></div>
 <div class="card"><h3>📝 Italian Corrections</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Results from your daily reflection submissions appear here.</p><div id="corrections-area" style="max-height:400px;overflow-y:auto"><p style="color:var(--muted);font-size:13px;font-style:italic">No corrections yet. Submit your daily Italian reflection from the Today tab.</p></div></div>
 <div class="card"><h3>🃏 Generated Anki Cards</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Cards follow your C2 ruleset. Copy or download.</p><div id="anki-area"><p style="color:var(--muted);font-size:13px;font-style:italic">No cards generated yet.</p></div><div class="flex mt8"><button class="btn btn-s" onclick="copyAnki()">📋 Copy All Cards</button><button class="btn btn-s" onclick="dlAnki()">⬇ Download .txt</button></div></div>
+</div>
+
+<!-- CARDS -->
+<div class="tab" id="tab-cards">
+<h1>🃏 Flashcards</h1>
+<div class="card" id="cards-summary">
+<div class="flex" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div><b id="cards-due-ct">0</b> <span style="color:var(--muted);font-size:13px">due today</span></div>
+<div><b id="cards-new-ct">0</b> <span style="color:var(--muted);font-size:13px">new</span></div>
+<div><b id="cards-total-ct">0</b> <span style="color:var(--muted);font-size:13px">total</span></div>
+<div><b id="cards-reviewed-ct">0</b> <span style="color:var(--muted);font-size:13px">reviewed today</span></div>
+<button class="btn btn-p" onclick="startStudy()">▶ Study Now</button>
+</div>
+</div>
+
+<div id="study-area" style="display:none">
+<div class="card" style="min-height:200px;text-align:center;position:relative">
+<div style="font-size:11px;color:var(--muted);margin-bottom:12px"><span id="study-progress"></span></div>
+<div id="study-front" style="font-size:1.4em;padding:20px 10px;cursor:pointer" onclick="flipCard()"></div>
+<div id="study-back" style="display:none;padding:16px 10px;border-top:1px dashed var(--border);margin-top:12px">
+<div id="study-back-content" style="font-size:1.2em;margin-bottom:16px"></div>
+<div class="flex" style="justify-content:center;gap:6px;flex-wrap:wrap">
+<button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);min-width:70px" onclick="rateCard(1)">Again<br><span style="font-size:10px">&lt;1min</span></button>
+<button class="btn" style="background:var(--orange);color:#fff;border-color:var(--orange);min-width:70px" onclick="rateCard(2)">Hard<br><span style="font-size:10px" id="hard-ivl"></span></button>
+<button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);min-width:70px" onclick="rateCard(3)">Good<br><span style="font-size:10px" id="good-ivl"></span></button>
+<button class="btn" style="background:var(--blue);color:#fff;border-color:var(--blue);min-width:70px" onclick="rateCard(4)">Easy<br><span style="font-size:10px" id="easy-ivl"></span></button>
+</div>
+</div>
+<p style="font-size:11px;color:var(--muted);margin-top:10px;cursor:pointer" onclick="flipCard()" id="study-hint">tap to flip</p>
+</div>
+<div style="text-align:center"><button class="btn btn-s" onclick="endStudy()">✕ End Session</button></div>
+</div>
+
+<div class="card"><h3>➕ Add Cards</h3>
+<div class="mb4"><input class="fin" id="card-front" placeholder="Front (Italian)"></div>
+<div class="mb4"><input class="fin" id="card-back" placeholder="Back (English)"></div>
+<div class="mb4"><input class="fin" id="card-tags" placeholder="Tags (comma-separated, optional)"></div>
+<div class="flex"><button class="btn btn-p" onclick="addCard()">Add Card</button><button class="btn btn-s" onclick="toggleBulkImport()">📋 Bulk Import</button></div>
+<div id="bulk-import" style="display:none" class="mt8">
+<p style="font-size:12px;color:var(--muted);margin-bottom:4px">Paste TSV (front→back, one per line) or Front: / Back: pairs:</p>
+<textarea class="fin" id="bulk-text" rows="6" placeholder="word1&#9;meaning1&#10;word2&#9;meaning2&#10;&#10;OR:&#10;&#10;Front: parola&#10;Back: word"></textarea>
+<button class="btn btn-p mt8" onclick="bulkImport()">Import</button>
+</div>
+</div>
+
+<div class="card"><h3>📋 Pending Cards from Reflections</h3>
+<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Cards generated by Claude from your Italian reflections. Review and add to your deck.</p>
+<div id="pending-cards"></div>
+</div>
+
+<div class="card"><h3>🔍 Browse Deck</h3>
+<div class="flex mb8"><input class="fin flex-1" id="card-search" placeholder="Search cards..." oninput="renderCardBrowse()"><select class="fin" id="card-filter" onchange="renderCardBrowse()" style="width:120px"><option value="all">All</option><option value="new">New</option><option value="learning">Learning</option><option value="review">Review</option><option value="due">Due</option></select></div>
+<div id="card-browse" style="max-height:400px;overflow-y:auto"></div>
+</div>
 </div>
 
 <!-- LOG -->
