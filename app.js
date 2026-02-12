@@ -427,6 +427,12 @@ function getNewCards() { const d = getCards(); return d.cards.filter(c => c.queu
 
 function renderCards() {
   const d = getCards(), now = todayDayNum();
+  // Auto-seed on first visit if deck is empty
+  if (d.cards.length === 0 && !renderCards._seeding) {
+    renderCards._seeding = true;
+    seedAnkiDeckAuto();
+    return;
+  }
   const due = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
   const newC = d.cards.filter(c => c.queue === 0);
   const reviewedToday = d.cards.filter(c => c.reviewedToday === today()).length;
@@ -435,6 +441,25 @@ function renderCards() {
   document.getElementById('cards-total-ct').textContent = d.cards.length;
   document.getElementById('cards-reviewed-ct').textContent = reviewedToday;
   renderPendingCards(); renderCardBrowse();
+}
+
+async function seedAnkiDeckAuto() {
+  const btn = document.getElementById('seed-anki-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Auto-importing...'; }
+  try {
+    const resp = await fetch('anki_cards.json');
+    if (!resp.ok) throw new Error('Failed to fetch anki_cards.json: ' + resp.status);
+    const imported = await resp.json();
+    const d = getCards();
+    const existingIds = new Set(d.cards.map(c => c.id));
+    let added = 0;
+    imported.forEach(c => { if (!existingIds.has(c.id)) { d.cards.push(c); added++; } });
+    save(d);
+    addLog('action', 'Auto-seeded ' + added + ' Anki cards');
+  } catch (e) { console.error('Auto-seed failed:', e); }
+  renderCards._seeding = false;
+  if (btn) { btn.disabled = false; btn.textContent = '📦 Seed Anki Deck'; }
+  renderCards();
 }
 
 function startStudy() {
