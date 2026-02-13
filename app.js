@@ -622,7 +622,204 @@ function sealDay() {
   const dd = dayData(today()); dd.days[today()].sealed = true; save(dd); lockToday(); addLog('sealed', 'Day sealed: ' + today());
 }
 
-// ============ REFLECTION SUBMIT ============
+// ============ FLASHCARD REVIEW SHARED INFRASTRUCTURE ============
+
+const FLASH_CARD_RULES = `Core Structure Rules:
+- Each lexical item generates exactly two cards: one definition/translation card and one cloze card. These must be paired and adjacent.
+- No orphan cards. Every word/expression must have both cards.
+
+Definition / Translation Card Rules:
+- The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
+- Default: Italian-language definition, idiomatic, modern, explanatory (not dictionary-literal).
+- Exception: Use English on prompt side for discourse markers, stance-setting expressions, long propositional phrases.
+- Answer side always includes: the Italian target word/expression + a brief English gloss.
+- The gloss should flag register (colloquial, informal, legal, literary, vulgar, etc.) and if the term is archaic or has a more common modern alternative.
+- Prefer natural Italian over calques.
+
+Cloze Card Rules:
+- The cloze must test productive knowledge (produce the target form, not just recognize it).
+- Verbs must be conjugated in context. Never use infinitives as cloze answers.
+- Prefer present tense or passato prossimo. No passato remoto unless unavoidable.
+- Rich contextual cues are mandatory. The sentence must contain enough information that the word is inferable.
+- Natural syntax and discourse flow take priority.
+
+Register, Usage, and Accuracy Rules:
+- Register must be explicit somewhere in the pair (especially colloquial/vulgar, legal/bureaucratic, literary/antiquated).
+- Avoid over-formalization. Prefer contemporary usage.
+- The two cards don't need to mirror each other structurally. Together they must lock down meaning, usage, and form.
+
+Scope Rules:
+- One lexical target per pair. No combining unrelated words.
+- Mixed directionality (IT→EN or EN→IT) is allowed depending on learning value.
+- Be explicit about markedness (odd, dated, sarcastic, regionally marked, unusually strong).`;
+
+const COMPOSITION_EXTRACTION_RULES = `Extraction Rules from Corrected Composition Exercises (targeting C2-level control):
+
+A. Extraction Priority (What to Pull First):
+1. Corrections replacing English-shaped structures with Italian ones (absolute priority): argument framing, concessive structures, causal chains, stance softening/strengthening.
+2. Upgraded verbs replacing generic ones (fare/dire/andare/mettere/avere → specific verb).
+3. Discourse operators and meta-textual moves: framing moves, evaluation phrases, self-positioning.
+4. Corrections that reduce explicitness without losing meaning (Italian prefers implication over specification).
+5. Idiomatic compression: longer phrase replaced by shorter idiomatic unit.
+
+B. What NOT to Extract:
+- Pure grammar fixes (agreement, gender/number, article choice) with no semantic/stylistic upgrade.
+- Transparent, obvious, predictable, stylistically neutral synonyms.
+- Hyper-local phrasing that only works in that precise context and doesn't generalize.
+
+C. Extraction Granularity:
+- Prefer constructions over single words (verb+complement patterns, stance-setting frames, concessive/contrastive structures).
+- Allow partial propositions ("da persona che + verbo", "non tanto X quanto Y", "il fatto che + congiuntivo").
+
+D. Card Framing:
+- Default to English-led definition cards (these encode thought moves, not objects).
+- English prompt should describe the function, not literal wording.
+- Cloze cards must recreate the rhetorical move, not just the word.
+
+E. Frequency Control:
+- Cap: 5-8 items per text. More dilutes salience and retention.
+- Prefer recurrence over novelty.
+
+F. C2 Calibration (before extracting, ask):
+- Would a fluent C1 speaker plausibly avoid this? → extract.
+- Does this change how the sentence positions the speaker? → extract.
+- Would mastering this reduce future correction density? → extract.
+
+G. Meta-Rule: Extraction is about control, not accumulation. Every item should reduce Anglicism, increase rhetorical flexibility, or improve stance precision.`;
+
+// Shared state for active flashcard reviews
+const _fcReviews = {};
+
+function renderFlashcardReview(containerId, cards, context, tags) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  _fcReviews[containerId] = { cards: cards.map(c => ({...c})), context, tags };
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div class="fc-review">
+      <h4 style="font-size:14px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
+      <div id="${containerId}-list" class="fc-review-list"></div>
+      <div class="flex mt8" style="gap:8px">
+        <button class="btn btn-p" onclick="fcSubmitAll('${containerId}')">✅ Submit All to Deck</button>
+        <span id="${containerId}-submit-status" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div class="fc-chat-section" style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px">
+        <h4 style="font-size:13px;margin-bottom:6px">💬 Ask about these cards</h4>
+        <div id="${containerId}-chat-log" style="max-height:200px;overflow-y:auto;font-size:12px;margin-bottom:6px"></div>
+        <div class="flex" style="gap:6px">
+          <input class="fin flex-1" id="${containerId}-chat-input" placeholder="Ask a follow-up question..." onkeydown="if(event.key==='Enter')fcChat('${containerId}')">
+          <button class="btn btn-s" onclick="fcChat('${containerId}')">Send</button>
+        </div>
+      </div>
+    </div>`;
+  _fcRenderCards(containerId);
+}
+
+function _fcRenderCards(containerId) {
+  const rev = _fcReviews[containerId];
+  if (!rev) return;
+  const list = document.getElementById(containerId + '-list');
+  if (!list) return;
+  list.innerHTML = rev.cards.length === 0 ?
+    '<p style="color:var(--muted);font-size:12px;font-style:italic">No cards. Use the chat to request more.</p>' :
+    rev.cards.map((c, i) => `
+      <div class="fc-card-row" style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;padding:6px;background:var(--bg);border:1px solid var(--border);border-radius:6px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Front:</div>
+          <textarea class="fin" style="width:100%;font-size:12px;min-height:36px;resize:vertical" id="${containerId}-f-${i}" onchange="fcEditCard('${containerId}',${i},'front',this.value)">${escHtml(c.front)}</textarea>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Back:</div>
+          <textarea class="fin" style="width:100%;font-size:12px;min-height:36px;resize:vertical" id="${containerId}-b-${i}" onchange="fcEditCard('${containerId}',${i},'back',this.value)">${escHtml(c.back)}</textarea>
+        </div>
+        <button class="btn" style="font-size:10px;padding:4px 8px;margin-top:14px;color:var(--red)" onclick="fcDeleteCard('${containerId}',${i})">✕</button>
+      </div>`).join('');
+}
+
+function fcEditCard(containerId, idx, field, val) {
+  if (_fcReviews[containerId] && _fcReviews[containerId].cards[idx]) {
+    _fcReviews[containerId].cards[idx][field] = val;
+  }
+}
+
+function fcDeleteCard(containerId, idx) {
+  if (_fcReviews[containerId]) {
+    _fcReviews[containerId].cards.splice(idx, 1);
+    _fcRenderCards(containerId);
+  }
+}
+
+function fcSubmitAll(containerId) {
+  const rev = _fcReviews[containerId];
+  if (!rev || rev.cards.length === 0) { alert('No cards to submit.'); return; }
+  let count = 0;
+  rev.cards.forEach(c => {
+    if (c.front.trim() && c.back.trim()) {
+      addCard(c.front.trim(), c.back.trim(), rev.tags);
+      count++;
+    }
+  });
+  const status = document.getElementById(containerId + '-submit-status');
+  if (status) status.textContent = '✅ Added ' + count + ' cards to deck!';
+  rev.cards = [];
+  _fcRenderCards(containerId);
+  addLog('action', 'Submitted ' + count + ' reviewed cards (' + rev.tags + ')');
+}
+
+async function fcChat(containerId) {
+  const rev = _fcReviews[containerId];
+  if (!rev) return;
+  const input = document.getElementById(containerId + '-chat-input');
+  const log = document.getElementById(containerId + '-chat-log');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); return; }
+  log.innerHTML += '<div style="margin-bottom:4px"><b style="color:var(--acc)">You:</b> ' + escHtml(q) + '</div>';
+  log.innerHTML += '<div style="margin-bottom:4px;color:var(--muted)">⏳ Thinking...</div>';
+  log.scrollTop = log.scrollHeight;
+  try {
+    const currentCards = rev.cards.map(c => 'Front: ' + c.front + ' | Back: ' + c.back).join('\n');
+    const prompt = `Context: ${rev.context}\n\nCurrent flashcards:\n${currentCards}\n\nUser question: ${q}\n\nIf the user asks to add/modify/generate cards, return any new cards as a JSON array with "front" and "back" fields, wrapped in <cards>[...]</cards> tags, IN ADDITION to your normal response. Otherwise just answer the question helpfully.`;
+    const resp = await callClaude(key, prompt);
+    // Remove the "Thinking..." message
+    const msgs = log.querySelectorAll('div');
+    if (msgs.length > 0) msgs[msgs.length - 1].remove();
+    // Check for new cards in response
+    const cardMatch = resp.match(/<cards>([\s\S]*?)<\/cards>/);
+    let cleanResp = resp.replace(/<cards>[\s\S]*?<\/cards>/, '').trim();
+    log.innerHTML += '<div style="margin-bottom:6px"><b style="color:var(--green)">Claude:</b> ' + cleanResp.replace(/\n/g, '<br>') + '</div>';
+    if (cardMatch) {
+      try {
+        const newCards = JSON.parse(cardMatch[1]);
+        if (Array.isArray(newCards)) {
+          newCards.forEach(c => {
+            if (c.front && c.back) rev.cards.push({ front: c.front, back: c.back });
+          });
+          _fcRenderCards(containerId);
+          log.innerHTML += '<div style="color:var(--green);font-size:11px;margin-bottom:4px">📥 Added ' + newCards.length + ' cards to review list.</div>';
+        }
+      } catch(e) { /* ignore parse errors */ }
+    }
+    log.scrollTop = log.scrollHeight;
+  } catch (e) {
+    const msgs = log.querySelectorAll('div');
+    if (msgs.length > 0) msgs[msgs.length - 1].remove();
+    log.innerHTML += '<div style="color:var(--red);margin-bottom:4px">Error: ' + escHtml(e.message) + '</div>';
+  }
+}
+
+function _parseCardsJSON(resp) {
+  try {
+    const jsonMatch = resp.match(/\[[\s\S]*\]/);
+    if (jsonMatch) return JSON.parse(jsonMatch[0]);
+  } catch(e) { /* ignore */ }
+  return [];
+}
+
+// ============ REFLECTION SUBMIT (Daily Composition) ============
 async function submitRefl() {
   const txt = document.getElementById('refl-txt').value.trim();
   const wc = txt.split(/\s+/).filter(w => w).length;
@@ -630,16 +827,23 @@ async function submitRefl() {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const res = document.getElementById('refl-res');
-  res.style.display = 'block'; res.innerHTML = '<p>⏳ Sending to Claude for correction + Anki cards...</p>';
+  res.style.display = 'block'; res.innerHTML = '<p>⏳ Sending to Claude for correction + flashcard generation...</p>';
   try {
-    const prompt = 'You are an expert Italian language tutor at C1-C2 level. The student wrote:\n\n' + txt + '\n\nPlease:\n1. CORRECT the text (show original errors → corrections with brief explanations in English)\n2. Generate 5-8 Anki flashcards from vocabulary/grammar in this text. Format each card as:\nFront: [Italian word/phrase]\nBack: [English meaning + example sentence in Italian]\n\nBe thorough but encouraging.';
-    const resp = await callClaude(key, prompt);
-    res.innerHTML = '<div style="background:#f0fdf4;padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap">' + escHtml(resp) + '</div>';
+    const feedbackPrompt = `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:\n\n"${txt}"\n\nIstruzioni:\n1. Per prima cosa, riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine — il testo intero, non solo frammenti.\n2. Poi elenca ogni errore: originale → corretto, con una spiegazione IN ITALIANO del perché era sbagliato.\n3. Valuta il livello (A2/B1/B2/C1/C2).\n\nSii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti. Solo correzioni e spiegazioni.\n\nFormatta la risposta con intestazioni chiare.`;
+    const feedbackResp = await callClaude(key, feedbackPrompt);
+    res.innerHTML = '<div style="background:var(--bg);padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap;border:1px solid var(--border)">' + escHtml(feedbackResp) + '</div>';
+    // Save correction
     const d = getGlobal();
-    d.corrections.push({ date: today(), text: txt, response: resp });
-    const cardMatch = resp.match(/Front:.*?Back:.*?(?=Front:|$)/gs);
-    if (cardMatch) { cardMatch.forEach(c => d.ankiCards.push({ date: today(), card: c.trim() })); }
-    save(d); addLog('action', 'Italian reflection submitted + corrected');
+    d.corrections.push({ date: today(), text: txt, response: feedbackResp });
+    save(d);
+    // Now generate flashcards
+    const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+    const cardResp = await callClaude(key, cardPrompt);
+    const cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      renderFlashcardReview('refl-card-review', cards, 'Daily composition:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'composition');
+    }
+    addLog('action', 'Italian composition submitted + corrected + ' + cards.length + ' cards generated');
   } catch (e) { res.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>'; }
 }
 
@@ -1492,41 +1696,20 @@ async function trSubmitWords() {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const status = document.getElementById('tr-words-status');
-  status.textContent = '⏳ Translating ' + trCollectedWords.length + ' words with Claude...';
+  status.textContent = '⏳ Generating flashcards for ' + trCollectedWords.length + ' words...';
   try {
-    const prompt = 'Translate each Italian word/phrase to English. Return ONLY a JSON array of objects with "it" and "en" fields.\n\nWords:\n' +
-      trCollectedWords.map(w => '- ' + w).join('\n');
+    const article = CAL._currentArticle || {};
+    const articleContext = article.title ? 'Article: "' + article.title + '" (' + (article.difficulty || '?') + ')\n' : '';
+    const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\n${articleContext}The student highlighted these words/phrases while reading:\n${trCollectedWords.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const resp = await callClaude(key, prompt);
-    let translations;
-    try {
-      const jsonMatch = resp.match(/\[[\s\S]*\]/);
-      translations = JSON.parse(jsonMatch ? jsonMatch[0] : resp);
-    } catch {
-      // Fallback: one translation per line
-      const lines = resp.split('\n').filter(l => l.trim());
-      translations = trCollectedWords.map((w, i) => ({ it: w, en: lines[i] || '...' }));
+    const cards = _parseCardsJSON(resp);
+    if (cards.length > 0) {
+      status.textContent = '✅ Generated ' + cards.length + ' cards. Review below.';
+      renderFlashcardReview('tr-words-card-review', cards, articleContext + 'Collected words: ' + trCollectedWords.join(', '), 'reading');
+    } else {
+      status.textContent = '⚠️ No cards parsed. Try again.';
     }
-    // Create cards
-    trArticleCards = [];
-    translations.forEach(t => {
-      const front = t.it || t.front || '';
-      const back = t.en || t.back || '';
-      if (front && back) {
-        addCard(front, back, 'reading');
-        trArticleCards.push({ front, back });
-      }
-    });
-    status.textContent = '✅ Created ' + trArticleCards.length + ' flashcards!';
-    // Show created cards
-    const createdDiv = document.getElementById('tr-created-cards');
-    const createdList = document.getElementById('tr-created-list');
-    if (createdDiv && createdList) {
-      createdDiv.style.display = 'block';
-      createdList.innerHTML = trArticleCards.map(c =>
-        '<div class="tr-card-item"><span class="front">' + escHtml(c.front) + '</span><span class="back">' + escHtml(c.back) + '</span></div>'
-      ).join('');
-    }
-    addLog('action', 'Created ' + trArticleCards.length + ' cards from reading');
+    addLog('action', 'Generated ' + cards.length + ' cards from ' + trCollectedWords.length + ' collected words');
   } catch (e) {
     status.textContent = '❌ Error: ' + e.message;
   }
@@ -1549,29 +1732,34 @@ async function trSubmitReflection(num) {
   const article = CAL._currentArticle || {};
   const title = article.title || document.getElementById('tr-title').textContent || 'Untitled';
   const status = document.getElementById('tr-refl-status');
-  status.textContent = '⏳ Sending reflection to Claude for feedback...';
+  status.textContent = '⏳ Sending reflection to Claude for feedback + flashcard generation...';
   try {
-    const prompt = `The student read an Italian article titled "${title}" and wrote this reflection in Italian:\n\n"${txt}"\n\nPlease:\n1. First, output the FULL corrected version of the text (the entire text rewritten correctly, not just fragments)\n2. Then list each error: original → corrected, with a brief explanation IN ITALIAN of why it was wrong\n3. Rate their level (A2/B1/B2/C1/C2)\n\nBe direct and factual. No encouragement, no compliments, no softening. Just corrections and explanations.\n\nFormat your response clearly with headers.`;
-    const resp = await callClaude(key, prompt);
+    const feedbackPrompt = `Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:\n\n"${txt}"\n\nIstruzioni:\n1. Per prima cosa, riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine — il testo intero, non solo frammenti.\n2. Poi elenca ogni errore: originale → corretto, con una spiegazione IN ITALIANO del perché era sbagliato.\n3. Valuta il livello (A2/B1/B2/C1/C2).\n\nSii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti. Solo correzioni e spiegazioni.`;
+    const feedbackResp = await callClaude(key, feedbackPrompt);
     document.getElementById('tr-refl-result').style.display = 'block';
-    document.getElementById('tr-refl-feedback').innerHTML = resp.replace(/\n/g, '<br>');
+    document.getElementById('tr-refl-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');
     // Log as article on Today tab
     const titleEl = document.getElementById('art' + num + '-t');
     const thoughtsEl = document.getElementById('art' + num + '-th');
     if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     if (thoughtsEl) thoughtsEl.value = txt;
-    // Update Italian Work checkmarks on Today tab
     const chk = document.getElementById('h-art' + num);
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title;
-    // Log to reading history
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
-    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: trArticleCards.length, reflectionWords: wc });
+    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc });
     save(d);
-    status.textContent = '✅ Feedback received! Logged as Article ' + num + '.';
-    addLog('action', 'Article ' + num + ' logged with reflection: ' + title);
+    // Now generate flashcards from the reflection corrections
+    const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard pairs (definition + cloze for each item) following the rules.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardResp = await callClaude(key, cardPrompt);
+    const cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      renderFlashcardReview('tr-refl-card-review', cards, 'Article: ' + title + '\nReflection:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'reading');
+    }
+    status.textContent = '✅ Feedback + ' + cards.length + ' cards generated. Logged as Article ' + num + '.';
+    addLog('action', 'Article ' + num + ' reflection: ' + title + ' + ' + cards.length + ' cards');
   } catch (e) {
     status.textContent = '❌ Error: ' + e.message;
   }
