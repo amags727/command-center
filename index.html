@@ -178,6 +178,12 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </style>
 </head>
 <body>
+<div class="sync-bar" id="sync-bar">
+<span id="sync-status">⚪ <span style="font-size:11px">Local only</span></span>
+<input id="sync-pass" type="password" placeholder="Sync passphrase…">
+<button class="btn-sync" onclick="doSyncConnect()">Connect</button>
+<button class="btn-disc" onclick="doSyncDisconnect()" style="display:none" id="sync-disc-btn">Disconnect</button>
+</div>
 <nav class="nav" id="nav">
 <button class="active" onclick="switchTab('today')">📅 Today</button>
 <button onclick="switchTab('week')">📊 Week</button>
@@ -490,6 +496,10 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="firebase-sync.js"></script>
 <script src="app.js"></script>
 <script>
 // Register service worker for PWA

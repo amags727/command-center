@@ -1,7 +1,7 @@
 // ============ DATA LAYER ============
 const KEY = 'cmdcenter';
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
-function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
 function today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function weekId(d) { const dt = new Date(d || today()); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(dt.setDate(diff)); return mon.getFullYear() + '-' + String(mon.getMonth() + 1).padStart(2, '0') + '-' + String(mon.getDate()).padStart(2, '0'); }
 function dayData(date) { const d = load(); if (!d.days) d.days = {}; if (!d.days[date]) d.days[date] = { habits: {}, blocks: [], top3: [], intentions: [], bundles: [], reflection: '', sealed: false, distractions: [], energy: [], dissTime: 0 }; return d; }
@@ -2382,8 +2382,38 @@ function forceNewArticle() {
   localStorage.removeItem('aotd_data');
   fetchArticleOfTheDay(true);
 }
+// ============ SYNC UI ============
+async function doSyncConnect() {
+  const pass = document.getElementById('sync-pass').value.trim();
+  if (!pass) { alert('Enter a sync passphrase.'); return; }
+  if (typeof FirebaseSync === 'undefined') { alert('Firebase not loaded.'); return; }
+  const ok = await FirebaseSync.connect(pass);
+  if (ok) {
+    document.getElementById('sync-pass').style.display = 'none';
+    document.querySelector('.sync-bar .btn-sync').style.display = 'none';
+    document.getElementById('sync-disc-btn').style.display = '';
+  }
+}
+function doSyncDisconnect() {
+  if (!confirm('Disconnect sync? Data stays local.')) return;
+  FirebaseSync.disconnect();
+  document.getElementById('sync-pass').style.display = '';
+  document.getElementById('sync-pass').value = '';
+  document.querySelector('.sync-bar .btn-sync').style.display = '';
+  document.getElementById('sync-disc-btn').style.display = 'none';
+}
+function initSyncUI() {
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.isConnected()) {
+    document.getElementById('sync-pass').style.display = 'none';
+    document.querySelector('.sync-bar .btn-sync').style.display = 'none';
+    document.getElementById('sync-disc-btn').style.display = '';
+  }
+}
+
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Firebase Sync
+  if (typeof FirebaseSync !== 'undefined') FirebaseSync.init().then(() => initSyncUI());
   // Clear stale Anki target cache (forces recalc with review-cap fix)
   const ankiKey = 'anki_target_' + today();
   const cached = parseInt(localStorage.getItem(ankiKey));
