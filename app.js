@@ -739,6 +739,9 @@ const _fcReviews = {};
 function renderFlashcardReview(containerId, cards, context, tags) {
   const container = document.getElementById(containerId);
   if (!container) return;
+  // Hide any previous success message
+  const prevSuccess = document.getElementById(containerId + '-success');
+  if (prevSuccess) prevSuccess.style.display = 'none';
   _fcReviews[containerId] = { cards: cards.map(c => ({...c})), context, tags };
   container.style.display = 'block';
   container.innerHTML = `
@@ -806,10 +809,23 @@ function fcSubmitAll(containerId) {
       count++;
     }
   });
-  const status = document.getElementById(containerId + '-submit-status');
-  if (status) status.textContent = '✅ Added ' + count + ' cards to deck!';
+  // Hide the review UI and show a success message below it
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.style.display = 'none';
+    // Create or update success message after the container
+    let successEl = document.getElementById(containerId + '-success');
+    if (!successEl) {
+      successEl = document.createElement('div');
+      successEl.id = containerId + '-success';
+      successEl.style.cssText = 'margin-top:8px;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;color:#16a34a;font-size:13px;font-weight:600';
+      container.parentNode.insertBefore(successEl, container.nextSibling);
+    }
+    successEl.textContent = '✅ Added ' + count + ' cards to deck!';
+    successEl.style.display = 'block';
+  }
   rev.cards = [];
-  _fcRenderCards(containerId);
+  delete _fcReviews[containerId];
   addLog('action', 'Submitted ' + count + ' reviewed cards (' + rev.tags + ')');
 }
 
