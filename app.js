@@ -114,7 +114,7 @@ function calViewDate() { return CAL.viewDate || today(); }
 function calSetDate(offset) {
   const cur = new Date(calViewDate() + 'T12:00:00');
   cur.setDate(cur.getDate() + offset);
-  CAL.viewDate = cur.getFullYear() + '-' + String(cur.getMonth() + 1).padStart(2, '0') + '-' + String(cur.getDate()).padStart(2, '0');
+  CAL.viewDate = cur.toISOString().slice(0, 10);
   renderCal();
 }
 function calGoToday() { CAL.viewDate = null; renderCal(); }
@@ -1927,6 +1927,205 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// ============ ARTICLE OF THE DAY ============
+const AOTD_FEEDS = {
+  italian: [
+    { name: 'Il Post', url: 'https://www.ilpost.it/feed/' },
+    { name: 'Internazionale', url: 'https://www.internazionale.it/sitemaps/rss.xml' },
+    { name: 'Doppiozero', url: 'https://www.doppiozero.com/rss.xml' }
+  ],
+  english: [
+    { name: 'NYRB', url: 'https://www.nybooks.com/feed/' },
+    { name: 'Aeon', url: 'https://aeon.co/feed.rss' },
+    { name: 'LRB', url: 'https://www.lrb.co.uk/feeds' }
+  ],
+  other: [
+    { name: 'Le Monde Idées', url: 'https://www.lemonde.fr/idees/rss_full.xml' },
+    { name: 'NZZ', url: 'https://www.nzz.ch/recent.rss' },
+    { name: 'Die Zeit', url: 'https://newsfeed.zeit.de/index' },
+    { name: 'El País', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/opinion/portada' }
+  ]
+};
+
+const AOTD_PROXIES = [
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`
+];
+
+const AOTD_METHODOLOGY = `You are a reading advisor for a reader with advanced training in economics and the humanities.
+
+TASK: From the pool of recent articles below, select ONE that best matches the following criteria. You may also REJECT the entire pool if nothing meets the bar.
+
+SOURCE STRATEGY — aim for balance over time. Yesterday's pick was from the "{lastCat}" category. Prefer a different category today if quality allows.
+Categories: Italian-language, English-language, Non-Anglophone/non-Italian
+
+SUBJECT AREAS TO PRIORITIZE (at least one, preferably two):
+- Political economy of technology (AI, data, platforms, measurement)
+- Media, expertise, and knowledge production
+- Migration, borders, categorization, and state capacity
+- Cultural responses to economic or technological change
+- Institutions whose public narratives diverge from their actual functioning
+
+ANALYTICAL CONSTRAINTS:
+- The article should interrogate a commonly accepted assumption rather than merely describe events
+- Prefer pieces that link abstract concepts (incentives, norms, classification, legitimacy) to a concrete case
+- Tone should be skeptical or analytical, not celebratory, alarmist, or moralizing
+- Avoid culture-war framing, hype about "the future of X," or managerial optimism
+
+AUDIENCE CALIBRATION:
+- The reader is comfortable with theory and abstraction but impatient with jargon
+- Do not pick articles that merely explain basic concepts unless doing so IS the argument
+
+STYLE PREFERENCES:
+- Clear argumentative spine; the core claim should be expressible in one sentence
+- Bonus for authors who quietly dissent from a dominant narrative
+
+RESPONSE FORMAT — return ONLY valid JSON, no markdown fences:
+If you find a worthy article:
+{"title":"...","url":"...","source":"...","category":"italian|english|other","blurb":"2-3 sentence description of why this is worth reading","claim":"The core argument in one sentence","image":"image_url_or_null"}
+
+If NOTHING in the pool meets the bar, respond with:
+{"resample":true,"reason":"brief explanation of why the pool was weak"}`;
+
+async function fetchWithProxy(url) {
+  for (const mkProxy of AOTD_PROXIES) {
+    try {
+      const r = await fetch(mkProxy(url), { signal: AbortSignal.timeout(12000) });
+      if (r.ok) return await r.text();
+    } catch(e) { /* try next proxy */ }
+  }
+  return null;
+}
+
+function parseRSSItems(xml, sourceName) {
+  try {
+    const doc = new DOMParser().parseFromString(xml, 'text/xml');
+    if (doc.querySelector('parsererror')) return [];
+    const items = [...doc.querySelectorAll('item')].slice(0, 15);
+    return items.map(it => {
+      const get = tag => { const el = it.querySelector(tag); return el ? el.textContent.trim() : ''; };
+      let image = null;
+      const media = it.querySelector('content[url]') || it.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'content')[0];
+      if (media) image = media.getAttribute('url');
+      if (!image) { const enc = it.querySelector('enclosure[url]'); if (enc && (enc.getAttribute('type')||'').startsWith('image')) image = enc.getAttribute('url'); }
+      const desc = get('description').replace(/<[^>]+>/g, '').slice(0, 400);
+      return { title: get('title'), link: get('link'), description: desc, pubDate: get('pubDate'), source: sourceName, image };
+    }).filter(i => i.title && i.link);
+  } catch(e) { return []; }
+}
+
+async function fetchAllRSSItems() {
+  const allFeeds = [...AOTD_FEEDS.italian.map(f=>({...f,cat:'italian'})), ...AOTD_FEEDS.english.map(f=>({...f,cat:'english'})), ...AOTD_FEEDS.other.map(f=>({...f,cat:'other'}))];
+  const results = await Promise.allSettled(allFeeds.map(async feed => {
+    const xml = await fetchWithProxy(feed.url);
+    if (!xml) return [];
+    return parseRSSItems(xml, feed.name).map(item => ({ ...item, category: feed.cat }));
+  }));
+  let pool = [];
+  results.forEach(r => { if (r.status === 'fulfilled') pool.push(...r.value); });
+  // Sort by date (most recent first), dedupe by title
+  pool.sort((a,b) => { try { return new Date(b.pubDate) - new Date(a.pubDate); } catch(e) { return 0; } });
+  const seen = new Set();
+  pool = pool.filter(i => { const k = i.title.toLowerCase().slice(0,60); if (seen.has(k)) return false; seen.add(k); return true; });
+  return pool.slice(0, 60);
+}
+
+async function askClaudeForArticle(pool, lastCat, isRetry) {
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) throw new Error('NO_KEY');
+  const prompt = AOTD_METHODOLOGY.replace('{lastCat}', lastCat || 'none') +
+    (isRetry ? '\n\nNOTE: This is a second pass. Nothing met the bar on the first attempt. Lower your threshold slightly but maintain core quality standards. If still nothing, pick the least-bad option and note it is a compromise in the blurb.' : '') +
+    '\n\nARTICLE POOL (' + pool.length + ' items):\n' + JSON.stringify(pool.map(({title,link,source,description,category,image}) => ({title,url:link,source,description,category,image})), null, 0);
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 512, messages: [{ role: 'user', content: prompt }] })
+  });
+  if (!resp.ok) throw new Error('Claude API error: ' + resp.status);
+  const data = await resp.json();
+  const text = data.content?.[0]?.text || '';
+  // Extract JSON from response (handle possible markdown fences)
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in Claude response');
+  return JSON.parse(jsonMatch[0]);
+}
+
+function renderAOTD(article) {
+  document.getElementById('aotd-loading').style.display = 'none';
+  document.getElementById('aotd-result').style.display = 'block';
+  document.getElementById('aotd-nokey').style.display = 'none';
+  document.getElementById('aotd-error').style.display = 'none';
+  const linkEl = document.getElementById('aotd-link');
+  linkEl.textContent = article.title;
+  linkEl.href = article.url;
+  document.getElementById('aotd-read-link').href = article.url;
+  document.getElementById('aotd-source').textContent = article.source;
+  const catEl = document.getElementById('aotd-cat');
+  catEl.textContent = article.category === 'italian' ? '🇮🇹 Italian' : article.category === 'english' ? '🇬🇧 English' : '🌍 International';
+  catEl.className = 'aotd-cat ' + (article.category === 'italian' ? 'it' : article.category === 'english' ? 'en' : 'other');
+  document.getElementById('aotd-blurb').textContent = article.blurb || '';
+  const claimEl = document.getElementById('aotd-claim');
+  if (article.claim) { claimEl.textContent = article.claim; claimEl.style.display = 'block'; } else { claimEl.style.display = 'none'; }
+  const iconEl = document.getElementById('aotd-icon');
+  if (article.image) {
+    iconEl.innerHTML = `<img src="${article.image}" alt="" onerror="this.parentElement.innerHTML='📰'">`;
+  } else {
+    try { const domain = new URL(article.url).hostname; iconEl.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=64" alt="" onerror="this.parentElement.innerHTML='📰'">`; } catch(e) { iconEl.innerHTML = '📰'; }
+  }
+}
+
+async function fetchArticleOfTheDay(force) {
+  const today = new Date().toISOString().slice(0, 10);
+  const cached = localStorage.getItem('aotd_data');
+  const cachedDate = localStorage.getItem('aotd_date');
+  if (!force && cached && cachedDate === today) {
+    try { renderAOTD(JSON.parse(cached)); return; } catch(e) { /* re-fetch */ }
+  }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) {
+    document.getElementById('aotd-loading').style.display = 'none';
+    document.getElementById('aotd-nokey').style.display = 'block';
+    return;
+  }
+  document.getElementById('aotd-loading').style.display = 'block';
+  document.getElementById('aotd-result').style.display = 'none';
+  document.getElementById('aotd-nokey').style.display = 'none';
+  document.getElementById('aotd-error').style.display = 'none';
+  try {
+    const pool = await fetchAllRSSItems();
+    if (pool.length === 0) throw new Error('No RSS feeds responded. Check your connection.');
+    const lastCat = localStorage.getItem('aotd_lastCategory') || 'none';
+    let result = await askClaudeForArticle(pool, lastCat, false);
+    // Handle resample / reject
+    if (result.resample) {
+      console.log('AOTD: Claude rejected pool —', result.reason);
+      result = await askClaudeForArticle(pool, lastCat, true);
+      if (result.resample) {
+        // Force pick: take the first item from a different category than last time
+        const fallback = pool.find(i => i.category !== lastCat) || pool[0];
+        result = { title: fallback.title, url: fallback.link, source: fallback.source, category: fallback.category, blurb: 'Auto-selected (Claude found no standout piece today). ' + (fallback.description || ''), claim: null, image: fallback.image };
+      }
+    }
+    localStorage.setItem('aotd_date', today);
+    localStorage.setItem('aotd_data', JSON.stringify(result));
+    localStorage.setItem('aotd_lastCategory', result.category || 'none');
+    renderAOTD(result);
+  } catch(e) {
+    document.getElementById('aotd-loading').style.display = 'none';
+    if (e.message === 'NO_KEY') {
+      document.getElementById('aotd-nokey').style.display = 'block';
+    } else {
+      document.getElementById('aotd-error').style.display = 'block';
+      document.getElementById('aotd-error-msg').textContent = '⚠ ' + e.message;
+    }
+  }
+}
+
+function forceNewArticle() {
+  localStorage.removeItem('aotd_date');
+  localStorage.removeItem('aotd_data');
+  fetchArticleOfTheDay(true);
+}
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
   // Clear stale Anki target cache (forces recalc with review-cap fix)
@@ -1941,6 +2140,8 @@ document.addEventListener('DOMContentLoaded', function() {
   loadAll();
   loadTodayNotes();
   loadWeekNotes();
+  // Article of the Day — runs once daily on launch
+  fetchArticleOfTheDay(false);
   // Auto-numbered list detection on notes
   ['today-notes', 'week-notes'].forEach(function(id) {
     var el = document.getElementById(id);
