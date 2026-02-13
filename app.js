@@ -859,9 +859,26 @@ async function fcChat(containerId) {
 
 function _parseCardsJSON(resp) {
   try {
-    const jsonMatch = resp.match(/\[[\s\S]*\]/);
+    // Strip markdown code fences if present
+    let cleaned = resp.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
-  } catch(e) { /* ignore */ }
+  } catch(e) {
+    // If JSON is truncated, try to salvage complete objects
+    try {
+      let cleaned = resp.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+      const arrMatch = cleaned.match(/\[[\s\S]*/);
+      if (arrMatch) {
+        let partial = arrMatch[0];
+        // Find the last complete object (ends with })
+        const lastBrace = partial.lastIndexOf('}');
+        if (lastBrace > 0) {
+          partial = partial.slice(0, lastBrace + 1) + ']';
+          return JSON.parse(partial);
+        }
+      }
+    } catch(e2) { /* give up */ }
+  }
   return [];
 }
 
@@ -1049,10 +1066,10 @@ function initClaude() {
   }
 }
 function saveKey() { localStorage.setItem('cc_apikey', document.getElementById('api-key').value.trim()); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
-async function callClaude(key, prompt) {
+async function callClaude(key, prompt, maxTokens) {
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2048, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 4096, messages: [{ role: 'user', content: prompt }] })
   });
   if (!resp.ok) throw new Error('API error: ' + resp.status + ' ' + (await resp.text()));
   const data = await resp.json(); return data.content[0].text;
