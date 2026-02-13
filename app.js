@@ -1482,6 +1482,151 @@ async function seedAnkiDeck() {
   }
 }
 
+// ============ ADD CARDS MODE SWITCHER ============
+function showAddCardMode(mode) {
+  ['manual', 'vocab', 'premade'].forEach(m => {
+    const panel = document.getElementById('add-mode-' + m);
+    const btn = document.getElementById('add-mode-' + m + '-btn');
+    if (panel) panel.style.display = m === mode ? 'block' : 'none';
+    if (btn) btn.style.background = m === mode ? 'var(--acc)' : '';
+    if (btn) btn.style.color = m === mode ? '#fff' : '';
+  });
+}
+
+// ============ VOCAB LIST → CLAUDE FLASHCARDS ============
+let _csvData = null;
+
+async function submitVocabList() {
+  const txt = document.getElementById('vocab-list-text').value.trim();
+  if (!txt) { alert('Enter some words or phrases first.'); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const words = txt.split(/\n/).map(w => w.trim()).filter(w => w.length > 0);
+  if (words.length === 0) { alert('No words found.'); return; }
+  const status = document.getElementById('vocab-list-status');
+  status.textContent = '⏳ Generating flashcards for ' + words.length + ' words...';
+  try {
+    const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\nThe student wants flashcards for these words/phrases:\n${words.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+    const resp = await callClaude(key, prompt);
+    const cards = _parseCardsJSON(resp);
+    if (cards.length > 0) {
+      status.textContent = '✅ Generated ' + cards.length + ' cards. Review below.';
+      renderFlashcardReview('vocab-list-card-review', cards, 'Vocab list: ' + words.join(', '), 'vocab');
+    } else {
+      status.textContent = '⚠️ No cards parsed. Try again.';
+    }
+    addLog('action', 'Generated ' + cards.length + ' cards from vocab list (' + words.length + ' words)');
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// ============ CSV / TSV IMPORT ============
+function handleCSVUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  document.getElementById('csv-file-name').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    // Detect delimiter: tab, comma, or semicolon
+    const firstLine = text.split('\n')[0] || '';
+    let delim = ',';
+    if (firstLine.includes('\t')) delim = '\t';
+    else if ((firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length) delim = ';';
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const rows = lines.map(l => {
+      // Simple CSV parse (handles basic quoting)
+      const result = [];
+      let current = '', inQuotes = false;
+      for (let i = 0; i < l.length; i++) {
+        const ch = l[i];
+        if (inQuotes) {
+          if (ch === '"' && l[i+1] === '"') { current += '"'; i++; }
+          else if (ch === '"') inQuotes = false;
+          else current += ch;
+        } else {
+          if (ch === '"') inQuotes = true;
+          else if (ch === delim) { result.push(current); current = ''; }
+          else current += ch;
+        }
+      }
+      result.push(current);
+      return result;
+    });
+    if (rows.length === 0) { alert('File appears empty.'); return; }
+    _csvData = { rows, hasHeader: false };
+    // Guess if first row is a header (non-empty, text-like, different pattern)
+    if (rows.length > 1) {
+      const first = rows[0];
+      const isHeader = first.every(c => c.length > 0 && c.length < 40 && !/\d{4}/.test(c));
+      _csvData.hasHeader = isHeader;
+    }
+    // Populate column selectors
+    const numCols = Math.max(...rows.map(r => r.length));
+    const frontSel = document.getElementById('csv-front-col');
+    const backSel = document.getElementById('csv-back-col');
+    frontSel.innerHTML = '';
+    backSel.innerHTML = '';
+    for (let i = 0; i < numCols; i++) {
+      const label = _csvData.hasHeader && rows[0][i] ? rows[0][i] : 'Column ' + (i + 1);
+      frontSel.innerHTML += '<option value="' + i + '">' + escHtml(label) + '</option>';
+      backSel.innerHTML += '<option value="' + i + '">' + escHtml(label) + '</option>';
+    }
+    frontSel.value = '0';
+    backSel.value = numCols > 1 ? '1' : '0';
+    document.getElementById('csv-preview').style.display = 'block';
+    renderCSVPreview();
+  };
+  reader.readAsText(file);
+}
+
+function renderCSVPreview() {
+  if (!_csvData) return;
+  const frontCol = parseInt(document.getElementById('csv-front-col').value);
+  const backCol = parseInt(document.getElementById('csv-back-col').value);
+  const startRow = _csvData.hasHeader ? 1 : 0;
+  const dataRows = _csvData.rows.slice(startRow);
+  const preview = dataRows.slice(0, 10);
+  const table = document.getElementById('csv-preview-table');
+  let html = '<thead><tr><th style="font-size:11px">#</th><th style="font-size:11px">Front</th><th style="font-size:11px">Back</th></tr></thead><tbody>';
+  preview.forEach((row, i) => {
+    const f = (row[frontCol] || '').trim();
+    const b = (row[backCol] || '').trim();
+    html += '<tr><td style="font-size:11px;color:var(--muted)">' + (i + 1) + '</td><td style="font-size:12px">' + escHtml(f) + '</td><td style="font-size:12px">' + escHtml(b) + '</td></tr>';
+  });
+  if (dataRows.length > 10) html += '<tr><td colspan="3" style="font-size:11px;color:var(--muted);text-align:center">... and ' + (dataRows.length - 10) + ' more rows</td></tr>';
+  html += '</tbody>';
+  table.innerHTML = html;
+  document.getElementById('csv-row-count').textContent = dataRows.length;
+}
+
+function importCSVCards() {
+  if (!_csvData) { alert('No file loaded.'); return; }
+  const frontCol = parseInt(document.getElementById('csv-front-col').value);
+  const backCol = parseInt(document.getElementById('csv-back-col').value);
+  const startRow = _csvData.hasHeader ? 1 : 0;
+  const dataRows = _csvData.rows.slice(startRow);
+  let count = 0;
+  dataRows.forEach(row => {
+    const f = (row[frontCol] || '').trim();
+    const b = (row[backCol] || '').trim();
+    if (f && b) { addCard(f, b, ''); count++; }
+  });
+  if (count > 0) {
+    alert('✅ Imported ' + count + ' cards!');
+    renderCards();
+    // Reset
+    _csvData = null;
+    document.getElementById('csv-preview').style.display = 'none';
+    document.getElementById('csv-file-name').textContent = '';
+    document.getElementById('csv-file-input').value = '';
+  } else {
+    alert('No valid cards found. Check your column selection.');
+  }
+  addLog('action', 'CSV import: ' + count + ' cards');
+}
+
 function renderCardBrowse() {
   const d = getCards(), el = document.getElementById('card-browse');
   if (!el) return;

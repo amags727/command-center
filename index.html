@@ -406,20 +406,55 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 
 <div class="card"><h3>➕ Add Cards</h3>
+<div class="flex" style="gap:8px;flex-wrap:wrap;margin-bottom:12px">
+<button class="btn btn-s" onclick="showAddCardMode('manual')" id="add-mode-manual-btn">✏️ Manual Entry</button>
+<button class="btn btn-s" onclick="showAddCardMode('vocab')" id="add-mode-vocab-btn">📝 Vocab List</button>
+<button class="btn btn-s" onclick="showAddCardMode('premade')" id="add-mode-premade-btn">📄 Pre-Made Cards</button>
+</div>
+
+<!-- Manual Entry -->
+<div id="add-mode-manual" style="display:none">
 <div class="mb4"><input class="fin" id="card-front" placeholder="Front (Italian)"></div>
 <div class="mb4"><input class="fin" id="card-back" placeholder="Back (English)"></div>
-<div class="mb4"><input class="fin" id="card-tags" placeholder="Tags (comma-separated, optional)"></div>
-<div class="flex"><button class="btn btn-p" onclick="addCard()">Add Card</button><button class="btn btn-s" onclick="toggleBulkImport()">📋 Bulk Import</button><button id="seed-anki-btn" class="btn btn-s" onclick="seedAnkiDeck()">📦 Seed Anki Deck</button></div>
-<div id="bulk-import" style="display:none" class="mt8">
-<p style="font-size:12px;color:var(--muted);margin-bottom:4px">Paste TSV (front→back, one per line) or Front: / Back: pairs:</p>
-<textarea class="fin" id="bulk-text" rows="6" placeholder="word1&#9;meaning1&#10;word2&#9;meaning2&#10;&#10;OR:&#10;&#10;Front: parola&#10;Back: word"></textarea>
-<button class="btn btn-p mt8" onclick="bulkImport()">Import</button>
+<div class="flex"><button class="btn btn-p" onclick="addCard()">Add Card</button></div>
+</div>
+
+<!-- Vocab List -->
+<div id="add-mode-vocab" style="display:none">
+<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Enter words or phrases, one per line. Claude will generate flashcard proposals.</p>
+<textarea class="fin" id="vocab-list-text" rows="8" placeholder="parola&#10;frase esempio&#10;un'altra parola..."></textarea>
+<div class="flex mt8"><button class="btn btn-p" onclick="submitVocabList()">🤖 Generate Flashcards</button></div>
+<div id="vocab-list-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+<div id="vocab-list-card-review" style="display:none;margin-top:10px" class="card"></div>
+</div>
+
+<!-- Pre-Made Cards (CSV) -->
+<div id="add-mode-premade" style="display:none">
+<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Upload a CSV or TSV file with your flashcards.</p>
+<div class="flex mb8"><label class="btn btn-s" style="cursor:pointer">📁 Choose File <input type="file" accept=".csv,.tsv,.txt" onchange="handleCSVUpload(event)" style="display:none" id="csv-file-input"></label><span id="csv-file-name" style="font-size:12px;color:var(--muted);align-self:center"></span></div>
+<div id="csv-preview" style="display:none">
+<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Preview (first 10 rows). Select which columns are Front and Back:</p>
+<div class="flex mb4" style="gap:12px;font-size:12px">
+<label>Front column: <select class="fin" id="csv-front-col" style="width:auto;font-size:12px" onchange="renderCSVPreview()"></select></label>
+<label>Back column: <select class="fin" id="csv-back-col" style="width:auto;font-size:12px" onchange="renderCSVPreview()"></select></label>
+</div>
+<div style="overflow-x:auto"><table class="atable" id="csv-preview-table"></table></div>
+<div class="flex mt8"><button class="btn btn-p" onclick="importCSVCards()">Import <span id="csv-row-count">0</span> Cards</button></div>
 </div>
 </div>
 
-<div class="card"><h3>🔍 Browse Deck</h3>
+<!-- Legacy buttons kept hidden for backward compat -->
+<div style="display:none"><button id="seed-anki-btn" onclick="seedAnkiDeck()">📦 Seed Anki Deck</button><div id="bulk-import"><textarea id="bulk-text"></textarea></div><input id="card-tags"></div>
+</div>
+
+<div class="card">
+<details id="browse-deck-details">
+<summary style="cursor:pointer;font-weight:600;font-size:1.05em">🔍 Browse Deck</summary>
+<div style="margin-top:10px">
 <div class="flex mb8"><input class="fin flex-1" id="card-search" placeholder="Search cards..." oninput="renderCardBrowse()"><select class="fin" id="card-filter" onchange="renderCardBrowse()" style="width:120px"><option value="all">All</option><option value="new">New</option><option value="learning">Learning</option><option value="review">Review</option><option value="due">Due</option></select></div>
 <div id="card-browse" style="max-height:400px;overflow-y:auto"></div>
+</div>
+</details>
 </div>
 </div>
 
