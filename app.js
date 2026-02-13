@@ -269,7 +269,7 @@ function calBindEvents() {
       const id = el.dataset.id;
       const { effective } = getCalBlocks(calViewDate());
       const block = effective.find(b => (b.id || b.recurId) === id);
-      if (block) calShowPopover(block, block.startMin, block.endMin, e);
+      if (block) calShowPopover(block, block.startMin, block.endMin, e, el);
     });
   });
   // Touch events for mobile
@@ -449,7 +449,7 @@ function calUpdateBlock(block, updates) {
   renderCal();
 }
 
-function calShowPopover(block, startMin, endMin, evt) {
+function calShowPopover(block, startMin, endMin, evt, targetEl) {
   calClosePopover();
   const isNew = !block;
   const cats = ['work','gym','italian','dissertation','social','misc'];
@@ -479,9 +479,25 @@ function calShowPopover(block, startMin, endMin, evt) {
   overlay.onclick = calClosePopover;
   document.body.appendChild(overlay);
   document.body.insertAdjacentHTML('beforeend', html);
-  // Position
+  // Position — to the right of the block if possible, else fallback to cursor
   const pop = document.getElementById('cal-pop');
-  const px = Math.min(evt.clientX, window.innerWidth - 320), py = Math.min(evt.clientY, window.innerHeight - 400);
+  let px, py;
+  if (targetEl) {
+    const rect = targetEl.getBoundingClientRect();
+    const gap = 8;
+    const popW = 300;
+    if (rect.right + gap + popW < window.innerWidth) {
+      px = rect.right + gap;
+    } else if (rect.left - gap - popW > 0) {
+      px = rect.left - gap - popW;
+    } else {
+      px = Math.min(evt.clientX, window.innerWidth - 320);
+    }
+    py = Math.min(rect.top, window.innerHeight - 400);
+  } else {
+    px = Math.min(evt.clientX, window.innerWidth - 320);
+    py = Math.min(evt.clientY, window.innerHeight - 400);
+  }
   pop.style.left = px + 'px'; pop.style.top = py + 'px';
   document.getElementById('cp-title').focus();
   // Cat click
