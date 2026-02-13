@@ -18,6 +18,7 @@ function switchTab(id) {
   const names = ['today','week','habits','dissertation','inbox','focus','cards','translate','claude','log'];
   const idx = names.indexOf(id);
   if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
+  if (id === 'today') initToday();
   if (id === 'habits') renderHabits();
   if (id === 'week') renderWeek();
   if (id === 'log') renderLog();
@@ -40,6 +41,19 @@ function initToday() {
   document.getElementById('today-label').textContent = labels[dayNum] || '';
   const dd = dayData(today());
   const day = dd.days[today()];
+  // Backfill article habits from readingHistory
+  const rh = dd.readingHistory || [];
+  const todaysArticles = rh.filter(a => a.date === today());
+  if (todaysArticles.length >= 1 && !day.habits.art1) {
+    day.habits.art1 = true;
+    day.habits.art1Title = todaysArticles[0].title || 'Completed';
+    save(dd);
+  }
+  if (todaysArticles.length >= 2 && !day.habits.art2) {
+    day.habits.art2 = true;
+    day.habits.art2Title = todaysArticles[1].title || 'Completed';
+    save(dd);
+  }
   ['anki','art1','art2'].forEach(h => {
     const el = document.getElementById('h-' + h);
     if (el && day.habits[h]) el.checked = true;
@@ -1998,6 +2012,14 @@ async function trSubmitReflection(num) {
     if (!d.readingHistory) d.readingHistory = [];
     d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc });
     save(d);
+    // Also persist article habit to day data so Today tab checkmark survives reload
+    const dd2 = dayData(today());
+    const dayObj = dd2.days[today()];
+    const artKey = 'art' + num;
+    dayObj.habits[artKey] = true;
+    dayObj.habits[artKey + 'Title'] = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+    dayObj.habits[artKey + 'Thoughts'] = txt;
+    save(dd2);
     // Now generate flashcards from the reflection corrections
     const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard pairs (definition + cloze for each item) following the rules.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
