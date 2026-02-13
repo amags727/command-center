@@ -2026,9 +2026,15 @@ STYLE PREFERENCES:
 - Clear argumentative spine; the core claim should be expressible in one sentence
 - Bonus for authors who quietly dissent from a dominant narrative
 
+BIAS RATING — after identifying the source, assign a political bias rating from this scale:
+far-left | left | left-center | center | center-right | right | far-right
+Base this on the outlet's overall editorial posture, not the individual article.
+
+FAR-RIGHT EXCLUSION — STRONGLY avoid far-right publications. Only include one if the specific piece contains genuinely rigorous analysis that transcends the outlet's editorial posture — this should be extremely rare.
+
 RESPONSE FORMAT — return ONLY valid JSON, no markdown fences:
 If you find a worthy article:
-{"title":"...","url":"...","source":"...","category":"italian|english|other","blurb":"2-3 sentence description of why this is worth reading","claim":"The core argument in one sentence","image":"image_url_or_null","paywalled":false}
+{"title":"...","url":"...","source":"...","bias":"left|left-center|center|center-right|right","category":"italian|english|other","blurb":"One sentence on why this is worth reading","image":"image_url_or_null","paywalled":false}
 
 If NOTHING in the pool meets the bar, respond with:
 {"resample":true,"reason":"brief explanation of why the pool was weak"}`;
@@ -2079,7 +2085,9 @@ async function fetchAllRSSItems() {
 async function askClaudeForArticle(pool, lastCat, isRetry) {
   const key = localStorage.getItem('cc_apikey');
   if (!key) throw new Error('NO_KEY');
+  const historyContext = getAotdHistorySummary();
   const prompt = AOTD_METHODOLOGY.replace('{lastCat}', lastCat || 'none') +
+    historyContext +
     (isRetry ? '\n\nNOTE: This is a second pass. Nothing met the bar on the first attempt. Lower your threshold slightly but maintain core quality standards. If still nothing, pick the least-bad option and note it is a compromise in the blurb.' : '') +
     '\n\nARTICLE POOL (' + pool.length + ' items):\n' + JSON.stringify(pool.map(({title,link,source,description,category,image}) => ({title,url:link,source,description,category,image})), null, 0);
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2096,6 +2104,72 @@ async function askClaudeForArticle(pool, lastCat, isRetry) {
   return JSON.parse(jsonMatch[0]);
 }
 
+function aotdTrack(action) {
+  // action: 'click' (read), 'skip' (new pick), 'ignore' (day ended without click)
+  const cached = localStorage.getItem('aotd_data');
+  if (!cached) return;
+  try {
+    const article = JSON.parse(cached);
+    const d = load();
+    if (!d.aotdHistory) d.aotdHistory = [];
+    // Don't double-log the same article+action
+    const existing = d.aotdHistory.find(h => h.date === today() && h.title === article.title && h.action === action);
+    if (existing) return;
+    d.aotdHistory.push({
+      date: today(),
+      title: article.title,
+      source: article.source,
+      category: article.category,
+      bias: article.bias || null,
+      action: action,
+      ts: new Date().toISOString()
+    });
+    // Keep last 60 entries
+    if (d.aotdHistory.length > 60) d.aotdHistory = d.aotdHistory.slice(-60);
+    save(d);
+  } catch(e) { /* ignore */ }
+}
+
+function getAotdHistorySummary() {
+  const d = load();
+  const hist = d.aotdHistory || [];
+  if (hist.length === 0) return '';
+  const clicked = hist.filter(h => h.action === 'click');
+  const skipped = hist.filter(h => h.action === 'skip');
+  let summary = '\n\nUSER READING HISTORY (use this to calibrate future picks):\n';
+  summary += 'Total tracked: ' + hist.length + ' articles | Read: ' + clicked.length + ' | Skipped: ' + skipped.length + '\n';
+  if (clicked.length > 0) {
+    summary += '\nArticles the user CLICKED (liked enough to read):\n';
+    clicked.slice(-15).forEach(h => { summary += '- "' + h.title + '" (' + h.source + ', ' + h.category + ')\n'; });
+  }
+  if (skipped.length > 0) {
+    summary += '\nArticles the user SKIPPED (hit New Pick — not interesting enough):\n';
+    skipped.slice(-15).forEach(h => { summary += '- "' + h.title + '" (' + h.source + ', ' + h.category + ')\n'; });
+  }
+  // Compute source preferences
+  const srcClicks = {}, srcSkips = {};
+  clicked.forEach(h => { srcClicks[h.source] = (srcClicks[h.source] || 0) + 1; });
+  skipped.forEach(h => { srcSkips[h.source] = (srcSkips[h.source] || 0) + 1; });
+  const allSrcs = new Set([...Object.keys(srcClicks), ...Object.keys(srcSkips)]);
+  if (allSrcs.size > 0) {
+    summary += '\nSource hit rates:\n';
+    allSrcs.forEach(s => {
+      const c = srcClicks[s] || 0, sk = srcSkips[s] || 0;
+      summary += '- ' + s + ': ' + c + ' read, ' + sk + ' skipped\n';
+    });
+  }
+  // Category preferences
+  const catClicks = {}, catSkips = {};
+  clicked.forEach(h => { catClicks[h.category] = (catClicks[h.category] || 0) + 1; });
+  skipped.forEach(h => { catSkips[h.category] = (catSkips[h.category] || 0) + 1; });
+  summary += '\nCategory preferences: ';
+  ['italian','english','other'].forEach(c => {
+    summary += c + ' (' + (catClicks[c]||0) + ' read / ' + (catSkips[c]||0) + ' skipped) ';
+  });
+  summary += '\n\nUse this data to favor sources and topics the user actually reads, and avoid sources/topics they consistently skip. This is a STRONG signal — weight it heavily.';
+  return summary;
+}
+
 function renderAOTD(article) {
   document.getElementById('aotd-loading').style.display = 'none';
   document.getElementById('aotd-result').style.display = 'block';
@@ -2104,16 +2178,18 @@ function renderAOTD(article) {
   const linkEl = document.getElementById('aotd-link');
   linkEl.textContent = article.title;
   linkEl.href = article.url;
-  document.getElementById('aotd-read-link').href = article.url;
+  const readLink = document.getElementById('aotd-read-link');
+  readLink.href = article.url;
+  readLink.onclick = function() { aotdTrack('click'); };
   const archEl = document.getElementById('aotd-archive-link');
   if (archEl) { if (article.archiveUrl) { archEl.href = article.archiveUrl; archEl.style.display = ''; } else { archEl.style.display = 'none'; } }
-  document.getElementById('aotd-source').textContent = article.source;
+  document.getElementById('aotd-source').textContent = article.source + (article.bias ? ' · ' + article.bias : '');
   const catEl = document.getElementById('aotd-cat');
   catEl.textContent = article.category === 'italian' ? '🇮🇹 Italian' : article.category === 'english' ? '🇬🇧 English' : '🌍 International';
   catEl.className = 'aotd-cat ' + (article.category === 'italian' ? 'it' : article.category === 'english' ? 'en' : 'other');
   document.getElementById('aotd-blurb').textContent = article.blurb || '';
   const claimEl = document.getElementById('aotd-claim');
-  if (article.claim) { claimEl.textContent = article.claim; claimEl.style.display = 'block'; } else { claimEl.style.display = 'none'; }
+  claimEl.style.display = 'none';
   const iconEl = document.getElementById('aotd-icon');
   if (article.image) {
     iconEl.innerHTML = `<img src="${article.image}" alt="" onerror="this.parentElement.innerHTML='📰'">`;
@@ -2180,6 +2256,7 @@ async function fetchArticleOfTheDay(force) {
 }
 
 function forceNewArticle() {
+  aotdTrack('skip');
   localStorage.removeItem('aotd_date');
   localStorage.removeItem('aotd_data');
   fetchArticleOfTheDay(true);
