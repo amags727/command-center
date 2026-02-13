@@ -1931,19 +1931,49 @@ document.addEventListener('keydown', function(e) {
 const AOTD_FEEDS = {
   italian: [
     { name: 'Il Post', url: 'https://www.ilpost.it/feed/' },
+    { name: 'La Repubblica', url: 'https://www.repubblica.it/rss/homepage/rss2.0.xml' },
     { name: 'Internazionale', url: 'https://www.internazionale.it/sitemaps/rss.xml' },
-    { name: 'Doppiozero', url: 'https://www.doppiozero.com/rss.xml' }
+    { name: 'Doppiozero', url: 'https://www.doppiozero.com/rss.xml' },
+    { name: 'Il Fatto Quotidiano', url: 'https://www.ilfattoquotidiano.it/feed/' },
+    { name: 'Fanpage', url: 'https://www.fanpage.it/feed/' },
+    { name: 'ANSA', url: 'https://www.ansa.it/sito/ansait_rss.xml' },
+    { name: 'Il Manifesto', url: 'https://ilmanifesto.it/feed' },
+    { name: 'Rivista Studio', url: 'https://www.rivistastudio.com/feed/' },
+    { name: 'Il Tascabile', url: 'https://www.iltascabile.com/feed/' },
+    { name: 'Valigia Blu', url: 'https://www.vfrancia.me/valigiablu/feed/' },
+    { name: 'Domani', url: 'https://www.editorialedomani.it/feed' },
+    { name: 'Wired Italia', url: 'https://www.wired.it/feed/rss' },
+    { name: 'Vita', url: 'https://www.vita.it/feed/' }
   ],
   english: [
-    { name: 'NYRB', url: 'https://www.nybooks.com/feed/' },
     { name: 'Aeon', url: 'https://aeon.co/feed.rss' },
-    { name: 'LRB', url: 'https://www.lrb.co.uk/feeds' }
+    { name: 'The Guardian Long Read', url: 'https://www.theguardian.com/news/series/the-long-read/rss' },
+    { name: 'The Conversation', url: 'https://theconversation.com/articles.atom' },
+    { name: 'ProPublica', url: 'https://feeds.propublica.org/propublica/main' },
+    { name: 'NPR', url: 'https://feeds.npr.org/1001/rss.xml' },
+    { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
+    { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml' },
+    { name: 'The Intercept', url: 'https://theintercept.com/feed/?rss' },
+    { name: 'Vox', url: 'https://www.vox.com/rss/index.xml' },
+    { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' },
+    { name: 'Quanta Magazine', url: 'https://www.quantamagazine.org/feed/' },
+    { name: 'Rest of World', url: 'https://restofworld.org/feed/' },
+    { name: 'NYRB', url: 'https://www.nybooks.com/feed/' },
+    { name: 'The Atlantic', url: 'https://www.theatlantic.com/feed/all/' }
   ],
   other: [
-    { name: 'Le Monde Idées', url: 'https://www.lemonde.fr/idees/rss_full.xml' },
-    { name: 'NZZ', url: 'https://www.nzz.ch/recent.rss' },
+    { name: 'Le Monde', url: 'https://www.lemonde.fr/rss/une.xml' },
+    { name: 'France 24', url: 'https://www.france24.com/fr/rss' },
     { name: 'Die Zeit', url: 'https://newsfeed.zeit.de/index' },
-    { name: 'El País', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/opinion/portada' }
+    { name: 'Deutsche Welle', url: 'https://rss.dw.com/xml/rss-de-all' },
+    { name: 'Der Spiegel', url: 'https://www.spiegel.de/schlagzeilen/index.rss' },
+    { name: 'NZZ', url: 'https://www.nzz.ch/recent.rss' },
+    { name: 'El País', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada' },
+    { name: 'BBC Mundo', url: 'https://www.bbc.com/mundo/rss.xml' },
+    { name: 'The Wire (India)', url: 'https://thewire.in/feed' },
+    { name: 'Daily Maverick', url: 'https://www.dailymaverick.co.za/feed/' },
+    { name: 'NHK World', url: 'https://www3.nhk.or.jp/rss/news/cat0.xml' },
+    { name: 'Mediapart Blog', url: 'https://blogs.mediapart.fr/feed' }
   ]
 };
 
@@ -1959,12 +1989,28 @@ TASK: From the pool of recent articles below, select ONE that best matches the f
 SOURCE STRATEGY — aim for balance over time. Yesterday's pick was from the "{lastCat}" category. Prefer a different category today if quality allows.
 Categories: Italian-language, English-language, Non-Anglophone/non-Italian
 
+QUALITY CONTROL — this pool comes from ~40 feeds of varying quality. You MUST apply strict editorial judgment:
+- REJECT clickbait, listicles, wire-service rewrites, aggregated news briefs, PR-driven announcements, and content-farm filler
+- REJECT anything that merely describes events without analysis ("X happened yesterday")
+- REJECT promotional or sponsored content, product announcements, celebrity gossip
+- REJECT pieces shorter than ~800 words (based on description length — if the description is a single sentence with no substance, it's probably a brief)
+- PREFER long-form: essays, reported features, investigations, serious reviews, deep analysis
+- PREFER pieces with original reporting or a distinct intellectual argument
+- PENALIZE duplicative coverage — if multiple outlets ran the same story, skip it unless one has a meaningfully different angle
+- ASK: "Would this be worth 10+ minutes of focused reading for someone who reads seriously?" If no, skip it.
+
 SUBJECT AREAS TO PRIORITIZE (at least one, preferably two):
 - Political economy of technology (AI, data, platforms, measurement)
 - Media, expertise, and knowledge production
 - Migration, borders, categorization, and state capacity
 - Cultural responses to economic or technological change
 - Institutions whose public narratives diverge from their actual functioning
+
+ACCESSIBILITY CONSTRAINT:
+- The reader subscribes to: Il Post, New York Times, Wall Street Journal
+- STRONGLY prefer articles that are either (a) from a subscribed outlet, (b) known to be freely accessible (e.g. Aeon, Guardian, BBC, NPR, ProPublica, The Conversation, Quanta, Rest of World, Al Jazeera, DW, France 24, BBC Mundo, NHK World), or (c) from outlets that typically don't paywall long-form content
+- If recommending a paywalled piece from a non-subscribed outlet, add "⚠️ likely paywalled" at the start of the blurb
+- Many feeds in this pool are free — lean toward those unless a subscribed or exceptional piece clearly wins
 
 ANALYTICAL CONSTRAINTS:
 - The article should interrogate a commonly accepted assumption rather than merely describe events
@@ -1982,7 +2028,7 @@ STYLE PREFERENCES:
 
 RESPONSE FORMAT — return ONLY valid JSON, no markdown fences:
 If you find a worthy article:
-{"title":"...","url":"...","source":"...","category":"italian|english|other","blurb":"2-3 sentence description of why this is worth reading","claim":"The core argument in one sentence","image":"image_url_or_null"}
+{"title":"...","url":"...","source":"...","category":"italian|english|other","blurb":"2-3 sentence description of why this is worth reading","claim":"The core argument in one sentence","image":"image_url_or_null","paywalled":false}
 
 If NOTHING in the pool meets the bar, respond with:
 {"resample":true,"reason":"brief explanation of why the pool was weak"}`;
@@ -2059,6 +2105,8 @@ function renderAOTD(article) {
   linkEl.textContent = article.title;
   linkEl.href = article.url;
   document.getElementById('aotd-read-link').href = article.url;
+  const archEl = document.getElementById('aotd-archive-link');
+  if (archEl) { if (article.archiveUrl) { archEl.href = article.archiveUrl; archEl.style.display = ''; } else { archEl.style.display = 'none'; } }
   document.getElementById('aotd-source').textContent = article.source;
   const catEl = document.getElementById('aotd-cat');
   catEl.textContent = article.category === 'italian' ? '🇮🇹 Italian' : article.category === 'english' ? '🇬🇧 English' : '🌍 International';
@@ -2106,6 +2154,16 @@ async function fetchArticleOfTheDay(force) {
         result = { title: fallback.title, url: fallback.link, source: fallback.source, category: fallback.category, blurb: 'Auto-selected (Claude found no standout piece today). ' + (fallback.description || ''), claim: null, image: fallback.image };
       }
     }
+    // Check Wayback Machine for an archive link
+    try {
+      const wbResp = await fetch('https://archive.org/wayback/available?url=' + encodeURIComponent(result.url), { signal: AbortSignal.timeout(6000) });
+      if (wbResp.ok) {
+        const wbData = await wbResp.json();
+        if (wbData.archived_snapshots && wbData.archived_snapshots.closest && wbData.archived_snapshots.closest.available) {
+          result.archiveUrl = wbData.archived_snapshots.closest.url.replace(/^http:/, 'https:');
+        }
+      }
+    } catch(e) { /* Wayback check is best-effort */ }
     localStorage.setItem('aotd_date', today);
     localStorage.setItem('aotd_data', JSON.stringify(result));
     localStorage.setItem('aotd_lastCategory', result.category || 'none');
