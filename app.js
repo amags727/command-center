@@ -1,7 +1,7 @@
 // ============ DATA LAYER ============
 const KEY = 'cmdcenter';
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
-function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
+function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
 function today() { return new Date().toISOString().slice(0, 10); }
 function weekId(d) { const dt = new Date(d || today()); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); return new Date(dt.setDate(diff)).toISOString().slice(0, 10); }
 function dayData(date) { const d = load(); if (!d.days) d.days = {}; if (!d.days[date]) d.days[date] = { habits: {}, blocks: [], top3: [], intentions: [], bundles: [], reflection: '', sealed: false, distractions: [], energy: [], dissTime: 0 }; return d; }
@@ -502,7 +502,8 @@ function calSavePopover(existingId, isRecurring) {
     save(d);
   } else {
     // Save as one-off for today
-    const dd = dayData(today()), day = dd.days[today()];
+    const vd = calViewDate();
+    const dd = dayData(vd), day = dd.days[vd];
     if (!day.calBlocks) day.calBlocks = [];
     if (existingId && !isRecurring) {
       const idx = day.calBlocks.findIndex(b => b.id === existingId);
@@ -619,7 +620,6 @@ function updRC() {
   const dd = dayData(today()); dd.days[today()].reflection = txt; save(dd);
 }
 
-function qCapture() { const v = document.getElementById('qcap').value.trim(); if (!v) return; const d = getGlobal(); d.inbox.push({ text: v, status: 'unsorted', cat: '', created: new Date().toISOString() }); save(d); document.getElementById('qcap').value = ''; addLog('action', 'Captured: ' + v); }
 
 function sealDay() {
   if (!confirm('Lock all entries for today permanently?')) return;
@@ -1810,6 +1810,123 @@ function loadAll() {
   }
 }
 
+// ============ NOTES (Today + Week) ============
+function saveTodayNotes() {
+  const el = document.getElementById('today-notes');
+  if (!el) return;
+  const dd = dayData(today());
+  dd.days[today()].notes = el.innerHTML;
+  save(dd);
+}
+function loadTodayNotes() {
+  const dd = dayData(today());
+  const el = document.getElementById('today-notes');
+  if (el && dd.days[today()].notes) el.innerHTML = dd.days[today()].notes;
+}
+function saveWeekNotes() {
+  const el = document.getElementById('week-notes');
+  if (!el) return;
+  const wk = weekId();
+  const wd = weekData(wk);
+  wd.weeks[wk].notes = el.innerHTML;
+  save(wd);
+}
+function loadWeekNotes() {
+  const wk = weekId();
+  const wd = weekData(wk);
+  const el = document.getElementById('week-notes');
+  if (el && wd.weeks[wk] && wd.weeks[wk].notes) el.innerHTML = wd.weeks[wk].notes;
+}
+
+// ============ KEYBOARD SHORTCUTS ============
+
+// Helper: get the closest list item ancestor of the current selection
+function _notesListContext() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return null;
+  let node = sel.anchorNode;
+  while (node && node !== document) {
+    if (node.nodeName === 'LI') return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+// Tab indent / Shift-Tab outdent inside contenteditable notes
+function _handleNotesTab(e) {
+  const el = document.activeElement;
+  if (!el || el.getAttribute('contenteditable') !== 'true') return;
+  if (el.id !== 'today-notes' && el.id !== 'week-notes') return;
+
+  const li = _notesListContext();
+  if (!li) return; // only act when cursor is in a list item
+
+  e.preventDefault();
+
+  if (e.shiftKey) {
+    // Outdent
+    document.execCommand('outdent');
+  } else {
+    // Indent
+    document.execCommand('indent');
+  }
+
+  // Fire save
+  if (el.id === 'today-notes') saveTodayNotes();
+  else saveWeekNotes();
+}
+
+// Auto-detect "1." or "1)" at the start of a line and convert to ordered list
+function _handleAutoNumberedList(e) {
+  const el = e.target;
+  if (!el || el.getAttribute('contenteditable') !== 'true') return;
+  if (el.id !== 'today-notes' && el.id !== 'week-notes') return;
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const anchor = sel.anchorNode;
+  if (!anchor || anchor.nodeType !== 3) return; // text node only
+
+  const text = anchor.textContent;
+  // Match "1." or "1)" at start of text node (possibly with leading whitespace)
+  if (/^\s*1[.)]\s$/.test(text)) {
+    // Clear the typed "1. " or "1) "
+    anchor.textContent = '';
+    // Insert ordered list via execCommand
+    document.execCommand('insertOrderedList');
+    // Fire save
+    if (el.id === 'today-notes') saveTodayNotes();
+    else saveWeekNotes();
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  // Tab handling for notes lists
+  if (e.key === 'Tab') {
+    _handleNotesTab(e);
+    // If we handled it (preventDefault was called), return
+    if (e.defaultPrevented) return;
+  }
+
+  // Notes rich-text shortcuts (only when inside contenteditable)
+  const el = document.activeElement;
+  if (el && el.getAttribute('contenteditable') === 'true') {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === '8') {
+      e.preventDefault(); document.execCommand('insertUnorderedList');
+    }
+    return; // don't process card shortcuts while editing
+  }
+  // Card study shortcuts (only when study area visible)
+  const studyArea = document.getElementById('study-area');
+  if (studyArea && studyArea.style.display !== 'none') {
+    if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); flipCard(); }
+    else if (studyFlipped && e.key === '1') { e.preventDefault(); rateCard(1); }
+    else if (studyFlipped && e.key === '2') { e.preventDefault(); rateCard(2); }
+    else if (studyFlipped && e.key === '3') { e.preventDefault(); rateCard(3); }
+    else if (studyFlipped && e.key === '4') { e.preventDefault(); rateCard(4); }
+  }
+});
+
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
   // Clear stale Anki target cache (forces recalc with review-cap fix)
@@ -1822,4 +1939,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cached > reviewCap) localStorage.removeItem(ankiKey);
   }
   loadAll();
+  loadTodayNotes();
+  loadWeekNotes();
+  // Auto-numbered list detection on notes
+  ['today-notes', 'week-notes'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', _handleAutoNumberedList);
+  });
 });
