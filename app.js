@@ -1521,20 +1521,39 @@ async function submitVocabList() {
   const words = txt.split(/\n/).map(w => w.trim()).filter(w => w.length > 0);
   if (words.length === 0) { alert('No words found.'); return; }
   const status = document.getElementById('vocab-list-status');
-  status.textContent = '⏳ Generating flashcards for ' + words.length + ' words...';
+
+  // Batch words into chunks of 10 to avoid token limit truncation
+  const BATCH_SIZE = 10;
+  const batches = [];
+  for (let i = 0; i < words.length; i += BATCH_SIZE) {
+    batches.push(words.slice(i, i + BATCH_SIZE));
+  }
+
+  let allCards = [];
+  let batchNum = 0;
   try {
-    const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\nThe student wants flashcards for these words/phrases:\n${words.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
-    const resp = await callClaude(key, prompt);
-    const cards = _parseCardsJSON(resp);
-    if (cards.length > 0) {
-      status.textContent = '✅ Generated ' + cards.length + ' cards. Review below.';
-      renderFlashcardReview('vocab-list-card-review', cards, 'Vocab list: ' + words.join(', '), 'vocab');
+    for (const batch of batches) {
+      batchNum++;
+      status.textContent = '⏳ Generating flashcards... batch ' + batchNum + '/' + batches.length + ' (' + allCards.length + ' cards so far)';
+      const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\nThe student wants flashcards for these words/phrases:\n${batch.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. No markdown fences, no commentary — just the JSON array. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+      const resp = await callClaude(key, prompt, 8192);
+      const cards = _parseCardsJSON(resp);
+      allCards = allCards.concat(cards);
+    }
+    if (allCards.length > 0) {
+      status.textContent = '✅ Generated ' + allCards.length + ' cards from ' + words.length + ' words. Review below.';
+      renderFlashcardReview('vocab-list-card-review', allCards, 'Vocab list: ' + words.join(', '), 'vocab');
     } else {
       status.textContent = '⚠️ No cards parsed. Try again.';
     }
-    addLog('action', 'Generated ' + cards.length + ' cards from vocab list (' + words.length + ' words)');
+    addLog('action', 'Generated ' + allCards.length + ' cards from vocab list (' + words.length + ' words)');
   } catch (e) {
-    status.textContent = '❌ Error: ' + e.message;
+    if (allCards.length > 0) {
+      status.textContent = '⚠️ Error on batch ' + batchNum + ', but got ' + allCards.length + ' cards from earlier batches. Review below.';
+      renderFlashcardReview('vocab-list-card-review', allCards, 'Vocab list: ' + words.join(', '), 'vocab');
+    } else {
+      status.textContent = '❌ Error: ' + e.message;
+    }
   }
 }
 
