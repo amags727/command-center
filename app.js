@@ -941,8 +941,30 @@ function renderWeek() {
   document.getElementById('wk-art').textContent = art; document.getElementById('wk-convo').textContent = convo;
   document.getElementById('wk-refl').textContent = refl; document.getElementById('wk-diss').textContent = dissHrs;
   renderCWG();
+  renderDailySummaries();
 }
 function addCWG() { const v = document.getElementById('cw-in').value.trim(), cat = document.getElementById('cw-cat').value; if (!v) return; const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.push({ text: v, cat, done: false }); save(wd); document.getElementById('cw-in').value = ''; renderCWG(); }
+function renderDailySummaries() {
+  const container = document.getElementById('daily-summaries');
+  if (!container) return;
+  const wk = weekId();
+  const mon = new Date(wk);
+  const d = load();
+  let html = '';
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayKey = today();
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(mon);
+    dt.setDate(mon.getDate() + i);
+    const key = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+    if (key === todayKey) continue;
+    const notes = d.days && d.days[key] && d.days[key].notes;
+    if (!notes || !notes.replace(/<[^>]*>/g,'').trim()) continue;
+    const label = days[dt.getDay()] + ', ' + dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    html += '<details class="card" style="margin-bottom:6px"><summary style="cursor:pointer;font-weight:600;font-size:13px">' + label + ' — Daily Notes</summary><div style="padding:8px;font-size:13px;line-height:1.6">' + notes + '</div></details>';
+  }
+  container.innerHTML = html || '<p style="font-size:12px;color:var(--muted);font-style:italic">No daily notes from this week yet.</p>';
+}
 function renderCWG() {
   const wk = weekId(), wd = weekData(wk), goals = wd.weeks[wk].goals || [];
   const catMap = { work: 'work', dissertation: 'diss', italian: 'ital', social: 'social', misc: 'misc' };
