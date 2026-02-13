@@ -107,9 +107,18 @@ document.addEventListener('change', function(e) {
 
 // ============ DAY CALENDAR ============
 const CAL = {
-  START_HOUR: 6, END_HOUR: 23, PX_PER_HOUR: 30, SNAP_MIN: 15,
+  START_HOUR: 6, END_HOUR: 23, PX_PER_HOUR: 60, SNAP_MIN: 30,
+  ZOOM_LEVELS: [30, 45, 60, 90, 120],
   dragging: null, resizing: null, popover: null, viewDate: null
 };
+function calZoom(dir) {
+  const idx = CAL.ZOOM_LEVELS.indexOf(CAL.PX_PER_HOUR);
+  const next = idx + dir;
+  if (next >= 0 && next < CAL.ZOOM_LEVELS.length) {
+    CAL.PX_PER_HOUR = CAL.ZOOM_LEVELS[next];
+    renderCal();
+  }
+}
 function calViewDate() { return CAL.viewDate || today(); }
 function calSetDate(offset) {
   const cur = new Date(calViewDate() + 'T12:00:00');

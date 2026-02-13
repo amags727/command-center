@@ -241,7 +241,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h3>📝 Notes</h3>
 <div id="today-notes" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
 </div>
-<div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
+<div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
 <label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
