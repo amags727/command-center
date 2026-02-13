@@ -2124,20 +2124,96 @@ function aotdTrack(action) {
       action: action,
       ts: new Date().toISOString()
     });
-    // Keep last 60 entries
-    if (d.aotdHistory.length > 60) d.aotdHistory = d.aotdHistory.slice(-60);
+    // Keep last 100 entries (raw), consolidation handles the rest
+    if (d.aotdHistory.length > 100) d.aotdHistory = d.aotdHistory.slice(-100);
     save(d);
+    // Check if we've crossed a 20-entry threshold since last consolidation
+    const lastConsolidatedAt = d.aotdConsolidatedAt || 0;
+    const totalSinceConsolidation = d.aotdHistory.length - lastConsolidatedAt;
+    if (totalSinceConsolidation >= 20) {
+      aotdConsolidate(); // fire-and-forget async
+    }
   } catch(e) { /* ignore */ }
+}
+
+async function aotdConsolidate() {
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) return;
+  const d = load();
+  const hist = d.aotdHistory || [];
+  if (hist.length < 20) return;
+  const existingPrior = d.aotdPrior || '';
+  const clicked = hist.filter(h => h.action === 'click');
+  const skipped = hist.filter(h => h.action === 'skip');
+  const prompt = `You are consolidating a reader's article recommendation history into a compact preference profile.
+
+${existingPrior ? 'EXISTING PRIOR (from earlier consolidation):\n' + existingPrior + '\n\n' : ''}NEW DATA (${hist.length} entries since last consolidation):
+
+Articles READ (${clicked.length}):
+${clicked.map(h => '- "' + h.title + '" (' + h.source + ', ' + h.category + ')').join('\n') || '(none)'}
+
+Articles SKIPPED (${skipped.length}):
+${skipped.map(h => '- "' + h.title + '" (' + h.source + ', ' + h.category + ')').join('\n') || '(none)'}
+
+TASK: Produce a COMPACT reader preference profile (max 300 words) that captures:
+1. Source preferences (which outlets get read vs skipped)
+2. Topic preferences (what subjects attract vs repel)
+3. Category balance (Italian/English/Other reading ratio)
+4. Any emerging patterns in what makes the reader click vs skip
+5. Concrete guidance for future article selection
+
+${existingPrior ? 'UPDATE the existing prior with these new signals — reinforce confirmed patterns, adjust any that new data contradicts.' : 'Create the initial profile from scratch.'}
+
+Return ONLY the preference profile text, no JSON wrapping. Be direct and specific.`;
+
+  try {
+    const resp = await callClaude(key, prompt);
+    const d2 = load();
+    d2.aotdPrior = resp.trim();
+    d2.aotdConsolidatedAt = (d2.aotdHistory || []).length;
+    save(d2);
+    addLog('action', 'AOTD preferences consolidated (' + hist.length + ' entries → compact prior)');
+  } catch(e) {
+    console.error('AOTD consolidation failed:', e);
+  }
 }
 
 function getAotdHistorySummary() {
   const d = load();
   const hist = d.aotdHistory || [];
-  if (hist.length === 0) return '';
-  const clicked = hist.filter(h => h.action === 'click');
-  const skipped = hist.filter(h => h.action === 'skip');
+  const prior = d.aotdPrior || '';
+  const consolidatedAt = d.aotdConsolidatedAt || 0;
+
+  if (hist.length === 0 && !prior) return '';
+
   let summary = '\n\nUSER READING HISTORY (use this to calibrate future picks):\n';
-  summary += 'Total tracked: ' + hist.length + ' articles | Read: ' + clicked.length + ' | Skipped: ' + skipped.length + '\n';
+
+  // If we have a consolidated prior, use it as the primary signal
+  if (prior) {
+    summary += '\n--- CONSOLIDATED PREFERENCE PROFILE (from ' + consolidatedAt + ' tracked articles) ---\n';
+    summary += prior + '\n';
+    summary += '--- END PROFILE ---\n';
+  }
+
+  // Only list individual entries SINCE the last consolidation
+  const recentHist = hist.slice(consolidatedAt);
+  if (recentHist.length === 0 && prior) {
+    summary += '\nNo new articles tracked since last consolidation.\n';
+    summary += '\nUse the preference profile above as a STRONG signal for source, topic, and category selection.';
+    return summary;
+  }
+
+  // If no prior exists yet, show all entries; otherwise only recent ones
+  const displayHist = prior ? recentHist : hist;
+  const clicked = displayHist.filter(h => h.action === 'click');
+  const skipped = displayHist.filter(h => h.action === 'skip');
+
+  if (prior) {
+    summary += '\nRECENT ACTIVITY (since last consolidation — ' + recentHist.length + ' new entries):\n';
+  } else {
+    summary += 'Total tracked: ' + hist.length + ' articles | Read: ' + clicked.length + ' | Skipped: ' + skipped.length + '\n';
+  }
+
   if (clicked.length > 0) {
     summary += '\nArticles the user CLICKED (liked enough to read):\n';
     clicked.slice(-15).forEach(h => { summary += '- "' + h.title + '" (' + h.source + ', ' + h.category + ')\n'; });
@@ -2146,27 +2222,30 @@ function getAotdHistorySummary() {
     summary += '\nArticles the user SKIPPED (hit New Pick — not interesting enough):\n';
     skipped.slice(-15).forEach(h => { summary += '- "' + h.title + '" (' + h.source + ', ' + h.category + ')\n'; });
   }
-  // Compute source preferences
+
+  // Compute source preferences from the display set
   const srcClicks = {}, srcSkips = {};
   clicked.forEach(h => { srcClicks[h.source] = (srcClicks[h.source] || 0) + 1; });
   skipped.forEach(h => { srcSkips[h.source] = (srcSkips[h.source] || 0) + 1; });
   const allSrcs = new Set([...Object.keys(srcClicks), ...Object.keys(srcSkips)]);
   if (allSrcs.size > 0) {
-    summary += '\nSource hit rates:\n';
+    summary += '\nSource hit rates' + (prior ? ' (recent only)' : '') + ':\n';
     allSrcs.forEach(s => {
       const c = srcClicks[s] || 0, sk = srcSkips[s] || 0;
       summary += '- ' + s + ': ' + c + ' read, ' + sk + ' skipped\n';
     });
   }
-  // Category preferences
+
+  // Category preferences from the display set
   const catClicks = {}, catSkips = {};
   clicked.forEach(h => { catClicks[h.category] = (catClicks[h.category] || 0) + 1; });
   skipped.forEach(h => { catSkips[h.category] = (catSkips[h.category] || 0) + 1; });
-  summary += '\nCategory preferences: ';
+  summary += '\nCategory preferences' + (prior ? ' (recent)' : '') + ': ';
   ['italian','english','other'].forEach(c => {
     summary += c + ' (' + (catClicks[c]||0) + ' read / ' + (catSkips[c]||0) + ' skipped) ';
   });
-  summary += '\n\nUse this data to favor sources and topics the user actually reads, and avoid sources/topics they consistently skip. This is a STRONG signal — weight it heavily.';
+
+  summary += '\n\n' + (prior ? 'Use the preference profile AND recent activity as STRONG signals.' : 'Use this data to favor sources and topics the user actually reads, and avoid sources/topics they consistently skip. This is a STRONG signal — weight it heavily.');
   return summary;
 }
 
