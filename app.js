@@ -136,7 +136,7 @@ function getCalBlocks(date) {
   if (!day.calBlocks) day.calBlocks = [];
   // Merge recurring blocks
   const d = load(); const recur = d.recurringBlocks || [];
-  const dow = new Date(date).getDay(); // 0=Sun
+  const dow = new Date(date + 'T12:00:00').getDay(); // 0=Sun — use noon to avoid UTC date shift
   const effective = [...day.calBlocks];
   recur.forEach(r => {
     if (r.days.includes(dow) && !effective.find(e => e.recurId === r.id)) {
@@ -363,24 +363,35 @@ function calBindTouchEvents() {
 function calStartDrag(e) {
   const el = e.target.closest('.cal-block');
   const grid = document.getElementById('cal-grid');
-  const rect = grid.getBoundingClientRect();
   const id = el.dataset.id;
   const { effective } = getCalBlocks(calViewDate());
   const block = effective.find(b => (b.id || b.recurId) === id);
   if (!block) return;
-  CAL.dragging = { el, block, startY: e.clientY, origTop: parseInt(el.style.top) };
-  el.style.opacity = '0.7'; el.style.zIndex = '20';
+  CAL.dragging = { el, block, startY: e.clientY, startX: e.clientX, origTop: parseInt(el.style.top), moved: false };
   e.preventDefault();
 }
 function calDoDrag(e) {
   if (!CAL.dragging) return;
   const dy = e.clientY - CAL.dragging.startY;
+  const dx = e.clientX - CAL.dragging.startX;
+  // Require 6px movement before starting actual drag
+  if (!CAL.dragging.moved && Math.abs(dy) < 6 && Math.abs(dx) < 6) return;
+  if (!CAL.dragging.moved) {
+    CAL.dragging.moved = true;
+    CAL.dragging.el.style.opacity = '0.7'; CAL.dragging.el.style.zIndex = '20';
+  }
   CAL.dragging.el.style.top = (CAL.dragging.origTop + dy) + 'px';
 }
 function calEndDrag(e) {
   if (!CAL.dragging) return;
-  const el = CAL.dragging.el, block = CAL.dragging.block;
+  const el = CAL.dragging.el, block = CAL.dragging.block, moved = CAL.dragging.moved;
   el.style.opacity = ''; el.style.zIndex = '';
+  if (!moved) {
+    // Didn't move enough — treat as a click to open popover
+    CAL.dragging = null;
+    calShowPopover(block, block.startMin, block.endMin, e);
+    return;
+  }
   const newTop = parseInt(el.style.top);
   const newStart = calYToMin(newTop);
   const duration = block.endMin - block.startMin;
@@ -497,6 +508,12 @@ function calSavePopover(existingId, isRecurring) {
       const idx = d.recurringBlocks.findIndex(r => r.id === existingId);
       if (idx >= 0) Object.assign(d.recurringBlocks[idx], { title, desc, cat, startMin, endMin, days: recurDays });
     } else {
+      // If converting a one-off block to recurring, remove the old one-off
+      if (existingId && !isRecurring) {
+        const vd = calViewDate();
+        const dd2 = dayData(vd), day2 = dd2.days[vd];
+        if (day2.calBlocks) { day2.calBlocks = day2.calBlocks.filter(b => b.id !== existingId); save(dd2); }
+      }
       d.recurringBlocks.push({ id: 'rec_' + Date.now(), title, desc, cat, startMin, endMin, days: recurDays });
     }
     save(d);
