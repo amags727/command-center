@@ -748,7 +748,7 @@ function renderFlashcardReview(containerId, cards, context, tags) {
     <div class="fc-review">
       <h4 style="font-size:14px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
       <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
-      <div id="${containerId}-list" class="fc-review-list"></div>
+      <div id="${containerId}-list" class="fc-review-list" style="max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:8px"></div>
       <div class="flex mt8" style="gap:8px">
         <button class="btn btn-p" onclick="fcSubmitAll('${containerId}')">✅ Submit All to Deck</button>
         <span id="${containerId}-submit-status" style="font-size:12px;color:var(--muted)"></span>
