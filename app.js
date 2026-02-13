@@ -862,7 +862,7 @@ function saveCardSettings() {
   renderCards();
 }
 function getAnkiDailyTarget() {
-  // Snapshot: compute once per day, then store so it doesn't shrink as you review
+  // Compute once at site open, cache for the day
   const key = 'anki_target_' + today();
   const cached = localStorage.getItem(key);
   if (cached !== null && parseInt(cached) > 0) return parseInt(cached);
@@ -870,9 +870,11 @@ function getAnkiDailyTarget() {
   const settings = d.cardSettings || { newPerDay: 20 };
   const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
   const newLimit = settings.newPerDay + dailyBonus;
+  const reviewCap = newLimit * 10;
   const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0).length;
   const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
-  const target = dueReviews + availableNew;
+  // Cap to review cap — you can't study more than this in one day
+  const target = Math.min(dueReviews + availableNew, reviewCap);
   if (d.cards.length > 0 && target > 0) localStorage.setItem(key, target);
   return target;
 }
@@ -1634,5 +1636,14 @@ function loadAll() {
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
+  // Clear stale Anki target cache (forces recalc with review-cap fix)
+  const ankiKey = 'anki_target_' + today();
+  const cached = parseInt(localStorage.getItem(ankiKey));
+  if (cached > 0) {
+    const d = getCards();
+    const settings = d.cardSettings || { newPerDay: 20 };
+    const reviewCap = settings.newPerDay * 10;
+    if (cached > reviewCap) localStorage.removeItem(ankiKey);
+  }
   loadAll();
 });
