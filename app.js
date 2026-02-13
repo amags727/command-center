@@ -1236,7 +1236,7 @@ function renderCards() {
   // Auto-update Anki habit based on cards studied today
   updateAnkiHabitFromCards(totalReviewedToday);
 
-  renderPendingCards(); renderCardBrowse();
+  renderCardBrowse();
 }
 
 async function seedAnkiDeckAuto() {
@@ -1354,16 +1354,19 @@ function endStudy() {
 }
 
 function addCard(front, back, tags) {
-  front = front || document.getElementById('card-front').value.trim();
-  back = back || document.getElementById('card-back').value.trim();
-  tags = tags || document.getElementById('card-tags').value.trim();
+  const frontEl = document.getElementById('card-front');
+  const backEl = document.getElementById('card-back');
+  const tagsEl = document.getElementById('card-tags');
+  front = front || (frontEl ? frontEl.value.trim() : '');
+  back = back || (backEl ? backEl.value.trim() : '');
+  tags = tags || (tagsEl ? tagsEl.value.trim() : '');
   if (!front || !back) return;
   const d = getCards();
-  d.cards.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), front, back, tags: tags ? tags.split(',').map(t => t.trim()) : [], queue: 0, due: todayDayNum(), ivl: 0, ease: 2500, reps: 0, lapses: 0, created: today(), reviewedToday: null });
+  d.cards.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), front, back, tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())) : [], queue: 0, due: todayDayNum(), ivl: 0, ease: 2500, reps: 0, lapses: 0, created: today(), reviewedToday: null });
   save(d);
-  document.getElementById('card-front').value = '';
-  document.getElementById('card-back').value = '';
-  document.getElementById('card-tags').value = '';
+  if (frontEl) frontEl.value = '';
+  if (backEl) backEl.value = '';
+  if (tagsEl) tagsEl.value = '';
   renderCards();
   addLog('action', 'Card added: ' + front);
 }
@@ -1431,43 +1434,6 @@ async function seedAnkiDeck() {
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '📦 Seed Anki Deck'; }
   }
-}
-
-function renderPendingCards() {
-  const d = getGlobal();
-  const pending = (d.ankiCards || []).filter(c => !c.added);
-  const el = document.getElementById('pending-cards');
-  if (!el) return;
-  if (pending.length === 0) { el.innerHTML = '<p style="color:var(--muted);font-size:13px;font-style:italic">No pending cards. Submit Italian reflections to generate cards.</p>'; return; }
-  el.innerHTML = pending.map((c, i) => {
-    const realIdx = d.ankiCards.indexOf(c);
-    // Try to parse Front:/Back:
-    const fm = c.card.match(/Front:\s*(.+)/i);
-    const bm = c.card.match(/Back:\s*(.+)/i);
-    const front = fm ? fm[1].trim() : c.card.split('\n')[0];
-    const back = bm ? bm[1].trim() : '';
-    return '<div class="iitem"><div class="itxt"><b>' + escHtml(front) + '</b>' + (back ? '<br><span style="color:var(--muted);font-size:12px">' + escHtml(back) + '</span>' : '') + '</div><button class="btn btn-s" onclick="acceptPending(' + realIdx + ')">✅ Add</button><button class="btn" style="font-size:10px;color:var(--red)" onclick="dismissPending(' + realIdx + ')">✕</button></div>';
-  }).join('');
-}
-
-function acceptPending(idx) {
-  const d = getGlobal();
-  const c = d.ankiCards[idx];
-  if (!c) return;
-  const fm = c.card.match(/Front:\s*(.+)/i);
-  const bm = c.card.match(/Back:\s*(.+)/i);
-  const front = fm ? fm[1].trim() : c.card.split('\n')[0];
-  const back = bm ? bm[1].trim() : c.card;
-  d.ankiCards[idx].added = true;
-  save(d);
-  addCard(front, back, 'reflection');
-}
-
-function dismissPending(idx) {
-  const d = getGlobal();
-  d.ankiCards[idx].added = true; // mark as handled
-  save(d);
-  renderPendingCards();
 }
 
 function renderCardBrowse() {
