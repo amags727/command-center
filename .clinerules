@@ -1,0 +1,46 @@
+# Command Center Project Rules
+
+## File Structure
+This project has a single monolithic `app.js` (2,655 lines) that is being split into modules. See `MODULARIZATION.md` for the extraction map and dependency graph.
+
+## Critical Rules
+
+### 1. NEVER read all of app.js
+`app.js` is ~2,655 lines and will consume 70%+ of your context window. Instead:
+- Read `MODULARIZATION.md` first (60 lines) to understand the structure
+- Use `grep -n` to find the specific section you need
+- Use `sed -n 'START,ENDp' app.js` to read only the lines you need
+- If a module file already exists (e.g., `week.js`), read that instead of app.js
+
+### 2. NEVER read all of index.html at once
+`index.html` is ~550 lines. Use grep to find the specific tab section you need:
+- `grep -n 'tab-week\|tab-today\|tab-habits' index.html` to find section boundaries
+- Then `sed -n 'START,ENDp' index.html` for just that section
+
+### 3. Context budget awareness
+- Check context usage before reading any file over 100 lines
+- If above 60% context: only read targeted line ranges, never full files
+- If above 80% context: stop new work, commit what you have, and generate a continuation prompt
+
+### 4. One module at a time
+When modifying features, only read the relevant module file(s). The extraction map in MODULARIZATION.md tells you which file contains which functions.
+
+### 5. Always commit working states
+After any successful change, git commit immediately. Never leave uncommitted work that spans multiple logical changes.
+
+### 6. Data layer is in core.js (or lines 1-10 of app.js pre-split)
+Functions available globally: `load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`. You never need to read their implementations — just know they exist.
+
+## Tab → File Mapping (post-modularization)
+| Tab | JS File | HTML id |
+|-----|---------|---------|
+| Today | today.js + calendar.js | tab-today |
+| Week | week.js | tab-week |
+| Habits | habits.js | tab-habits |
+| Dissertation | dissertation.js | tab-dissertation |
+| Inbox | app.js (renderInbox) | tab-inbox |
+| Focus | focus.js | tab-focus |
+| Cards | anki.js | tab-cards |
+| Translate | translate.js | tab-translate |
+| Claude | chat.js | tab-claude |
+| Log | app.js (renderLog) | tab-log |
