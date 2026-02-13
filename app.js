@@ -61,7 +61,7 @@ function initToday() {
   }
   if (day.reflection) document.getElementById('refl-txt').value = day.reflection;
   updRC();
-  renderBlocks(); renderTop3(); renderIntentions(); renderBundles();
+  renderBlocks(); loadT3Intentions();
   const wk = weekId();
   const wd = weekData(wk);
   if (wd.weeks[wk].pushGoal) {
@@ -583,31 +583,35 @@ function importICS(event) {
 // Legacy compat
 function addBlock() {} function renderBlocks() { renderCal(); } function rmBlock() {}
 
-function addT3() {
-  const v = document.getElementById('t3-in').value.trim(); if (!v) return;
-  const dd = dayData(today()); if (dd.days[today()].top3.length >= 3) { alert('Max 3. Remove one first.'); return; }
-  dd.days[today()].top3.push({ text: v, done: false }); save(dd); document.getElementById('t3-in').value = ''; renderTop3(); addLog('action', 'Priority: ' + v);
+function saveT3Intentions() {
+  const dd = dayData(today());
+  dd.days[today()].t3intentions = {
+    work: document.getElementById('t3-work').value,
+    school: document.getElementById('t3-school').value,
+    life: document.getElementById('t3-life').value
+  };
+  save(dd);
 }
-function renderTop3() {
-  const dd = dayData(today()), items = dd.days[today()].top3 || [];
-  document.getElementById('top3').innerHTML = items.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">Set your top 3 priorities.</p>' : items.map((t, i) => '<div class="hrow"><input type="checkbox" class="hchk" ' + (t.done ? 'checked' : '') + ' onchange="toggleT3(' + i + ')"><div class="hinfo"><span style="' + (t.done ? 'text-decoration:line-through;color:var(--muted)' : '') + '">' + t.text + '</span></div><button class="btn" style="font-size:10px;padding:2px 6px" onclick="rmT3(' + i + ')">✕</button></div>').join('');
+function loadT3Intentions() {
+  const dd = dayData(today());
+  const t = dd.days[today()].t3intentions;
+  if (t && (t.work || t.school || t.life)) {
+    document.getElementById('t3-work').value = t.work || '';
+    document.getElementById('t3-school').value = t.school || '';
+    document.getElementById('t3-life').value = t.life || '';
+  } else {
+    // Auto-populate from previous day
+    const prev = new Date(); prev.setDate(prev.getDate() - 1);
+    const prevKey = prev.toISOString().slice(0, 10);
+    const pd = dd.days[prevKey];
+    if (pd && pd.t3intentions) {
+      document.getElementById('t3-work').value = pd.t3intentions.work || '';
+      document.getElementById('t3-school').value = pd.t3intentions.school || '';
+      document.getElementById('t3-life').value = pd.t3intentions.life || '';
+      saveT3Intentions();
+    }
+  }
 }
-function toggleT3(i) { const dd = dayData(today()); dd.days[today()].top3[i].done = !dd.days[today()].top3[i].done; save(dd); renderTop3(); }
-function rmT3(i) { const dd = dayData(today()); dd.days[today()].top3.splice(i, 1); save(dd); renderTop3(); }
-
-function addInt() { const v = document.getElementById('int-in').value.trim(); if (!v) return; const dd = dayData(today()); dd.days[today()].intentions.push(v); save(dd); document.getElementById('int-in').value = ''; renderIntentions(); }
-function renderIntentions() {
-  const dd = dayData(today()), items = dd.days[today()].intentions || [];
-  document.getElementById('int-list').innerHTML = items.length === 0 ? '<p style="color:var(--muted);font-size:12px;font-style:italic">Set if-then plans.</p>' : items.map((t, i) => '<div class="intention">' + t + ' <button style="float:right;background:none;border:none;color:var(--red);cursor:pointer;font-size:10px" onclick="rmInt(' + i + ')">✕</button></div>').join('');
-}
-function rmInt(i) { const dd = dayData(today()); dd.days[today()].intentions.splice(i, 1); save(dd); renderIntentions(); }
-
-function addBun() { const v = document.getElementById('bun-in').value.trim(); if (!v) return; const dd = dayData(today()); dd.days[today()].bundles.push(v); save(dd); document.getElementById('bun-in').value = ''; renderBundles(); }
-function renderBundles() {
-  const dd = dayData(today()), items = dd.days[today()].bundles || [];
-  document.getElementById('bun-list').innerHTML = items.length === 0 ? '<p style="color:var(--muted);font-size:12px;font-style:italic">Pair hard tasks with rewards.</p>' : items.map((t, i) => '<div class="bundle">🔗 ' + t + ' <button style="float:right;background:none;border:none;color:var(--red);cursor:pointer;font-size:10px" onclick="rmBun(' + i + ')">✕</button></div>').join('');
-}
-function rmBun(i) { const dd = dayData(today()); dd.days[today()].bundles.splice(i, 1); save(dd); renderBundles(); }
 
 function updRC() {
   const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
@@ -1689,6 +1693,22 @@ function trUpdReflWC() {
   el.className = 'wc' + (wc < 50 ? ' bad' : '');
 }
 
+function trGetNextArticleSlot() {
+  const dd = dayData(today());
+  const day = dd.days[today()];
+  if (!day.habits || !day.habits.art1) return 1;
+  return 2;
+}
+
+function trUpdateSubmitBtn() {
+  const btn = document.getElementById('tr-refl-submit-btn');
+  if (btn) btn.textContent = '✅ Submit as Article ' + trGetNextArticleSlot();
+}
+
+function trSubmitReflectionAuto() {
+  trSubmitReflection(trGetNextArticleSlot());
+}
+
 async function trSubmitReflection(num) {
   const txt = document.getElementById('tr-refl-txt').value.trim();
   const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
@@ -1726,6 +1746,7 @@ async function trSubmitReflection(num) {
     }
     status.textContent = '✅ Feedback + ' + cards.length + ' cards generated. Logged as Article ' + num + '.';
     addLog('action', 'Article ' + num + ' reflection: ' + title + ' + ' + cards.length + ' cards');
+    trUpdateSubmitBtn();
   } catch (e) {
     status.textContent = '❌ Error: ' + e.message;
   }
@@ -1771,6 +1792,7 @@ setInterval(() => {
 // ============ LOAD ALL (called by FirebaseSync on remote update) ============
 function loadAll() {
   initToday();
+  trUpdateSubmitBtn();
   const key = localStorage.getItem('cc_apikey');
   if (key) document.getElementById('api-key').value = key;
   // Re-render whichever tab is active

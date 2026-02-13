@@ -179,11 +179,14 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h1 id="today-date"></h1>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px" id="today-label"></p>
 <div class="pgb" id="pgb" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="pg-text"></p><p style="font-size:11px;color:var(--muted)" id="pg-countdown"></p></div>
-<div class="card"><h3>⚡ Implementation Intentions</h3><div id="int-list"></div><div class="flex mt8"><input class="fin flex-1" id="int-in" placeholder="When X, I will Y..." onkeydown="if(event.key==='Enter')addInt()"><button class="btn-s btn" onclick="addInt()">Add</button></div></div>
-<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
-<div class="card" style="flex:0 0 40%;min-width:280px"><h3>🎯 Top 3 Priorities</h3><div id="top3"></div><div class="flex mt8"><input class="fin flex-1" id="t3-in" placeholder="Priority..." onkeydown="if(event.key==='Enter')addT3()"><button class="btn btn-s" onclick="addT3()">Add</button></div></div>
-<div class="card" style="flex:1;min-width:300px"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px"><button class="btn btn-s" onclick="exportICS()">📤 Export to Outlook (.ics)</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
+<div class="card"><h3>🎯 Top-3 Intentions</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px" id="t3-grid">
+<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="5" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:80px;resize:vertical;line-height:1.7"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--purple)">🎓 School</h4><textarea class="fin" id="t3-school" rows="5" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:80px;resize:vertical;line-height:1.7"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--green)">🌱 Life</h4><textarea class="fin" id="t3-life" rows="5" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:80px;resize:vertical;line-height:1.7"></textarea></div>
 </div>
+</div>
+<div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px"><button class="btn btn-s" onclick="exportICS()">📤 Export to Outlook (.ics)</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
 <label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
@@ -201,8 +204,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div id="refl-res" style="display:none" class="mt8"></div>
 <div id="refl-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
-<div class="card"><h3>🔗 Temptation Bundles</h3><div id="bun-list"></div><div class="flex mt8"><input class="fin flex-1" id="bun-in" placeholder="I only get [X] during/after [Y]..." onkeydown="if(event.key==='Enter')addBun()"><button class="btn btn-s" onclick="addBun()">Add</button></div></div>
-<div class="card"><h3>📥 Quick Capture</h3><div class="iinput"><input id="qcap" placeholder="Capture a thought or task..." onkeydown="if(event.key==='Enter')qCapture()"><button onclick="qCapture()">Capture</button></div></div>
+<div class="card"><h3> Quick Capture</h3><div class="iinput"><input id="qcap" placeholder="Capture a thought or task..." onkeydown="if(event.key==='Enter')qCapture()"><button onclick="qCapture()">Capture</button></div></div>
 <div class="card" style="text-align:center"><button class="btn btn-d" onclick="sealDay()">🔒 Seal Today (Cannot Undo)</button><p style="font-size:11px;color:var(--muted);margin-top:4px">Locks all entries for today. Auto-seals at midnight.</p></div>
 </div>
 
@@ -393,8 +395,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="wc" id="tr-refl-wc">0 / 50 words</div>
 <div class="flex mt8" style="gap:8px;flex-wrap:wrap;align-items:center">
 <span style="font-size:12px;color:var(--muted)">Log as:</span>
-<button class="btn btn-p" onclick="trSubmitReflection(1)">✅ Submit as Article 1</button>
-<button class="btn btn-p" onclick="trSubmitReflection(2)">✅ Submit as Article 2</button>
+<button class="btn btn-p" id="tr-refl-submit-btn" onclick="trSubmitReflectionAuto()">✅ Submit as Article 1</button>
 </div>
 <div id="tr-refl-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
 <div id="tr-refl-result" style="display:none;margin-top:10px" class="card" >
