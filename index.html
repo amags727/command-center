@@ -364,16 +364,16 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
 <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
 <span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
-<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
-<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
-<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
-<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
-<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
-<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
-<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
-<button class="btn btn-s" onclick="dissClearHighlights()" style="min-width:42px;font-size:11px;border:2px solid transparent;background:#f0f0f0;color:#666" title="Remove all day highlights">✕ Clear</button>
+<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissAssignDay('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
+<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissAssignDay('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
+<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissAssignDay('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
+<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissAssignDay('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
+<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissAssignDay('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
+<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissAssignDay('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
+<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissAssignDay('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
+<button class="btn btn-s" onclick="dissClearHighlights()" style="min-width:42px;font-size:11px;border:2px solid transparent;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
 </div>
-<p id="diss-highlight-status" style="font-size:11px;color:var(--muted);margin-top:4px;display:none">🎨 Highlight mode active — select text to highlight, press Esc to exit</p>
+<p style="font-size:11px;color:var(--muted);margin-top:4px">Select text, then click a day button to assign it</p>
 </div>
 <div class="card"><h3>📊 Overall Progress</h3><div class="pbar"><div class="pfill" id="diss-pbar" style="width:0%"></div></div><p style="font-size:12px;color:var(--muted)" id="diss-total">0 / 0 words</p></div>
 

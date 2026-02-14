@@ -342,7 +342,10 @@ function renderDissLog() {
   document.getElementById('diss-log').innerHTML = sessions.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">No sessions yet.</p>' : sessions.map(s => '<div class="lentry action"><span class="lt">' + s.date + '</span> ' + s.minutes + ' min — ' + s.chapter + '</div>').join('');
 }
 // ============ WEEKLY GOALS WITH DAY HIGHLIGHTS ============
-let _dissHighlightDay = null;
+// ── Dissertation Weekly Goals: highlight system ──
+// Flow: select text first, THEN click a day button to assign it.
+
+const _dissHighlightColors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
 
 function saveDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
@@ -354,16 +357,6 @@ function saveDissWeeklyGoals() {
   if (typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
 }
 
-function dissClearHighlights() {
-  const el = document.getElementById('diss-weekly-goals');
-  if (!el) return;
-  el.querySelectorAll('span[data-day]').forEach(span => {
-    span.replaceWith(document.createTextNode(span.textContent));
-  });
-  el.normalize();
-  saveDissWeeklyGoals();
-}
-
 function loadDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
@@ -371,23 +364,9 @@ function loadDissWeeklyGoals() {
   el.innerHTML = (d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()]) || '';
 }
 
-function dissToggleHighlight(day) {
-  const btns = document.querySelectorAll('.diss-day-btn');
-  const status = document.getElementById('diss-highlight-status');
-  if (_dissHighlightDay === day) {
-    _dissHighlightDay = null;
-    btns.forEach(b => b.classList.remove('active'));
-    if (status) status.style.display = 'none';
-    return;
-  }
-  _dissHighlightDay = day;
-  btns.forEach(b => b.classList.toggle('active', b.dataset.day === day));
-  if (status) status.style.display = 'block';
-}
-
-// Apply highlight on mouseup inside weekly goals
-document.addEventListener('mouseup', function() {
-  if (!_dissHighlightDay) return;
+// Called when a day button (MON–SUN) is clicked.
+// If text is selected inside weekly goals, wrap it in a highlight span for that day.
+function dissAssignDay(day) {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
   const sel = window.getSelection();
@@ -395,41 +374,44 @@ document.addEventListener('mouseup', function() {
   const range = sel.getRangeAt(0);
   if (!el.contains(range.commonAncestorContainer)) return;
 
-  // Check if entire selection is inside an existing span with same day → un-highlight
-  const parentSpan = range.commonAncestorContainer.nodeType === 3
-    ? range.commonAncestorContainer.parentElement
-    : range.commonAncestorContainer;
-  if (parentSpan && parentSpan.tagName === 'SPAN' && parentSpan.dataset.day === _dissHighlightDay) {
-    const text = document.createTextNode(parentSpan.textContent);
-    parentSpan.parentNode.replaceChild(text, parentSpan);
-    sel.removeAllRanges();
-    saveDissWeeklyGoals();
-    return;
-  }
-
-  // Collect text nodes within the range (intersectsNode handles element containers from contenteditable divs)
+  // Walk all text nodes that intersect the selection
   const textNodes = [];
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-  let node;
-  while ((node = walker.nextNode())) {
-    if (range.intersectsNode(node)) textNodes.push(node);
+  let n;
+  while ((n = walker.nextNode())) {
+    if (range.intersectsNode(n)) textNodes.push(n);
   }
-
-  const colors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
+  if (!textNodes.length) return;
 
   textNodes.forEach(function(tn) {
-    let startOff = 0, endOff = tn.length;
-    if (tn === range.startContainer) startOff = range.startOffset;
-    if (tn === range.endContainer) endOff = range.endOffset;
-    if (startOff >= endOff) return;
-    const txt = tn.textContent.substring(startOff, endOff);
+    let sOff = 0, eOff = tn.length;
+    if (tn === range.startContainer) sOff = range.startOffset;
+    if (tn === range.endContainer) eOff = range.endOffset;
+    if (sOff >= eOff) return;
+    const txt = tn.textContent.substring(sOff, eOff);
     if (!txt.trim()) return;
 
-    const before = tn.textContent.substring(0, startOff);
-    const after = tn.textContent.substring(endOff);
+    // If this text node is already inside a highlight span, unwrap first
+    if (tn.parentElement && tn.parentElement.tagName === 'SPAN' && tn.parentElement.dataset.day) {
+      const oldSpan = tn.parentElement;
+      const plain = document.createTextNode(oldSpan.textContent);
+      oldSpan.parentNode.replaceChild(plain, oldSpan);
+      // Re-wrap the full text under the new day (simplest approach)
+      const span = document.createElement('span');
+      span.setAttribute('data-day', day);
+      span.style.backgroundColor = _dissHighlightColors[day] || '#eee';
+      span.style.borderRadius = '2px';
+      span.style.padding = '0 2px';
+      span.textContent = plain.textContent;
+      plain.parentNode.replaceChild(span, plain);
+      return;
+    }
+
+    const before = tn.textContent.substring(0, sOff);
+    const after = tn.textContent.substring(eOff);
     const span = document.createElement('span');
-    span.setAttribute('data-day', _dissHighlightDay);
-    span.style.backgroundColor = colors[_dissHighlightDay] || '#eee';
+    span.setAttribute('data-day', day);
+    span.style.backgroundColor = _dissHighlightColors[day] || '#eee';
     span.style.borderRadius = '2px';
     span.style.padding = '0 2px';
     span.textContent = txt;
@@ -441,48 +423,42 @@ document.addEventListener('mouseup', function() {
     parent.removeChild(tn);
   });
 
-  // Move cursor after last inserted span so typing doesn't inherit highlight
-  const allSpans = el.querySelectorAll('span[data-day]');
-  if (allSpans.length) {
-    const lastSpan = allSpans[allSpans.length - 1];
-    const r = document.createRange();
-    r.setStartAfter(lastSpan);
-    r.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(r);
-  } else {
-    sel.removeAllRanges();
-  }
-
+  sel.removeAllRanges();
   saveDissWeeklyGoals();
-});
+}
 
-// Esc to exit highlight mode — also move cursor out of any highlight span
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && _dissHighlightDay) {
-    _dissHighlightDay = null;
-    document.querySelectorAll('.diss-day-btn').forEach(b => b.classList.remove('active'));
-    const status = document.getElementById('diss-highlight-status');
-    if (status) status.style.display = 'none';
-    // Move cursor to end of contenteditable, outside any highlight span
-    const el = document.getElementById('diss-weekly-goals');
-    if (el) {
-      el.focus();
-      // Append a clean text node at the end so cursor escapes any styled span
-      let tail = el.lastChild;
-      if (!tail || tail.nodeType !== 3 || tail.parentElement !== el) {
-        tail = document.createTextNode('\u200B'); // zero-width space
-        el.appendChild(tail);
+// Clear highlights. If text is selected inside a highlight span, unwrap just that span.
+// If no selection, clear ALL highlights.
+function dissClearHighlights() {
+  const el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+
+  const sel = window.getSelection();
+  // Check if there's a selection inside a highlight span → clear just that one
+  if (sel && !sel.isCollapsed && sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    if (el.contains(range.commonAncestorContainer)) {
+      const ancestor = range.commonAncestorContainer.nodeType === 3
+        ? range.commonAncestorContainer.parentElement
+        : range.commonAncestorContainer;
+      if (ancestor && ancestor.tagName === 'SPAN' && ancestor.dataset.day) {
+        const text = document.createTextNode(ancestor.textContent);
+        ancestor.parentNode.replaceChild(text, ancestor);
+        el.normalize();
+        sel.removeAllRanges();
+        saveDissWeeklyGoals();
+        return;
       }
-      const sel = window.getSelection();
-      const r = document.createRange();
-      r.setStartAfter(el.lastChild);
-      r.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(r);
     }
   }
-});
+
+  // No specific selection — clear all highlights
+  el.querySelectorAll('span[data-day]').forEach(function(span) {
+    span.replaceWith(document.createTextNode(span.textContent));
+  });
+  el.normalize();
+  saveDissWeeklyGoals();
+}
 
 // Extract highlighted text for a given day from weekly goals
 function getDissWeeklyGoalsForDay(dayKey) {
@@ -492,7 +468,7 @@ function getDissWeeklyGoalsForDay(dayKey) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   const spans = tmp.querySelectorAll('span[data-day="' + dayKey + '"]');
-  return Array.from(spans).map(s => s.textContent.trim()).filter(Boolean).join('\n');
+  return Array.from(spans).map(function(s) { return s.textContent.trim(); }).filter(Boolean).join('\n');
 }
 
 // Map JS day number (0=Sun) to our day keys
