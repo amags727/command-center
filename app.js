@@ -640,36 +640,7 @@ function importICS(event) {
 // Legacy compat
 function addBlock() {} function renderBlocks() { renderCal(); } function rmBlock() {}
 
-function saveT3Intentions() {
-  const dd = dayData(today());
-  dd.days[today()].t3intentions = {
-    work: document.getElementById('t3-work').value,
-    school: document.getElementById('t3-school').value,
-    life: document.getElementById('t3-life').value
-  };
-  save(dd);
-}
-function loadT3Intentions() {
-  const dd = dayData(today());
-  const t = dd.days[today()].t3intentions;
-  if (t && (t.work || t.school || t.life)) {
-    document.getElementById('t3-work').value = t.work || '';
-    document.getElementById('t3-school').value = t.school || '';
-    document.getElementById('t3-life').value = t.life || '';
-  } else {
-    // Auto-populate from previous day
-    const prev = new Date(); prev.setDate(prev.getDate() - 1);
-    const prevKey = prev.toISOString().slice(0, 10);
-    const pd = dd.days[prevKey];
-    if (pd && pd.t3intentions) {
-      document.getElementById('t3-work').value = pd.t3intentions.work || '';
-      document.getElementById('t3-school').value = pd.t3intentions.school || '';
-      document.getElementById('t3-life').value = pd.t3intentions.life || '';
-      saveT3Intentions();
-    }
-  }
-}
-
+// saveT3Intentions and loadT3Intentions moved to today.js (chip-based)
 function updRC() {
   const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
   el.textContent = wc + ' / 200 words'; el.className = 'wc' + (wc > 0 && wc < 200 ? ' bad' : '');
