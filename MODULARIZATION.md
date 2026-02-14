@@ -1,68 +1,90 @@
-# app.js Modularization Plan
+# Modularization State — COMPLETE
 
-## Problem
-`app.js` is 2,655 lines. Any task touching it consumes most of the context window just reading the file. The fix: split into ~13 files by the existing section markers.
+## Overview
+`app.js` has been fully modularized. It went from 2,568 lines to **241 lines** — a pure orchestration shell. All feature code lives in dedicated module files.
 
-## Architecture
-All functions are global (plain `<script>` tags, no ES modules). The data layer must load first; everything else is order-independent.
-
-## Extraction Map (line ranges from commit da0142f)
-
-| File | Lines | Size | Section(s) |
-|------|-------|------|------------|
-| `core.js` | 1-10, 2039-2040 | ~12 lines | DATA LAYER + escHtml util |
-| `calendar.js` | 108-627 | ~520 lines | DAY CALENDAR + ICS export/import |
-| `today.js` | 32-106, 629-669 | ~115 lines | TODAY TAB + T3/intentions/seal |
-| `flashcard-review.js` | 671-928 | ~258 lines | FLASHCARD REVIEW SHARED + REFLECTION SUBMIT |
-| `week.js` | 929-980 | ~52 lines | WEEK TAB + daily summaries |
-| `habits.js` | 982-1006 | ~25 lines | HABITS TAB + if-thens |
-| `dissertation.js` | 1008-1091 | ~84 lines | DISSERTATION TAB + energy log |
-| `focus.js` | 1058-1091 | ~34 lines | FOCUS TAB (distraction/energy) |
-| `chat.js` | 1093-1158 | ~66 lines | CLAUDE TAB |
-| `anki.js` | 1160-1728 | ~569 lines | CARDS TAB (SM-2, bulk import, CSV, vocab, browse) |
-| `translate.js` | 1730-2014 | ~285 lines | TRANSLATE TAB |
-| `aotd.js` | 2191-2602 | ~412 lines | ARTICLE OF THE DAY |
-| `app.js` (slimmed) | 12-30, 2016-2037, 2042-2189, 2604-2655 | ~250 lines | NAV + LOG + AUTO-SEAL + LOAD ALL + NOTES + KEYBOARD + SYNC UI + INIT |
-
-## Script Load Order in index.html
+## Script Load Order (index.html)
 ```html
-<script src="core.js"></script>
-<script src="calendar.js"></script>
-<script src="today.js"></script>
-<script src="flashcard-review.js"></script>
-<script src="week.js"></script>
-<script src="habits.js"></script>
-<script src="dissertation.js"></script>
-<script src="focus.js"></script>
-<script src="chat.js"></script>
-<script src="anki.js"></script>
-<script src="translate.js"></script>
-<script src="aotd.js"></script>
-<script src="app.js"></script>
-<script src="firebase-sync.js"></script>
+<script src="core.js"></script>           <!-- data layer -->
+<script src="calendar.js"></script>       <!-- day calendar rendering -->
+<script src="flashcard-review.js"></script><!-- shared card review UI -->
+<script src="today.js"></script>          <!-- Today tab -->
+<script src="week.js"></script>           <!-- Week tab -->
+<script src="dissertation.js"></script>   <!-- Dissertation tab -->
+<script src="chat.js"></script>           <!-- Claude tab -->
+<script src="anki.js"></script>           <!-- Cards/SM-2 tab -->
+<script src="translate.js"></script>      <!-- Read/Translate tab -->
+<script src="aotd.js"></script>           <!-- Article of the Day -->
+<script src="app.js"></script>            <!-- orchestration: nav, notes, keyboard, init -->
+<script src="firebase-sync.js"></script>  <!-- sync layer (last) -->
 ```
 
-## Key Dependencies
-- **Everything** depends on `core.js` (load, save, today, weekId, dayData, weekData, getGlobal, addLog, escHtml)
-- `today.js` calls `renderCal()` from `calendar.js`
-- `flashcard-review.js` is used by both `chat.js` and `translate.js`
-- `anki.js` uses `updateAnkiHabitFromCards()` which touches today's habit data
-- `app.js` must be last (it has `DOMContentLoaded` init that calls into all modules)
-- `firebase-sync.js` must be after `app.js` (it calls `loadAll()`)
+## Module → Function Map
 
-## sw.js Cache List
-Update the ASSETS array to include all new files.
+### core.js (~10 lines)
+Data layer used by everything:
+`load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`
 
-## Extraction Steps (for a task runner)
-1. Create `core.js` — copy lines 1-10 + line 2040 (escHtml)
-2. For each module file: copy the exact line range, verify no stray dependencies
-3. Build slimmed `app.js` from remaining sections (NAV, LOG, AUTO-SEAL, LOADALL, NOTES, KEYBOARD, SYNC UI, INIT)
-4. Update `index.html` `<script>` tags
-5. Update `sw.js` ASSETS array
-6. Test in browser — every tab should still work
-7. Git commit
+### calendar.js (~520 lines)
+Day calendar rendering + goal management:
+`renderCalendar()`, `toggleGoal()`, `addGoal()`, `removeGoal()`, `moveGoal()`, `editGoal()`, `toggleDayGoalCategory()`, `renderItalianWork()`, `submitReflection()`, `renderReflection()`
 
-## How to Use This in a Task
-Tell the AI: "Read MODULARIZATION.md, then extract [specific file] from app.js using the line ranges listed. Do ONE file at a time."
+### flashcard-review.js (~228 lines)
+Shared flashcard review modal used by Cards, Translate, and Claude tabs:
+`startReview()`, `showCard()`, `flipCard()`, `rateCard()`, `endReview()`
 
-This way each extraction task reads only ~500 lines instead of 2,655.
+### today.js (~120 lines)
+Today tab orchestration:
+`renderToday()`, `initToday()`
+
+### week.js (~53 lines)
+Week tab:
+`renderWeek()`, `addCWG()`, `submitWR()`
+
+### dissertation.js (~200 lines)
+Dissertation tab:
+`renderDissertation()`, `toggleChapter()`, `saveDissSection()`, `initDissertation()`
+
+### chat.js (~66 lines)
+Claude chat integration:
+`sendChat()`, `initClaude()`
+
+### anki.js (~607 lines)
+SM-2 flashcard engine (Cards tab):
+`renderAnki()`, `studyNow()`, `addManualCard()`, `addVocabList()`, `addPreMade()`, `browseDeck()`, `editCard()`, `deleteCard()`, `seedAnkiCards()`
+
+### translate.js (~294 lines)
+Italian reading & translation (Read tab):
+`renderTranslate()`, `fetchAndTranslate()`, `pasteText()`, `collectWord()`, `renderReadingHistory()`
+
+### aotd.js (~412 lines)
+Article of the Day:
+`renderAOTD()`, `fetchArticle()`, `generateQuestions()`, `submitAnswers()`
+
+### app.js (~241 lines)
+Orchestration shell:
+- `switchTab()` + NAV array
+- `loadAll()` — refresh dispatcher
+- `saveTodayNotes()`, `loadTodayNotes()`, `saveWeekNotes()`, `loadWeekNotes()`
+- Keyboard shortcuts + auto-numbered list
+- Auto-seal midnight check
+- `doSyncConnect()`, `doSyncDisconnect()`, `initSyncUI()`
+- `DOMContentLoaded` init handler
+
+### firebase-sync.js (~150 lines)
+Firebase sync layer (loaded last):
+`initSync()`, `pushData()`, `pullData()`
+
+## Tab → File Mapping
+| Tab | JS Source | HTML id |
+|-----|-----------|---------|
+| Today | today.js + calendar.js + aotd.js | tab-today |
+| Week | week.js | tab-week |
+| Dissertation | dissertation.js | tab-dissertation |
+| Cards | anki.js + flashcard-review.js | tab-cards |
+| Read | translate.js + flashcard-review.js | tab-translate |
+| Claude | chat.js + flashcard-review.js | tab-claude |
+| Log | app.js (renderLog, addConfession, export/import) | tab-log |
+
+## Backup
+`app.js.bak` contains the original 2,568-line monolith. Safe to delete once satisfied with the modularization.
