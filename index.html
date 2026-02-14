@@ -213,6 +213,9 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .diss-day-btn[data-day="mon"]{background:#FFB3B3;color:#8B0000}.diss-day-btn[data-day="tue"]{background:#FFD9B3;color:#8B4513}.diss-day-btn[data-day="wed"]{background:#FFFFB3;color:#6B6B00}.diss-day-btn[data-day="thu"]{background:#B3FFB3;color:#006400}.diss-day-btn[data-day="fri"]{background:#B3D9FF;color:#00008B}.diss-day-btn[data-day="sat"]{background:#D9B3FF;color:#4B0082}.diss-day-btn[data-day="sun"]{background:#FFB3E6;color:#8B0060}
 .diss-day-btn.active{box-shadow:0 0 0 2px currentColor;transform:scale(1.1);font-weight:700}
 #diss-weekly-goals [data-day]{border-radius:2px;padding:0 2px}
+.wg-tab-btn.active{background:var(--accent);color:#fff}
+.wg-panel [data-day]{border-radius:2px;padding:0 2px}
+#wg-work [data-day],#wg-school [data-day],#wg-life [data-day]{border-radius:2px;padding:0 2px}
 /* --- Goal Chips --- */
 .chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
 .goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:13px; line-height:1.5; max-width:100%; }
@@ -323,9 +326,54 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="tab" id="tab-week">
 <h1>📊 Week of <span id="wk-date"></span></h1>
 <div class="card">
-<h3>📝 Weekly Notes</h3>
-<div id="week-notes" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekNotes()"></div>
-<h3 style="margin-top:16px">📋 Daily Summaries</h3>
+<h3>🎯 Weekly Goals</h3>
+<div style="display:flex;gap:4px;margin-bottom:8px">
+  <button class="btn btn-s wg-tab-btn active" onclick="switchWeekGoalTab('work')" id="wg-tab-btn-work">💼 Work</button>
+  <button class="btn btn-s wg-tab-btn" onclick="switchWeekGoalTab('school')" id="wg-tab-btn-school">🎓 School</button>
+  <button class="btn btn-s wg-tab-btn" onclick="switchWeekGoalTab('life')" id="wg-tab-btn-life">🌿 Life</button>
+</div>
+<div id="wg-panel-work" class="wg-panel">
+  <div id="wg-work" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('work')"></div>
+  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;align-items:center">
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','mon')" style="min-width:32px;font-size:11px">MON</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','tue')" style="min-width:32px;font-size:11px">TUES</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','wed')" style="min-width:32px;font-size:11px">WED</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','thu')" style="min-width:32px;font-size:11px">THURS</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','fri')" style="min-width:32px;font-size:11px">FRI</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','sat')" style="min-width:32px;font-size:11px">SAT</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('work','sun')" style="min-width:32px;font-size:11px">SUN</button>
+    <button class="btn btn-s" onclick="weekGoalClearHighlights('work')" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
+  </div>
+</div>
+<div id="wg-panel-school" class="wg-panel" style="display:none">
+  <div id="wg-school" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('school')"></div>
+  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;align-items:center">
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','mon')" style="min-width:32px;font-size:11px">MON</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','tue')" style="min-width:32px;font-size:11px">TUES</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','wed')" style="min-width:32px;font-size:11px">WED</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','thu')" style="min-width:32px;font-size:11px">THURS</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','fri')" style="min-width:32px;font-size:11px">FRI</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','sat')" style="min-width:32px;font-size:11px">SAT</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('school','sun')" style="min-width:32px;font-size:11px">SUN</button>
+    <button class="btn btn-s" onclick="weekGoalClearHighlights('school')" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
+  </div>
+</div>
+<div id="wg-panel-life" class="wg-panel" style="display:none">
+  <div id="wg-life" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('life')"></div>
+  <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;align-items:center">
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','mon')" style="min-width:32px;font-size:11px">MON</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','tue')" style="min-width:32px;font-size:11px">TUES</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','wed')" style="min-width:32px;font-size:11px">WED</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','thu')" style="min-width:32px;font-size:11px">THURS</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','fri')" style="min-width:32px;font-size:11px">FRI</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','sat')" style="min-width:32px;font-size:11px">SAT</button>
+    <button class="btn btn-s wg-day-btn" onclick="weekGoalAssignDay('life','sun')" style="min-width:32px;font-size:11px">SUN</button>
+    <button class="btn btn-s" onclick="weekGoalClearHighlights('life')" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
+  </div>
+</div>
+</div>
+<div class="card">
+<h3>📋 Daily Summaries</h3>
 <div id="daily-summaries">
   <div id="ds-buttons" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"></div>
   <div id="ds-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:13px"></div>
