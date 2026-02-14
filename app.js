@@ -6,7 +6,7 @@ function today() { const d = new Date(); return d.getFullYear() + '-' + String(d
 function weekId(d) { const dt = new Date(d || today()); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(dt.setDate(diff)); return mon.getFullYear() + '-' + String(mon.getMonth() + 1).padStart(2, '0') + '-' + String(mon.getDate()).padStart(2, '0'); }
 function dayData(date) { const d = load(); if (!d.days) d.days = {}; if (!d.days[date]) d.days[date] = { habits: {}, blocks: [], top3: [], intentions: [], bundles: [], reflection: '', sealed: false, distractions: [], energy: [], dissTime: 0 }; return d; }
 function weekData(wk) { const d = load(); if (!d.weeks) d.weeks = {}; if (!d.weeks[wk]) d.weeks[wk] = { goals: [], review: null, pushGoal: '' }; return d; }
-function getGlobal() { const d = load(); if (!d.chapters) d.chapters = []; if (!d.dissSessions) d.dissSessions = []; if (!d.inbox) d.inbox = []; if (!d.log) d.log = []; if (!d.ifthens) d.ifthens = []; if (!d.chatHistory) d.chatHistory = []; if (!d.ankiCards) d.ankiCards = []; if (!d.corrections) d.corrections = []; return d; }
+function getGlobal() { const d = load(); if (!d.chapters) d.chapters = []; if (!d.dissSessions) d.dissSessions = []; if (!d.log) d.log = []; if (!d.chatHistory) d.chatHistory = []; if (!d.ankiCards) d.ankiCards = []; if (!d.corrections) d.corrections = []; return d; }
 function addLog(type, msg) { const d = load(); if (!d.log) d.log = []; d.log.unshift({ type, msg, ts: new Date().toISOString() }); if (d.log.length > 500) d.log = d.log.slice(0, 500); save(d); }
 
 // ============ NAV ============
@@ -961,74 +961,6 @@ function submitWR() {
   document.getElementById('wr-res').style.display = 'block'; document.getElementById('wr-res').innerHTML = '<p style="color:var(--green);font-weight:600">✅ Weekly review submitted!</p>'; addLog('action', 'Weekly review: ' + wk);
 }
 
-// ============ HABITS TAB ============
-function renderHabits() {
-  const habitNames = [{ key: 'anki', label: 'Anki 300', cls: 'l-ital' }, { key: 'art1', label: 'Article 1', cls: 'l-ital' }, { key: 'art2', label: 'Article 2', cls: 'l-ital' }, { key: 'gym', label: 'Workout', cls: 'l-gym' }, { key: 'diss', label: 'Dissertation', cls: 'l-diss' }, { key: 'convo', label: 'Conversation', cls: 'l-ital' }];
-  const d = load(), days = d.days || {}, container = document.getElementById('habit-grids');
-  let html = '';
-  habitNames.forEach(h => {
-    let best = 0, cur = 0, cells = '';
-    for (let i = 55; i >= 0; i--) {
-      const dt = new Date(); dt.setDate(dt.getDate() - i); const key = dt.toISOString().slice(0, 10), day = days[key];
-      let done = false;
-      if (h.key === 'diss') { done = (d.dissSessions || []).filter(s => s.date === key).reduce((a, s) => a + s.minutes, 0) >= 30; }
-      else { done = day && day.habits && day.habits[h.key]; }
-      if (done) { cur++; if (cur > best) best = cur; } else { cur = 0; }
-      cells += '<div class="scell ' + (done ? 'done' : '') + (key === today() ? ' today' : '') + '" title="' + key + '"></div>';
-    }
-    html += '<div class="card"><h3><span class="label ' + h.cls + '">' + h.label + '</span></h3><p style="font-size:12px;color:var(--muted)">🔥 Current: ' + cur + ' | 🏆 Best: ' + best + '</p><div class="sgrid">' + cells + '</div></div>';
-  });
-  container.innerHTML = html; renderIFT();
-}
-function addIFT() { const v = document.getElementById('ift-in').value.trim(); if (!v) return; const d = getGlobal(); d.ifthens.push(v); save(d); document.getElementById('ift-in').value = ''; renderIFT(); }
-function renderIFT() {
-  const d = getGlobal();
-  document.getElementById('ifthen-list').innerHTML = (d.ifthens || []).length === 0 ? '<p style="color:var(--muted);font-size:12px;font-style:italic">Pre-register fallback plans.</p>' : d.ifthens.map((t, i) => '<div class="intention">🛡 ' + t + ' <button style="float:right;background:none;border:none;color:var(--red);cursor:pointer;font-size:10px" onclick="rmIFT(' + i + ')">✕</button></div>').join('');
-}
-function rmIFT(i) { const d = getGlobal(); d.ifthens.splice(i, 1); save(d); renderIFT(); }
-
-// ============ DISSERTATION TAB ============
-// Moved to dissertation.js
-
-// ============ INBOX TAB ============
-function renderInbox() {
-  const d = getGlobal();
-  const unsorted = (d.inbox || []).filter(x => x.status === 'unsorted');
-  const scheduled = (d.inbox || []).filter(x => x.status === 'scheduled');
-  const someday = (d.inbox || []).filter(x => x.status === 'someday');
-  document.getElementById('inbox-unsorted').innerHTML = unsorted.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">Inbox zero!</p>' : unsorted.map((x, i) => inboxItem(x, i)).join('');
-  document.getElementById('inbox-scheduled').innerHTML = scheduled.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">Nothing scheduled.</p>' : scheduled.map((x, i) => inboxItem(x, i)).join('');
-  document.getElementById('inbox-someday').innerHTML = someday.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">Empty.</p>' : someday.map((x, i) => inboxItem(x, i)).join('');
-}
-function inboxItem(x, globalIdx) {
-  const d = getGlobal(), realIdx = d.inbox.indexOf(x);
-  return '<div class="iitem"><span class="itxt">' + escHtml(x.text) + '</span><select onchange="moveInbox(' + realIdx + ',this.value)"><option value="unsorted"' + (x.status === 'unsorted' ? ' selected' : '') + '>Unsorted</option><option value="scheduled"' + (x.status === 'scheduled' ? ' selected' : '') + '>Scheduled</option><option value="someday"' + (x.status === 'someday' ? ' selected' : '') + '>Someday</option></select><button class="del" onclick="rmInbox(' + realIdx + ')">✕</button></div>';
-}
-function addInbox() { const v = document.getElementById('inbox-in').value.trim(); if (!v) return; const d = getGlobal(); d.inbox.push({ text: v, status: 'unsorted', created: new Date().toISOString() }); save(d); document.getElementById('inbox-in').value = ''; renderInbox(); addLog('action', 'Inbox: ' + v); }
-function moveInbox(i, status) { const d = getGlobal(); d.inbox[i].status = status; save(d); renderInbox(); }
-function rmInbox(i) { const d = getGlobal(); d.inbox.splice(i, 1); save(d); renderInbox(); }
-
-// ============ FOCUS TAB ============
-let focusInt = null, focusSec = 0, focusTotal = 1500, focusRunning = false;
-function renderFocus() {
-  const d = getGlobal(), dd = dayData(today());
-  const dists = dd.days[today()].distractions || [];
-  document.getElementById('distraction-log').innerHTML = dists.length === 0 ? '<p style="color:var(--muted);font-size:12px;font-style:italic">No distractions logged today.</p>' : dists.map(x => '<div class="lentry warning">' + escHtml(x) + '</div>').join('');
-  const energies = dd.days[today()].energy || [];
-  document.getElementById('energy-log').innerHTML = energies.length === 0 ? '' : energies.map(e => '<span style="margin-right:6px">' + e.time + ': ' + ['','💀','😴','😐','⚡','🔥'][e.level] + '</span>').join('');
-}
-function setFocus(mins) { focusTotal = mins * 60; focusSec = focusTotal; focusRunning = false; clearInterval(focusInt); updFocusDisplay(); document.getElementById('focus-status').textContent = mins + ' min focus'; }
-function focusTimer(action) {
-  if (action === 'start' && !focusRunning) {
-    if (focusSec <= 0) focusSec = focusTotal;
-    focusRunning = true;
-    focusInt = setInterval(() => { focusSec--; updFocusDisplay(); if (focusSec <= 0) { clearInterval(focusInt); focusRunning = false; document.getElementById('focus-status').textContent = '🎉 Done!'; try { new Audio('data:audio/wav;base64,UklGRl9vT19teleWQVZFZm10IBAAAAAAEAABABBgAABAAAgAZGF0YQ==').play(); } catch(e) {} } }, 1000);
-  } else if (action === 'pause') { clearInterval(focusInt); focusRunning = false; document.getElementById('focus-status').textContent = 'Paused'; }
-  else if (action === 'reset') { clearInterval(focusInt); focusRunning = false; focusSec = focusTotal; updFocusDisplay(); document.getElementById('focus-status').textContent = 'Reset'; }
-}
-function updFocusDisplay() { const m = Math.floor(focusSec / 60), s = focusSec % 60; document.getElementById('focus-timer').textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); }
-function addDist() { const v = document.getElementById('dist-in').value.trim(); if (!v) return; const dd = dayData(today()); dd.days[today()].distractions.push(v); save(dd); document.getElementById('dist-in').value = ''; renderFocus(); addLog('warning', 'Distraction: ' + v); }
-function logEnergy() { const level = document.getElementById('energy-level').value; const dd = dayData(today()); const now = new Date(); dd.days[today()].energy.push({ level: parseInt(level), time: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') }); save(dd); renderFocus(); }
 
 // ============ CLAUDE TAB ============
 function initClaude() {
@@ -1060,7 +992,6 @@ function buildContext() {
   ctx += '- Top 3: ' + (day.top3 || []).map(t => t.text + (t.done ? ' ✓' : '')).join(', ') + '\n';
   ctx += '- Dissertation sessions today: ' + (g.dissSessions || []).filter(s => s.date === today()).reduce((a, s) => a + s.minutes, 0) + ' min\n';
   ctx += '- Chapters: ' + (g.chapters || []).map(c => c.name + ' ' + c.current + '/' + c.target).join(', ') + '\n';
-  ctx += '- Inbox items: ' + (g.inbox || []).filter(x => x.status === 'unsorted').length + ' unsorted\n';
   return ctx;
 }
 async function sendChat() {
