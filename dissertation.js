@@ -397,15 +397,12 @@ document.addEventListener('mouseup', function() {
     return;
   }
 
-  // Collect text nodes within the range
+  // Collect text nodes within the range (intersectsNode handles element containers from contenteditable divs)
   const textNodes = [];
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
   let node;
-  let started = false;
   while ((node = walker.nextNode())) {
-    if (node === range.startContainer) started = true;
-    if (started) textNodes.push(node);
-    if (node === range.endContainer) break;
+    if (range.intersectsNode(node)) textNodes.push(node);
   }
 
   const colors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
