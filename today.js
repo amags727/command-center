@@ -95,9 +95,7 @@ function saveT3Intentions() {
   dd.days[today()].t3intentions = {
     work: document.getElementById('t3-work').value,
     school: document.getElementById('t3-school').value,
-    life1: document.getElementById('t3-life-1').value,
-    life2: document.getElementById('t3-life-2').value,
-    life3: document.getElementById('t3-life-3').value
+    life: document.getElementById('t3-life').value
   };
   save(dd);
 }
@@ -107,10 +105,7 @@ function loadT3Intentions() {
   if (t && (t.work || t.school || t.life1 || t.life2 || t.life3 || t.life)) {
     document.getElementById('t3-work').value = t.work || '';
     document.getElementById('t3-school').value = t.school || '';
-    // Support old single-field life and new 3-field
-    document.getElementById('t3-life-1').value = t.life1 || t.life || '';
-    document.getElementById('t3-life-2').value = t.life2 || '';
-    document.getElementById('t3-life-3').value = t.life3 || '';
+    document.getElementById('t3-life').value = t.life || [t.life1, t.life2, t.life3].filter(Boolean).join('\n') || '';
   } else {
     const prev = new Date(); prev.setDate(prev.getDate() - 1);
     const prevKey = prev.toISOString().slice(0, 10);
@@ -118,26 +113,39 @@ function loadT3Intentions() {
     if (pd && pd.t3intentions) {
       document.getElementById('t3-work').value = pd.t3intentions.work || '';
       document.getElementById('t3-school').value = pd.t3intentions.school || '';
-      document.getElementById('t3-life-1').value = pd.t3intentions.life1 || pd.t3intentions.life || '';
-      document.getElementById('t3-life-2').value = pd.t3intentions.life2 || '';
-      document.getElementById('t3-life-3').value = pd.t3intentions.life3 || '';
+      document.getElementById('t3-life').value = pd.t3intentions.life || [pd.t3intentions.life1, pd.t3intentions.life2, pd.t3intentions.life3].filter(Boolean).join('\n') || '';
       saveT3Intentions();
     }
   }
   // Auto-populate weekly goals for today's day
-  populateLifeWeeklyGoals();
+  populateSchoolWeeklyGoals();
+  // Auto-resize all daily goal textareas
+  document.querySelectorAll('#t3-grid textarea').forEach(autoResizeTextarea);
 }
-function populateLifeWeeklyGoals() {
-  const el = document.getElementById('t3-life-weekly');
+function populateSchoolWeeklyGoals() {
+  const el = document.getElementById('t3-school-weekly');
   if (!el) return;
   if (typeof getDissWeeklyGoalsForDay === 'function' && typeof getTodayDayKey === 'function') {
-    const txt = getDissWeeklyGoalsForDay(getTodayDayKey());
+    const dayKey = getTodayDayKey();
+    const txt = getDissWeeklyGoalsForDay(dayKey);
     if (txt) {
-      el.innerHTML = '<span style="font-size:11px;font-weight:600;color:var(--green)">📌 Weekly:</span> ' + escHtml(txt).replace(/\n/g, ' · ');
+      el.innerHTML = '<span style="font-size:11px;font-weight:600;color:var(--purple)">📌 Weekly:</span> ' + escHtml(txt).replace(/\n/g, ' · ');
+      // Auto-fill school field if empty (diss goals → school category)
+      const schoolEl = document.getElementById('t3-school');
+      if (schoolEl && !schoolEl.value.trim()) {
+        schoolEl.value = txt;
+        saveT3Intentions();
+        autoResizeTextarea(schoolEl);
+      }
     } else {
       el.innerHTML = '';
     }
   }
+}
+
+function autoResizeTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 function updRC() {

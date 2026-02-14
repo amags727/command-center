@@ -276,15 +276,11 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
 <div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:28px;resize:vertical;line-height:1.7"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><textarea class="fin" id="t3-school" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:28px;resize:vertical;line-height:1.7"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4>
-<div id="t3-life-weekly" style="font-size:12px;color:var(--muted);padding:2px 6px;margin-bottom:4px;min-height:0;line-height:1.4"></div>
-<div style="display:flex;flex-direction:column;gap:3px">
-<textarea class="fin" id="t3-life-1" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
-<textarea class="fin" id="t3-life-2" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
-<textarea class="fin" id="t3-life-3" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
-</div></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4>
+<div id="t3-school-weekly" style="font-size:12px;color:var(--muted);padding:2px 6px;margin-bottom:4px;min-height:0;line-height:1.4"></div>
+<textarea class="fin" id="t3-school" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><textarea class="fin" id="t3-life" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
 </div>
 </div>
 <div class="card">
@@ -411,13 +407,13 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
 <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
 <span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
-<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">M</button>
-<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">T</button>
-<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">W</button>
-<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">TH</button>
-<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">F</button>
-<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SA</button>
-<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SU</button>
+<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
+<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
+<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
+<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
+<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
+<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
+<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
 </div>
 <p id="diss-highlight-status" style="font-size:11px;color:var(--muted);margin-top:4px;display:none">🎨 Highlight mode active — select text to highlight, press Esc to exit</p>
 </div>
@@ -629,6 +625,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="firebase-sync.js"></script>
 <script src="dissertation.js"></script>
+<script src="today.js"></script>
 <script src="app.js"></script>
 <script>
 // Register service worker for PWA

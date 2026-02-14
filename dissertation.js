@@ -395,13 +395,21 @@ document.addEventListener('mouseup', function() {
   saveDissWeeklyGoals();
 });
 
-// Esc to exit highlight mode
+// Esc to exit highlight mode — also move cursor out of any highlight span
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && _dissHighlightDay) {
     _dissHighlightDay = null;
     document.querySelectorAll('.diss-day-btn').forEach(b => b.classList.remove('active'));
     const status = document.getElementById('diss-highlight-status');
     if (status) status.style.display = 'none';
+    // Move cursor to end of contenteditable, outside any highlight span
+    const el = document.getElementById('diss-weekly-goals');
+    if (el) {
+      el.focus();
+      const sel = window.getSelection();
+      sel.selectAllChildren(el);
+      sel.collapseToEnd();
+    }
   }
 });
 
