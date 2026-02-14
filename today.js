@@ -123,22 +123,16 @@ function loadT3Intentions() {
   document.querySelectorAll('#t3-grid textarea').forEach(autoResizeTextarea);
 }
 function populateSchoolWeeklyGoals() {
-  const el = document.getElementById('t3-school-weekly');
-  if (!el) return;
   if (typeof getDissWeeklyGoalsForDay === 'function' && typeof getTodayDayKey === 'function') {
     const dayKey = getTodayDayKey();
     const txt = getDissWeeklyGoalsForDay(dayKey);
     if (txt) {
-      el.innerHTML = '<span style="font-size:11px;font-weight:600;color:var(--purple)">📌 Weekly:</span> ' + escHtml(txt).replace(/\n/g, ' · ');
-      // Auto-fill school field if empty (diss goals → school category)
       const schoolEl = document.getElementById('t3-school');
       if (schoolEl && !schoolEl.value.trim()) {
         schoolEl.value = txt;
         saveT3Intentions();
         autoResizeTextarea(schoolEl);
       }
-    } else {
-      el.innerHTML = '';
     }
   }
 }
