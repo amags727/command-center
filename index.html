@@ -241,10 +241,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <nav class="nav" id="nav">
 <button class="active" onclick="switchTab('today')">📅 Today</button>
 <button onclick="switchTab('week')">📊 Week</button>
-<button onclick="switchTab('habits')">🔥 Habits</button>
 <button onclick="switchTab('dissertation')">📝 Dissertation</button>
-<button onclick="switchTab('inbox')">📥 Inbox</button>
-<button onclick="switchTab('focus')">🔒 Focus</button>
 <button onclick="switchTab('cards')">🃏 Cards</button>
 <button onclick="switchTab('translate')">🇮🇹 Read</button>
 <button onclick="switchTab('claude')">🤖 Claude</button>
@@ -365,12 +362,6 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 
 <!-- HABITS -->
-<div class="tab" id="tab-habits">
-<h1>🔥 Habit Tracker</h1>
-<div id="habit-grids"></div>
-<div class="card"><h3>🛡 Failure Mode If-Thens</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Pre-register what you'll do when things go wrong.</p><div id="ifthen-list"></div><div class="flex mt8"><input class="fin flex-1" id="ift-in" placeholder="If I miss [X], then I will [Y]..." onkeydown="if(event.key==='Enter')addIFT()"><button class="btn btn-s" onclick="addIFT()">Add</button></div></div>
-</div>
-
 <!-- DISSERTATION -->
 <div class="tab" id="tab-dissertation">
 <h1>📝 Dissertation</h1>
@@ -434,33 +425,6 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 
 <!-- INBOX -->
-<div class="tab" id="tab-inbox">
-<h1>📥 Inbox</h1>
-<div class="card"><h3>Add Item</h3><div class="iinput"><input id="inbox-in" placeholder="Add task, thought, or idea..." onkeydown="if(event.key==='Enter')addInbox()"><button onclick="addInbox()">Add</button></div></div>
-<div class="card"><h3>Unsorted</h3><div id="inbox-unsorted"></div></div>
-<div class="card"><h3>Scheduled</h3><div id="inbox-scheduled"></div></div>
-<div class="card"><h3>Someday/Maybe</h3><div id="inbox-someday"></div></div>
-</div>
-
-<!-- FOCUS -->
-<div class="tab" id="tab-focus">
-<h1>🔒 Focus Mode</h1>
-<div class="card"><h3>⏱ Focus Timer</h3>
-<div class="timer-d" id="focus-timer">25:00</div>
-<p style="text-align:center;font-size:12px;color:var(--muted)" id="focus-status">Pomodoro — 25 min</p>
-<div class="timer-c mt8">
-<button class="pri" onclick="focusTimer('start')">▶ Start</button>
-<button onclick="focusTimer('pause')">⏸ Pause</button>
-<button class="dan" onclick="focusTimer('reset')">↺ Reset</button>
-</div>
-<div class="flex mt8" style="justify-content:center"><button class="btn btn-s" onclick="setFocus(25)">25min</button><button class="btn btn-s" onclick="setFocus(50)">50min</button><button class="btn btn-s" onclick="setFocus(90)">90min</button></div>
-</div>
-<div class="card"><h3>📵 Distraction Log</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Each time you catch yourself getting distracted, log it here. Awareness is the first step.</p><div id="distraction-log"></div><div class="flex mt8"><input class="fin flex-1" id="dist-in" placeholder="What distracted you?" onkeydown="if(event.key==='Enter')addDist()"><button class="btn btn-s" onclick="addDist()">Log</button></div></div>
-<div class="card"><h3>🧠 Energy Level</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Track your energy to learn your peak hours.</p>
-<div class="flex"><select class="fin" id="energy-level" style="width:120px"><option value="5">🔥 Peak</option><option value="4">⚡ High</option><option value="3" selected>😐 Medium</option><option value="2">😴 Low</option><option value="1">💀 Drained</option></select><button class="btn btn-s" onclick="logEnergy()">Log Now</button></div>
-<div id="energy-log" class="mt8" style="font-size:12px"></div></div>
-</div>
-
 <!-- CLAUDE -->
 <div class="tab" id="tab-claude">
 <h1>🤖 Claude Integration</h1>
