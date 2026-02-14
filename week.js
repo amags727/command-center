@@ -14,6 +14,8 @@ function renderWeek() {
   document.getElementById('wk-refl').textContent = refl; document.getElementById('wk-diss').textContent = dissHrs;
   renderCWG();
   renderDailySummaries();
+  loadWeekGoals();
+  switchWeekGoalTab('work');
 }
 function addCWG() { const v = document.getElementById('cw-in').value.trim(), cat = document.getElementById('cw-cat').value; if (!v) return; const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.push({ text: v, cat, done: false }); save(wd); document.getElementById('cw-in').value = ''; renderCWG(); }
 function renderDailySummaries() {
@@ -44,6 +46,98 @@ function renderCWG() {
 }
 function toggleCWG(i) { const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals[i].done = !wd.weeks[wk].goals[i].done; save(wd); renderCWG(); }
 function rmCWG(i) { const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.splice(i, 1); save(wd); renderCWG(); }
+// ── Weekly Goals (Work / School / Life) ─────────────────────────
+const DAY_COLORS = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
+
+function switchWeekGoalTab(cat) {
+  ['work','school','life'].forEach(c => {
+    const p = document.getElementById('wg-panel-'+c);
+    const b = document.getElementById('wg-tab-btn-'+c);
+    if (c === cat) { p.style.display=''; b.classList.add('active'); }
+    else { p.style.display='none'; b.classList.remove('active'); }
+  });
+}
+
+function saveWeekGoals(cat) {
+  const el = document.getElementById('wg-'+cat);
+  if (!el) return;
+  const d = getGlobal();
+  if (!d.weekGoals) d.weekGoals = {};
+  if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
+  d.weekGoals[weekId()][cat] = el.innerHTML;
+  save(d);
+  if (cat === 'school' && typeof populateDissWeeklyGoals === 'function') populateDissWeeklyGoals();
+}
+
+function loadWeekGoals() {
+  const d = getGlobal();
+  const wk = d.weekGoals && d.weekGoals[weekId()] || {};
+  ['work','school','life'].forEach(cat => {
+    const el = document.getElementById('wg-'+cat);
+    if (el) el.innerHTML = wk[cat] || '';
+  });
+}
+
+function weekGoalAssignDay(cat, day) {
+  const el = document.getElementById('wg-'+cat);
+  if (!el) return;
+  const sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  if (!el.contains(range.commonAncestorContainer)) return;
+  const span = document.createElement('span');
+  span.setAttribute('data-day', day);
+  span.style.background = DAY_COLORS[day] || '#eee';
+  range.surroundContents(span);
+  sel.removeAllRanges();
+  saveWeekGoals(cat);
+}
+
+function weekGoalClearHighlights(cat) {
+  const el = document.getElementById('wg-'+cat);
+  if (!el) return;
+  const sel = window.getSelection();
+  if (sel.rangeCount && !sel.isCollapsed && el.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const range = sel.getRangeAt(0);
+    el.querySelectorAll('[data-day]').forEach(sp => {
+      if (range.intersectsNode(sp)) {
+        const parent = sp.parentNode;
+        while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
+        parent.removeChild(sp);
+      }
+    });
+    sel.removeAllRanges();
+  } else {
+    el.querySelectorAll('[data-day]').forEach(sp => {
+      const parent = sp.parentNode;
+      while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
+      parent.removeChild(sp);
+    });
+  }
+  saveWeekGoals(cat);
+}
+
+function populateSchoolWeeklyGoals() {
+  const d = getGlobal();
+  const html = d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()] || '';
+  const el = document.getElementById('wg-school');
+  if (el) el.innerHTML = html;
+  if (!d.weekGoals) d.weekGoals = {};
+  if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
+  d.weekGoals[weekId()].school = html;
+  save(d);
+}
+
+function populateDissWeeklyGoals() {
+  const d = getGlobal();
+  const html = d.weekGoals && d.weekGoals[weekId()] && d.weekGoals[weekId()].school || '';
+  const el = document.getElementById('diss-weekly-goals');
+  if (el) el.innerHTML = html;
+  if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
+  d.dissWeeklyGoals[weekId()] = html;
+  save(d);
+}
+
 function submitWR() {
   const well = document.getElementById('wr-well').value.trim(), bad = document.getElementById('wr-bad').value.trim(), imp = document.getElementById('wr-imp').value.trim(), push = document.getElementById('wr-push').value.trim();
   if (!well || !bad || !imp) { alert('Complete all review prompts.'); return; }
