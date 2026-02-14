@@ -383,17 +383,65 @@ document.addEventListener('mouseup', function() {
   const sel = window.getSelection();
   if (!sel || sel.isCollapsed || !sel.rangeCount) return;
   const range = sel.getRangeAt(0);
-  // Only apply if selection is inside the weekly goals div
   if (!el.contains(range.commonAncestorContainer)) return;
-  const span = document.createElement('span');
-  span.setAttribute('data-day', _dissHighlightDay);
+
+  // Check if entire selection is inside an existing span with same day → un-highlight
+  const parentSpan = range.commonAncestorContainer.nodeType === 3
+    ? range.commonAncestorContainer.parentElement
+    : range.commonAncestorContainer;
+  if (parentSpan && parentSpan.tagName === 'SPAN' && parentSpan.dataset.day === _dissHighlightDay) {
+    const text = document.createTextNode(parentSpan.textContent);
+    parentSpan.parentNode.replaceChild(text, parentSpan);
+    sel.removeAllRanges();
+    saveDissWeeklyGoals();
+    return;
+  }
+
+  // Collect text nodes within the range
+  const textNodes = [];
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+  let node;
+  let started = false;
+  while ((node = walker.nextNode())) {
+    if (node === range.startContainer) started = true;
+    if (started) textNodes.push(node);
+    if (node === range.endContainer) break;
+  }
+
   const colors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
-  span.style.backgroundColor = colors[_dissHighlightDay] || '#eee';
-  span.style.borderRadius = '2px';
-  span.style.padding = '0 2px';
-  try { range.surroundContents(span); } catch(e) { /* partial selection across nodes */ }
+
+  textNodes.forEach(function(tn) {
+    let startOff = 0, endOff = tn.length;
+    if (tn === range.startContainer) startOff = range.startOffset;
+    if (tn === range.endContainer) endOff = range.endOffset;
+    if (startOff >= endOff) return;
+    const txt = tn.textContent.substring(startOff, endOff);
+    if (!txt.trim()) return;
+
+    const before = tn.textContent.substring(0, startOff);
+    const after = tn.textContent.substring(endOff);
+    const span = document.createElement('span');
+    span.setAttribute('data-day', _dissHighlightDay);
+    span.style.backgroundColor = colors[_dissHighlightDay] || '#eee';
+    span.style.borderRadius = '2px';
+    span.style.padding = '0 2px';
+    span.textContent = txt;
+
+    const parent = tn.parentNode;
+    if (after) parent.insertBefore(document.createTextNode(after), tn.nextSibling);
+    parent.insertBefore(span, tn.nextSibling);
+    if (before) parent.insertBefore(document.createTextNode(before), span);
+    parent.removeChild(tn);
+  });
+
   sel.removeAllRanges();
   saveDissWeeklyGoals();
+
+  // Auto-exit highlight mode after applying
+  _dissHighlightDay = null;
+  document.querySelectorAll('.diss-day-btn').forEach(b => b.classList.remove('active'));
+  const status = document.getElementById('diss-highlight-status');
+  if (status) status.style.display = 'none';
 });
 
 // Esc to exit highlight mode — also move cursor out of any highlight span
