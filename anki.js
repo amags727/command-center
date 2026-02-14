@@ -286,7 +286,7 @@ function rateCard(quality) {
   studyIdx++;
   // Show undo button
   const undoBtn = document.getElementById('undo-card-btn');
-  if (undoBtn) undoBtn.style.display = '';
+  if (undoBtn) { undoBtn.style.opacity = '1'; undoBtn.style.pointerEvents = 'auto'; }
   // Live-update the reviewed-today counter
   const reviewedNow = getTotalReviewedToday();
   document.getElementById('cards-reviewed-today').textContent = reviewedNow;
@@ -313,7 +313,7 @@ function undoCardResponse() {
   lastCardAction = null;
   // Hide undo button
   const undoBtn = document.getElementById('undo-card-btn');
-  if (undoBtn) undoBtn.style.display = 'none';
+  if (undoBtn) { undoBtn.style.opacity = '.35'; undoBtn.style.pointerEvents = 'none'; }
   // Update counters
   const reviewedNow = getTotalReviewedToday();
   document.getElementById('cards-reviewed-today').textContent = reviewedNow;
