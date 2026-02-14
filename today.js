@@ -120,7 +120,10 @@ function loadT3Intentions() {
   // Auto-populate weekly goals for today's day
   populateSchoolWeeklyGoals();
   // Auto-resize all daily goal textareas
-  document.querySelectorAll('#t3-grid textarea').forEach(autoResizeTextarea);
+  // Delay auto-resize until browser has laid out the newly-visible tab
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#t3-grid textarea').forEach(autoResizeTextarea);
+  });
 }
 function populateSchoolWeeklyGoals() {
   if (typeof getDissWeeklyGoalsForDay === 'function' && typeof getTodayDayKey === 'function') {
