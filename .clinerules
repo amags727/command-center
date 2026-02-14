@@ -1,20 +1,20 @@
 # Command Center Project Rules
 
 ## File Structure
-This project has a single monolithic `app.js` (2,655 lines) that is being split into modules. See `MODULARIZATION.md` for the extraction map and dependency graph.
+`app.js` (~2,568 lines) is being modularized. Module files exist on disk but most are NOT yet wired into `index.html`. See `MODULARIZATION.md` for the current extraction state.
 
 ## Critical Rules
 
 ### 1. NEVER read all of app.js
-`app.js` is ~2,655 lines and will consume 70%+ of your context window. Instead:
-- Read `MODULARIZATION.md` first (60 lines) to understand the structure
+`app.js` is ~2,568 lines and will consume 70%+ of your context window. Instead:
+- Read `MODULARIZATION.md` first to understand the structure
 - Use `grep -n` to find the specific section you need
 - Use `sed -n 'START,ENDp' app.js` to read only the lines you need
-- If a module file already exists (e.g., `week.js`), read that instead of app.js
+- If a module file is wired in (loaded via `<script>` in index.html), read that instead of app.js
 
 ### 2. NEVER read all of index.html at once
-`index.html` is ~550 lines. Use grep to find the specific tab section you need:
-- `grep -n 'tab-week\|tab-today\|tab-habits' index.html` to find section boundaries
+`index.html` is ~590 lines. Use grep to find the specific tab section you need:
+- `grep -n 'tab-week\|tab-today\|tab-cards' index.html` to find section boundaries
 - Then `sed -n 'START,ENDp' index.html` for just that section
 
 ### 3. Context budget awareness
@@ -31,16 +31,31 @@ After any successful change, git commit immediately. Never leave uncommitted wor
 ### 6. Data layer is in core.js (or lines 1-10 of app.js pre-split)
 Functions available globally: `load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`. You never need to read their implementations — just know they exist.
 
-## Tab → File Mapping (post-modularization)
-| Tab | JS File | HTML id |
-|-----|---------|---------|
-| Today | today.js + calendar.js | tab-today |
-| Week | week.js | tab-week |
-| Habits | habits.js | tab-habits |
-| Dissertation | dissertation.js | tab-dissertation |
-| Inbox | app.js (renderInbox) | tab-inbox |
-| Focus | focus.js | tab-focus |
-| Cards | anki.js | tab-cards |
-| Translate | translate.js | tab-translate |
-| Claude | chat.js | tab-claude |
-| Log | app.js (renderLog) | tab-log |
+### 7. Keep documentation in sync
+When modifying any module file or app.js:
+- Update `MODULARIZATION.md` if the function map, line ranges, file ownership, or dependencies change
+- Update `sw.js` ASSETS array if files are added, removed, or renamed
+- Update the Tab → File Mapping table below if tab ownership changes
+- If a function moves between files, update both source and destination entries
+- After any structural change, verify `index.html` script tags match the actual module files being used
+
+## Current Script Load Order (index.html)
+Only these files are currently loaded:
+```html
+<script src="firebase-sync.js"></script>
+<script src="dissertation.js"></script>
+<script src="today.js"></script>
+<script src="app.js"></script>
+```
+All other module files (core.js, calendar.js, week.js, anki.js, translate.js, chat.js, flashcard-review.js, aotd.js) exist on disk but are NOT loaded — their code still lives in app.js.
+
+## Tab → File Mapping (current state)
+| Tab | JS Source | HTML id |
+|-----|-----------|---------|
+| Today | today.js (loaded) + app.js calendar/flashcard sections | tab-today |
+| Week | app.js (renderWeek, lines 911-963) | tab-week |
+| Dissertation | dissertation.js (loaded) | tab-dissertation |
+| Cards | app.js (SM-2 engine, lines 1031-1637) | tab-cards |
+| Translate | app.js (translate functions, lines 1638-1931) | tab-translate |
+| Claude | app.js (chat functions, lines 965-1030) | tab-claude |
+| Log | app.js (renderLog, lines 1932-1954) | tab-log |
