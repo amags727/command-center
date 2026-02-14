@@ -351,6 +351,7 @@ function saveDissWeeklyGoals() {
   if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
   d.dissWeeklyGoals[weekId()] = el.innerHTML;
   save(d);
+  if (typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
 }
 
 function loadDissWeeklyGoals() {
@@ -406,9 +407,18 @@ document.addEventListener('keydown', function(e) {
     const el = document.getElementById('diss-weekly-goals');
     if (el) {
       el.focus();
+      // Append a clean text node at the end so cursor escapes any styled span
+      let tail = el.lastChild;
+      if (!tail || tail.nodeType !== 3 || tail.parentElement !== el) {
+        tail = document.createTextNode('\u200B'); // zero-width space
+        el.appendChild(tail);
+      }
       const sel = window.getSelection();
-      sel.selectAllChildren(el);
-      sel.collapseToEnd();
+      const r = document.createRange();
+      r.setStartAfter(el.lastChild);
+      r.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(r);
     }
   }
 });

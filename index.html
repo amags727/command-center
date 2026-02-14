@@ -183,7 +183,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .diss-ch-arrow{transition:transform .2s;font-size:12px}
 .diss-ch-arrow.open{transform:rotate(90deg)}
 .diss-ch-body{padding:0 14px 14px;display:none}
-.diss-ch-body.open{display:block}
+.diss-ch-body.open{display:block;max-height:400px;overflow-y:auto}
 .diss-ch-actions{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .diss-ch-actions .btn{font-size:11px;padding:3px 8px}
 .diss-md-edit{width:100%;min-height:300px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.6;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:vertical;display:none}
@@ -360,28 +360,43 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <!-- DISSERTATION -->
 <div class="tab" id="tab-dissertation">
 <h1>📝 Dissertation</h1>
+<div class="card">
+<h3>🎯 Weekly Goals</h3>
+<div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
+<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
+<span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
+<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
+<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
+<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
+<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
+<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
+<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
+<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
+</div>
+<p id="diss-highlight-status" style="font-size:11px;color:var(--muted);margin-top:4px;display:none">🎨 Highlight mode active — select text to highlight, press Esc to exit</p>
+</div>
 <div class="card"><h3>📊 Overall Progress</h3><div class="pbar"><div class="pfill" id="diss-pbar" style="width:0%"></div></div><p style="font-size:12px;color:var(--muted)" id="diss-total">0 / 0 words</p></div>
 
 <div id="diss-chapter-cards">
 <div class="diss-ch-card" data-ch="ch1">
-<div class="diss-ch-header" onclick="toggleDissChapter('ch1')"><span class="diss-ch-arrow open" id="diss-arrow-ch1">▶</span>Chapter 1: Migration<span class="diss-sync-status" id="diss-sync-ch1"></span></div>
-<div class="diss-ch-body open" id="diss-body-ch1">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch1')"><span class="diss-ch-arrow" id="diss-arrow-ch1">▶</span>Chapter 1: Migration<span class="diss-sync-status" id="diss-sync-ch1"></span></div>
+<div class="diss-ch-body" id="diss-body-ch1">
 <div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch1')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch1')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch1')">⬆ Push to Local</button></div>
 <textarea class="diss-md-edit" id="diss-edit-ch1" oninput="dissAutoSave('ch1')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch1"></div>
 </div>
 </div>
 <div class="diss-ch-card" data-ch="ch2">
-<div class="diss-ch-header" onclick="toggleDissChapter('ch2')"><span class="diss-ch-arrow open" id="diss-arrow-ch2">▶</span>Chapter 2: Data Economy (Closed)<span class="diss-sync-status" id="diss-sync-ch2"></span></div>
-<div class="diss-ch-body open" id="diss-body-ch2">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch2')"><span class="diss-ch-arrow" id="diss-arrow-ch2">▶</span>Chapter 2: Data Economy (Closed)<span class="diss-sync-status" id="diss-sync-ch2"></span></div>
+<div class="diss-ch-body" id="diss-body-ch2">
 <div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch2" oninput="dissAutoSave('ch2')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch2"></div>
 </div>
 </div>
 <div class="diss-ch-card" data-ch="ch3">
-<div class="diss-ch-header" onclick="toggleDissChapter('ch3')"><span class="diss-ch-arrow open" id="diss-arrow-ch3">▶</span>Chapter 3: Data Economy (Open)<span class="diss-sync-status" id="diss-sync-ch3"></span></div>
-<div class="diss-ch-body open" id="diss-body-ch3">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch3')"><span class="diss-ch-arrow" id="diss-arrow-ch3">▶</span>Chapter 3: Data Economy (Open)<span class="diss-sync-status" id="diss-sync-ch3"></span></div>
+<div class="diss-ch-body" id="diss-body-ch3">
 <div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch3" oninput="dissAutoSave('ch3')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch3"></div>
@@ -401,22 +416,6 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="mt8"><select class="fin" id="diss-ch-sel"><option value="">Working on...</option></select></div>
 </div>
 <div class="card"><h3>📋 Session Log</h3><div id="diss-log" style="max-height:300px;overflow-y:auto"></div></div>
-
-<div class="card">
-<h3>🎯 Weekly Goals</h3>
-<div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
-<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
-<span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
-<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
-<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
-<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
-<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
-<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
-<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
-<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
-</div>
-<p id="diss-highlight-status" style="font-size:11px;color:var(--muted);margin-top:4px;display:none">🎨 Highlight mode active — select text to highlight, press Esc to exit</p>
-</div>
 </div>
 
 <!-- INBOX -->
