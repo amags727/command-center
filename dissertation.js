@@ -7,7 +7,7 @@ function renderDiss() { initDissChapters(); renderChapters(); renderDissLog(); u
 
 // ============ MARKDOWN PARSER ============
 function dissParseMd(src) {
-  if (!src) return '<p style="color:var(--muted);font-style:italic">Empty — double-click to edit, or ⌘⇧V for full editor</p>';
+  if (!src) return '';
   let html = '', inCode = false, codeBuf = '';
   const lines = src.split('\n');
   const escape = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -227,6 +227,8 @@ async function dissLinkFile(ch) {
     document.getElementById('diss-sync-'+ch).textContent = '📎 '+handle.name;
     // Persist handle in IndexedDB
     saveFileHandle(ch, handle);
+    // Auto-pull content from the linked file
+    await dissPullLocal(ch);
   } catch(e) { if(e.name!=='AbortError') console.error(e); }
 }
 
