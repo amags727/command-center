@@ -95,27 +95,47 @@ function saveT3Intentions() {
   dd.days[today()].t3intentions = {
     work: document.getElementById('t3-work').value,
     school: document.getElementById('t3-school').value,
-    life: document.getElementById('t3-life').value
+    life1: document.getElementById('t3-life-1').value,
+    life2: document.getElementById('t3-life-2').value,
+    life3: document.getElementById('t3-life-3').value
   };
   save(dd);
 }
 function loadT3Intentions() {
   const dd = dayData(today());
   const t = dd.days[today()].t3intentions;
-  if (t && (t.work || t.school || t.life)) {
+  if (t && (t.work || t.school || t.life1 || t.life2 || t.life3 || t.life)) {
     document.getElementById('t3-work').value = t.work || '';
     document.getElementById('t3-school').value = t.school || '';
-    document.getElementById('t3-life').value = t.life || '';
+    // Support old single-field life and new 3-field
+    document.getElementById('t3-life-1').value = t.life1 || t.life || '';
+    document.getElementById('t3-life-2').value = t.life2 || '';
+    document.getElementById('t3-life-3').value = t.life3 || '';
   } else {
-    // Auto-populate from previous day
     const prev = new Date(); prev.setDate(prev.getDate() - 1);
     const prevKey = prev.toISOString().slice(0, 10);
     const pd = dd.days[prevKey];
     if (pd && pd.t3intentions) {
       document.getElementById('t3-work').value = pd.t3intentions.work || '';
       document.getElementById('t3-school').value = pd.t3intentions.school || '';
-      document.getElementById('t3-life').value = pd.t3intentions.life || '';
+      document.getElementById('t3-life-1').value = pd.t3intentions.life1 || pd.t3intentions.life || '';
+      document.getElementById('t3-life-2').value = pd.t3intentions.life2 || '';
+      document.getElementById('t3-life-3').value = pd.t3intentions.life3 || '';
       saveT3Intentions();
+    }
+  }
+  // Auto-populate weekly goals for today's day
+  populateLifeWeeklyGoals();
+}
+function populateLifeWeeklyGoals() {
+  const el = document.getElementById('t3-life-weekly');
+  if (!el) return;
+  if (typeof getDissWeeklyGoalsForDay === 'function' && typeof getTodayDayKey === 'function') {
+    const txt = getDissWeeklyGoalsForDay(getTodayDayKey());
+    if (txt) {
+      el.innerHTML = '<span style="font-size:11px;font-weight:600;color:var(--green)">📌 Weekly:</span> ' + escHtml(txt).replace(/\n/g, ' · ');
+    } else {
+      el.innerHTML = '';
     }
   }
 }

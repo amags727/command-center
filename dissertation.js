@@ -3,7 +3,7 @@ let dissInterval = null, dissStartTime = null, dissElapsed = 0;
 const DISS_CHAPTERS = {ch1:'Chapter 1: Migration', ch2:'Chapter 2: Data Economy (Closed)', ch3:'Chapter 3: Data Economy (Open)'};
 const dissFileHandles = {}; // in-memory file handles per chapter
 
-function renderDiss() { initDissChapters(); renderChapters(); renderDissLog(); updateDissChapterSelect(); }
+function renderDiss() { initDissChapters(); renderChapters(); renderDissLog(); updateDissChapterSelect(); loadDissWeeklyGoals(); }
 
 // ============ MARKDOWN PARSER ============
 function dissParseMd(src) {
@@ -340,4 +340,84 @@ function dissTimer(action) {
 function renderDissLog() {
   const d = getGlobal(), sessions = (d.dissSessions || []).slice(-20).reverse();
   document.getElementById('diss-log').innerHTML = sessions.length === 0 ? '<p style="color:var(--muted);font-size:13px;font-style:italic">No sessions yet.</p>' : sessions.map(s => '<div class="lentry action"><span class="lt">' + s.date + '</span> ' + s.minutes + ' min — ' + s.chapter + '</div>').join('');
+}
+// ============ WEEKLY GOALS WITH DAY HIGHLIGHTS ============
+let _dissHighlightDay = null;
+
+function saveDissWeeklyGoals() {
+  const el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  const d = getGlobal();
+  if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
+  d.dissWeeklyGoals[weekId()] = el.innerHTML;
+  save(d);
+}
+
+function loadDissWeeklyGoals() {
+  const el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  const d = getGlobal();
+  el.innerHTML = (d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()]) || '';
+}
+
+function dissToggleHighlight(day) {
+  const btns = document.querySelectorAll('.diss-day-btn');
+  const status = document.getElementById('diss-highlight-status');
+  if (_dissHighlightDay === day) {
+    _dissHighlightDay = null;
+    btns.forEach(b => b.classList.remove('active'));
+    if (status) status.style.display = 'none';
+    return;
+  }
+  _dissHighlightDay = day;
+  btns.forEach(b => b.classList.toggle('active', b.dataset.day === day));
+  if (status) status.style.display = 'block';
+}
+
+// Apply highlight on mouseup inside weekly goals
+document.addEventListener('mouseup', function() {
+  if (!_dissHighlightDay) return;
+  const el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  // Only apply if selection is inside the weekly goals div
+  if (!el.contains(range.commonAncestorContainer)) return;
+  const span = document.createElement('span');
+  span.setAttribute('data-day', _dissHighlightDay);
+  const colors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
+  span.style.backgroundColor = colors[_dissHighlightDay] || '#eee';
+  span.style.borderRadius = '2px';
+  span.style.padding = '0 2px';
+  try { range.surroundContents(span); } catch(e) { /* partial selection across nodes */ }
+  sel.removeAllRanges();
+  saveDissWeeklyGoals();
+});
+
+// Esc to exit highlight mode
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && _dissHighlightDay) {
+    _dissHighlightDay = null;
+    document.querySelectorAll('.diss-day-btn').forEach(b => b.classList.remove('active'));
+    const status = document.getElementById('diss-highlight-status');
+    if (status) status.style.display = 'none';
+  }
+});
+
+// Extract highlighted text for a given day from weekly goals
+function getDissWeeklyGoalsForDay(dayKey) {
+  const d = getGlobal();
+  const html = (d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()]) || '';
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const spans = tmp.querySelectorAll('span[data-day="' + dayKey + '"]');
+  return Array.from(spans).map(s => s.textContent.trim()).filter(Boolean).join('\n');
+}
+
+// Map JS day number (0=Sun) to our day keys
+function getTodayDayKey() {
+  const map = ['sun','mon','tue','wed','thu','fri','sat'];
+  return map[new Date().getDay()];
 }

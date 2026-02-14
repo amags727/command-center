@@ -209,6 +209,10 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .diss-md-rendered .diss-section-collapsed>.diss-section-heading .sec-arrow{transform:rotate(0deg)}
 .diss-section-inline-edit{width:100%;min-height:100px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.5;padding:8px;border:1px solid var(--purple);border-radius:4px;background:var(--bg);color:var(--text);resize:vertical;margin:4px 0}
 .diss-sync-status{font-size:11px;color:var(--muted);margin-left:auto}
+/* Weekly Goals day highlight buttons */
+.diss-day-btn[data-day="mon"]{background:#FFB3B3;color:#8B0000}.diss-day-btn[data-day="tue"]{background:#FFD9B3;color:#8B4513}.diss-day-btn[data-day="wed"]{background:#FFFFB3;color:#6B6B00}.diss-day-btn[data-day="thu"]{background:#B3FFB3;color:#006400}.diss-day-btn[data-day="fri"]{background:#B3D9FF;color:#00008B}.diss-day-btn[data-day="sat"]{background:#D9B3FF;color:#4B0082}.diss-day-btn[data-day="sun"]{background:#FFB3E6;color:#8B0060}
+.diss-day-btn.active{box-shadow:0 0 0 2px currentColor;transform:scale(1.1);font-weight:700}
+#diss-weekly-goals [data-day]{border-radius:2px;padding:0 2px}
 </style>
 </head>
 <body>
@@ -271,10 +275,16 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px" id="t3-grid">
-<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="2" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:40px;resize:vertical;line-height:1.7"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--purple)">🎓 School</h4><textarea class="fin" id="t3-school" rows="2" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:40px;resize:vertical;line-height:1.7"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:6px;color:var(--green)">🌱 Life</h4><textarea class="fin" id="t3-life" rows="2" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:40px;resize:vertical;line-height:1.7"></textarea></div>
+<div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:28px;resize:vertical;line-height:1.7"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><textarea class="fin" id="t3-school" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:28px;resize:vertical;line-height:1.7"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4>
+<div id="t3-life-weekly" style="font-size:12px;color:var(--muted);padding:2px 6px;margin-bottom:4px;min-height:0;line-height:1.4"></div>
+<div style="display:flex;flex-direction:column;gap:3px">
+<textarea class="fin" id="t3-life-1" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
+<textarea class="fin" id="t3-life-2" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
+<textarea class="fin" id="t3-life-3" rows="1" placeholder="• ..." oninput="saveT3Intentions()" style="min-height:24px;resize:none;line-height:1.5;padding:4px 8px"></textarea>
+</div></div>
 </div>
 </div>
 <div class="card">
@@ -368,7 +378,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="diss-ch-card" data-ch="ch2">
 <div class="diss-ch-header" onclick="toggleDissChapter('ch2')"><span class="diss-ch-arrow open" id="diss-arrow-ch2">▶</span>Chapter 2: Data Economy (Closed)<span class="diss-sync-status" id="diss-sync-ch2"></span></div>
 <div class="diss-ch-body open" id="diss-body-ch2">
-<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button></div>
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch2" oninput="dissAutoSave('ch2')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch2"></div>
 </div>
@@ -376,7 +386,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="diss-ch-card" data-ch="ch3">
 <div class="diss-ch-header" onclick="toggleDissChapter('ch3')"><span class="diss-ch-arrow open" id="diss-arrow-ch3">▶</span>Chapter 3: Data Economy (Open)<span class="diss-sync-status" id="diss-sync-ch3"></span></div>
 <div class="diss-ch-body open" id="diss-body-ch3">
-<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button></div>
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch3" oninput="dissAutoSave('ch3')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch3"></div>
 </div>
@@ -395,6 +405,22 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="mt8"><select class="fin" id="diss-ch-sel"><option value="">Working on...</option></select></div>
 </div>
 <div class="card"><h3>📋 Session Log</h3><div id="diss-log" style="max-height:300px;overflow-y:auto"></div></div>
+
+<div class="card">
+<h3>🎯 Weekly Goals</h3>
+<div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
+<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
+<span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
+<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissToggleHighlight('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">M</button>
+<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissToggleHighlight('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">T</button>
+<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissToggleHighlight('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">W</button>
+<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissToggleHighlight('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">TH</button>
+<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissToggleHighlight('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">F</button>
+<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissToggleHighlight('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SA</button>
+<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissToggleHighlight('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SU</button>
+</div>
+<p id="diss-highlight-status" style="font-size:11px;color:var(--muted);margin-top:4px;display:none">🎨 Highlight mode active — select text to highlight, press Esc to exit</p>
+</div>
 </div>
 
 <!-- INBOX -->
