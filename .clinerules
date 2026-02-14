@@ -1,61 +1,68 @@
 # Command Center Project Rules
 
-## File Structure
-`app.js` (~2,568 lines) is being modularized. Module files exist on disk but most are NOT yet wired into `index.html`. See `MODULARIZATION.md` for the current extraction state.
+## Architecture
+Fully modularized as of Feb 2026. `app.js` is a 241-line orchestration shell. All feature code lives in dedicated module files. See `MODULARIZATION.md` for the complete module→function map and script load order.
+
+## Module Map (quick reference)
+| File | Lines | Owns |
+|------|-------|------|
+| core.js | ~10 | Data layer: load/save/today/weekId/dayData/weekData/getGlobal/addLog/escHtml |
+| calendar.js | ~520 | Day calendar rendering, goal CRUD, Italian work, reflection |
+| flashcard-review.js | ~228 | Shared card review modal (used by Cards, Translate, Claude) |
+| today.js | ~120 | Today tab orchestration |
+| week.js | ~53 | Week tab |
+| dissertation.js | ~200 | Dissertation tab |
+| chat.js | ~66 | Claude tab |
+| anki.js | ~607 | SM-2 flashcard engine (Cards tab) |
+| translate.js | ~294 | Read/Translate tab |
+| aotd.js | ~412 | Article of the Day |
+| app.js | ~241 | Nav, notes, keyboard, auto-seal, sync UI, init |
+| firebase-sync.js | ~150 | Firebase sync (loaded last) |
 
 ## Critical Rules
 
-### 1. NEVER read all of app.js
-`app.js` is ~2,568 lines and will consume 70%+ of your context window. Instead:
-- Read `MODULARIZATION.md` first to understand the structure
-- Use `grep -n` to find the specific section you need
-- Use `sed -n 'START,ENDp' app.js` to read only the lines you need
-- If a module file is wired in (loaded via `<script>` in index.html), read that instead of app.js
+### 1. Read MODULARIZATION.md before any feature work
+Before touching any feature, read `MODULARIZATION.md` to know which file(s) own the relevant code. Never guess which file contains a function — check the map.
 
-### 2. NEVER read all of index.html at once
-`index.html` is ~590 lines. Use grep to find the specific tab section you need:
-- `grep -n 'tab-week\|tab-today\|tab-cards' index.html` to find section boundaries
-- Then `sed -n 'START,ENDp' index.html` for just that section
+### 2. One tab at a time
+When modifying a feature, only read the module file(s) for that tab. Don't read unrelated modules "for context." The Tab → File Mapping in MODULARIZATION.md tells you exactly what to open.
 
-### 3. Context budget awareness
-- Check context usage before reading any file over 100 lines
-- If above 60% context: only read targeted line ranges, never full files
-- If above 80% context: stop new work, commit what you have, and generate a continuation prompt
+### 3. File size gate
+Before reading any file, check its size: `wc -l <file>`
+- Under 400 lines: safe to read in full
+- Over 400 lines AND context > 50%: use `grep -n` to find the section, then `sed -n 'START,ENDp'` to read only what you need
+- `index.html` (~590 lines): always grep for the tab section you need, never read in full
 
-### 4. One module at a time
-When modifying features, only read the relevant module file(s). The extraction map in MODULARIZATION.md tells you which file contains which functions.
+### 4. Context checkpoint at 60%
+At 60% context usage: pause and assess. Can you finish the current task? If not, commit what you have and note remaining work in `continuation.md`.
 
-### 5. Always commit working states
-After any successful change, git commit immediately. Never leave uncommitted work that spans multiple logical changes.
+### 5. Hard stop at 80%
+At 80% context usage:
+1. Commit all working changes immediately
+2. Update `continuation.md` with: what was done, what remains, which files are affected
+3. Generate a continuation prompt the user can paste into a new task
+4. Do NOT start reading new files or making new changes
 
-### 6. Data layer is in core.js (or lines 1-10 of app.js pre-split)
-Functions available globally: `load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`. You never need to read their implementations — just know they exist.
+### 6. Anti-bloat rule (700-line ceiling)
+No single JS file should exceed 700 lines. If a module grows past that threshold during edits, split it before committing. This prevents re-monolithification. If you're about to add significant code to a file, check `wc -l` first.
 
-### 7. Keep documentation in sync
-When modifying any module file or app.js:
-- Update `MODULARIZATION.md` if the function map, line ranges, file ownership, or dependencies change
+### 7. Always commit working states
+After any successful change, `git commit` immediately. Never leave uncommitted work that spans multiple logical changes. Commit messages should name the module(s) changed.
+
+### 8. Keep documentation in sync
+When modifying any module file:
+- Update `MODULARIZATION.md` if functions are added, removed, moved, or renamed
 - Update `sw.js` ASSETS array if files are added, removed, or renamed
-- Update the Tab → File Mapping table below if tab ownership changes
-- If a function moves between files, update both source and destination entries
-- After any structural change, verify `index.html` script tags match the actual module files being used
+- After any structural change, verify `index.html` script tags match actual module files
 
-## Current Script Load Order (index.html)
-Only these files are currently loaded:
-```html
-<script src="firebase-sync.js"></script>
-<script src="dissertation.js"></script>
-<script src="today.js"></script>
-<script src="app.js"></script>
+### 9. Data layer is read-only knowledge
+`core.js` exports: `load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`. You never need to read their implementations — just know they exist and are globally available.
+
+### 10. Script load order matters
 ```
-All other module files (core.js, calendar.js, week.js, anki.js, translate.js, chat.js, flashcard-review.js, aotd.js) exist on disk but are NOT loaded — their code still lives in app.js.
-
-## Tab → File Mapping (current state)
-| Tab | JS Source | HTML id |
-|-----|-----------|---------|
-| Today | today.js (loaded) + app.js calendar/flashcard sections | tab-today |
-| Week | app.js (renderWeek, lines 911-963) | tab-week |
-| Dissertation | dissertation.js (loaded) | tab-dissertation |
-| Cards | app.js (SM-2 engine, lines 1031-1637) | tab-cards |
-| Translate | app.js (translate functions, lines 1638-1931) | tab-translate |
-| Claude | app.js (chat functions, lines 965-1030) | tab-claude |
-| Log | app.js (renderLog, lines 1932-1954) | tab-log |
+core.js → calendar.js → flashcard-review.js → today.js → week.js → dissertation.js → chat.js → anki.js → translate.js → aotd.js → app.js → firebase-sync.js
+```
+- `core.js` must be first (everything depends on it)
+- `app.js` must be after all feature modules (it calls their render functions)
+- `firebase-sync.js` must be last (it depends on everything)
+- If adding a new module, insert it before `app.js` and after its dependencies
