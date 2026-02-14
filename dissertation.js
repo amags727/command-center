@@ -354,6 +354,16 @@ function saveDissWeeklyGoals() {
   if (typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
 }
 
+function dissClearHighlights() {
+  const el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  el.querySelectorAll('span[data-day]').forEach(span => {
+    span.replaceWith(document.createTextNode(span.textContent));
+  });
+  el.normalize();
+  saveDissWeeklyGoals();
+}
+
 function loadDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
@@ -431,14 +441,20 @@ document.addEventListener('mouseup', function() {
     parent.removeChild(tn);
   });
 
-  sel.removeAllRanges();
-  saveDissWeeklyGoals();
+  // Move cursor after last inserted span so typing doesn't inherit highlight
+  const allSpans = el.querySelectorAll('span[data-day]');
+  if (allSpans.length) {
+    const lastSpan = allSpans[allSpans.length - 1];
+    const r = document.createRange();
+    r.setStartAfter(lastSpan);
+    r.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(r);
+  } else {
+    sel.removeAllRanges();
+  }
 
-  // Auto-exit highlight mode after applying
-  _dissHighlightDay = null;
-  document.querySelectorAll('.diss-day-btn').forEach(b => b.classList.remove('active'));
-  const status = document.getElementById('diss-highlight-status');
-  if (status) status.style.display = 'none';
+  saveDissWeeklyGoals();
 });
 
 // Esc to exit highlight mode — also move cursor out of any highlight span
