@@ -110,6 +110,7 @@ function _t3ReadChips(containerId) {
   return Array.from(el.querySelectorAll('.goal-chip')).map(function(chip) {
     const obj = { text: chip.querySelector('.chip-text').textContent.trim(), id: chip.dataset.chipId || '' };
     if (chip.dataset.dissLinked === 'true') { obj.dissLinked = true; obj.spanIndex = parseInt(chip.dataset.spanIndex) || 0; }
+    if (chip.dataset.done === 'true') obj.done = true;
     return obj;
   }).filter(function(c) { return c.text; });
 }
@@ -130,16 +131,26 @@ function _t3RenderChips(containerId, chips, prefix) {
 
 function _t3MakeChip(chipData, containerId, prefix) {
   const chip = document.createElement('span');
-  chip.className = 'goal-chip' + (chipData.dissLinked ? ' linked' : '');
+  chip.className = 'goal-chip' + (chipData.dissLinked ? ' linked' : '') + (chipData.done ? ' done' : '');
   chip.dataset.chipId = chipData.id || _t3GenId(prefix);
+  if (chipData.done) chip.dataset.done = 'true';
   if (chipData.dissLinked) {
     chip.dataset.dissLinked = 'true';
     chip.dataset.spanIndex = chipData.spanIndex;
-    // color the left border based on today's day highlight color
     if (typeof _dissHighlightColors !== 'undefined' && typeof getTodayDayKey === 'function') {
       chip.style.borderLeftColor = _dissHighlightColors[getTodayDayKey()] || '#B3D9FF';
     }
   }
+  // Check circle
+  const chk = document.createElement('span');
+  chk.className = 'chip-check';
+  chk.textContent = '✓';
+  chk.onclick = function() {
+    chip.classList.toggle('done');
+    chip.dataset.done = chip.classList.contains('done') ? 'true' : '';
+    saveT3Intentions();
+  };
+  chip.appendChild(chk);
   const txt = document.createElement('span');
   txt.className = 'chip-text';
   txt.contentEditable = 'true';
