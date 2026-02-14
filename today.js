@@ -300,8 +300,10 @@ function loadT3Intentions() {
     _t3RenderChips('t3-school', t2.school || [], 's');
     _t3RenderChips('t3-life', t2.life || [], 'l');
   }
-  // Auto-populate from dissertation weekly goals
+  // Auto-populate from dissertation weekly goals (school)
   populateSchoolWeeklyGoals();
+  // Auto-populate from weekly goals (work + life)
+  populateFromWeeklyGoals();
 }
 
 function populateSchoolWeeklyGoals() {
@@ -336,6 +338,51 @@ function populateSchoolWeeklyGoals() {
       const chip = _t3MakeChip(chipData, 't3-school', 's');
       container.insertBefore(chip, addBtn);
     }
+  });
+  saveT3Intentions();
+}
+
+// --- Auto-populate daily chips from Weekly Goals (Work / Life) ---
+function getWeeklyGoalsForToday() {
+  const d = getGlobal();
+  const wk = d.weekGoals && d.weekGoals[weekId()] || {};
+  const dayMap = {1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat',0:'sun'};
+  const todayDay = dayMap[new Date().getDay()];
+  const results = {work:[], life:[]};
+  ['work','life'].forEach(cat => {
+    const html = wk[cat] || '';
+    if (!html) return;
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.querySelectorAll('[data-day="'+todayDay+'"]').forEach(span => {
+      const text = span.textContent.trim();
+      if (text) results[cat].push(text);
+    });
+  });
+  return results;
+}
+
+function populateFromWeeklyGoals() {
+  const goals = getWeeklyGoalsForToday();
+  const catMap = {work:'t3-work', life:'t3-life'};
+  const prefixMap = {work:'w', life:'l'};
+  ['work','life'].forEach(cat => {
+    const items = goals[cat];
+    if (!items.length) return;
+    const container = document.getElementById(catMap[cat]);
+    if (!container) return;
+    const existingTexts = new Set();
+    container.querySelectorAll('.goal-chip .chip-text').forEach(el => {
+      existingTexts.add(el.textContent.trim());
+    });
+    const addBtn = container.querySelector('.chip-add');
+    items.forEach(text => {
+      if (existingTexts.has(text)) return;
+      const chipData = { text, id: _t3GenId(prefixMap[cat]), linked: true };
+      const chip = _t3MakeChip(chipData, catMap[cat], prefixMap[cat]);
+      chip.classList.add('linked');
+      container.insertBefore(chip, addBtn);
+    });
   });
   saveT3Intentions();
 }
