@@ -93,6 +93,77 @@ document.addEventListener('change', function(e) {
 
 function _t3GenId(prefix) { return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2,6); }
 
+// Date helper: offset a YYYY-MM-DD string by N days (negative = past)
+function _dateOffset(dateStr, days) {
+  var d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// Get day key (mon/tue/...) for a YYYY-MM-DD string
+function _dayKeyForDate(dateStr) {
+  var map = ['sun','mon','tue','wed','thu','fri','sat'];
+  return map[new Date(dateStr + 'T12:00:00').getDay()];
+}
+
+// Recursive carry-forward: walk back up to 14 days, collect undone chips
+function carryForwardTasks() {
+  var todayStr = today();
+  var dd = dayData(todayStr);
+  var todayT3 = dd.days[todayStr].t3intentions;
+  // Build lookup of existing chip texts in today (to avoid duplicates)
+  var existingTexts = {};
+  if (todayT3) {
+    ['work','school','life'].forEach(function(cat) {
+      var arr = todayT3[cat];
+      if (Array.isArray(arr)) arr.forEach(function(c) { if (c.text) existingTexts[cat + '::' + c.text.trim()] = true; });
+    });
+  }
+  var carried = { work: [], school: [], life: [] };
+  var todayDayKey = typeof getTodayDayKey === 'function' ? getTodayDayKey() : _dayKeyForDate(todayStr);
+  // Walk backwards up to 14 days
+  for (var offset = 1; offset <= 14; offset++) {
+    var pastDate = _dateOffset(todayStr, -offset);
+    var pastDd = dayData(pastDate);
+    var pastDay = pastDd.days[pastDate];
+    if (!pastDay || !pastDay.t3intentions) continue;
+    var pt = pastDay.t3intentions;
+    ['work','school','life'].forEach(function(cat) {
+      var arr = pt[cat];
+      if (!Array.isArray(arr)) return;
+      arr.forEach(function(chip) {
+        if (chip.done) return; // completed, skip
+        var key = cat + '::' + (chip.text || '').trim();
+        if (!key || existingTexts[key]) return; // already exists in today
+        existingTexts[key] = true;
+        var newChip = { text: chip.text, id: _t3GenId(cat[0]), overdue: true, originalDate: chip.originalDate || pastDate };
+        if (chip.dissLinked) {
+          // Move diss span to today's day color
+          var oldDayKey = _dayKeyForDate(pastDate);
+          if (typeof moveDissSpanToDay === 'function') {
+            moveDissSpanToDay(oldDayKey, chip.spanIndex, todayDayKey);
+          }
+          // Re-query to get new spanIndex after move
+          if (typeof getDissWeeklyGoalsForDayArray === 'function') {
+            var todaySpans = getDissWeeklyGoalsForDayArray(todayDayKey);
+            var found = todaySpans.find(function(s) { return s.text.trim() === chip.text.trim(); });
+            if (found) { newChip.dissLinked = true; newChip.spanIndex = found.spanIndex; }
+          }
+        }
+        carried[cat].push(newChip);
+      });
+    });
+  }
+  // Append carried chips to today
+  var changed = false;
+  if (!todayT3) { dd.days[todayStr].t3intentions = { work: [], school: [], life: [] }; todayT3 = dd.days[todayStr].t3intentions; }
+  ['work','school','life'].forEach(function(cat) {
+    if (!Array.isArray(todayT3[cat])) todayT3[cat] = [];
+    if (carried[cat].length) { todayT3[cat] = todayT3[cat].concat(carried[cat]); changed = true; }
+  });
+  if (changed) save(dd);
+}
+
 function saveT3Intentions() {
   const dd = dayData(today());
   dd.days[today()].t3intentions = {
@@ -131,7 +202,7 @@ function _t3RenderChips(containerId, chips, prefix) {
 
 function _t3MakeChip(chipData, containerId, prefix) {
   const chip = document.createElement('span');
-  chip.className = 'goal-chip' + (chipData.dissLinked ? ' linked' : '') + (chipData.done ? ' done' : '');
+  chip.className = 'goal-chip' + (chipData.dissLinked ? ' linked' : '') + (chipData.done ? ' done' : '') + (chipData.overdue ? ' overdue' : '');
   chip.dataset.chipId = chipData.id || _t3GenId(prefix);
   if (chipData.done) chip.dataset.done = 'true';
   if (chipData.dissLinked) {
@@ -156,6 +227,14 @@ function _t3MakeChip(chipData, containerId, prefix) {
     }
   };
   chip.appendChild(chk);
+  // Overdue badge
+  if (chipData.overdue && chipData.originalDate) {
+    const badge = document.createElement('span');
+    badge.className = 'chip-overdue-badge';
+    badge.textContent = '⏰';
+    badge.title = 'Carried from ' + chipData.originalDate;
+    chip.appendChild(badge);
+  }
   const txt = document.createElement('span');
   txt.className = 'chip-text';
   txt.contentEditable = 'true';
@@ -210,6 +289,16 @@ function loadT3Intentions() {
     _t3RenderChips('t3-work', [], 'w');
     _t3RenderChips('t3-school', [], 's');
     _t3RenderChips('t3-life', [], 'l');
+  }
+  // Carry forward undone tasks from previous days
+  carryForwardTasks();
+  // Re-read after carry-forward may have added chips
+  const dd2 = dayData(today());
+  const t2 = dd2.days[today()].t3intentions;
+  if (t2) {
+    _t3RenderChips('t3-work', t2.work || [], 'w');
+    _t3RenderChips('t3-school', t2.school || [], 's');
+    _t3RenderChips('t3-life', t2.life || [], 'l');
   }
   // Auto-populate from dissertation weekly goals
   populateSchoolWeeklyGoals();

@@ -517,6 +517,20 @@ function updateDissWeeklyGoalSpan(dayKey, spanIndex, newText) {
   }
 }
 
+// Move a dissertation span from one day to another (for carry-forward)
+function moveDissSpanToDay(oldDayKey, spanIndex, newDayKey) {
+  var el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  var spans = el.querySelectorAll('span[data-day="' + oldDayKey + '"]');
+  if (spans[spanIndex]) {
+    spans[spanIndex].setAttribute('data-day', newDayKey);
+    spans[spanIndex].style.backgroundColor = _dissHighlightColors[newDayKey] || '#eee';
+    var g = getGlobal(); var wk = weekId();
+    if (!g.dissWeeklyGoals) g.dissWeeklyGoals = {};
+    g.dissWeeklyGoals[wk] = el.innerHTML; save(g);
+  }
+}
+
 // Map JS day number (0=Sun) to our day keys
 function getTodayDayKey() {
   const map = ['sun','mon','tue','wed','thu','fri','sat'];
