@@ -471,6 +471,39 @@ function getDissWeeklyGoalsForDay(dayKey) {
   return Array.from(spans).map(function(s) { return s.textContent.trim(); }).filter(Boolean).join('\n');
 }
 
+// Returns array of {text, spanIndex} for all spans matching dayKey
+function getDissWeeklyGoalsForDayArray(dayKey) {
+  const d = getGlobal();
+  const html = (d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()]) || '';
+  if (!html) return [];
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const spans = tmp.querySelectorAll('span[data-day="' + dayKey + '"]');
+  return Array.from(spans).map(function(s, i) {
+    const txt = s.textContent.trim();
+    return txt ? { text: txt, spanIndex: i } : null;
+  }).filter(Boolean);
+}
+
+// Update the nth span for dayKey in dissWeeklyGoals HTML, re-save
+function updateDissWeeklyGoalSpan(dayKey, spanIndex, newText) {
+  const d = getGlobal();
+  if (!d.dissWeeklyGoals) return;
+  const html = d.dissWeeklyGoals[weekId()] || '';
+  if (!html) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const spans = tmp.querySelectorAll('span[data-day="' + dayKey + '"]');
+  if (spans[spanIndex]) {
+    spans[spanIndex].textContent = newText;
+    d.dissWeeklyGoals[weekId()] = tmp.innerHTML;
+    save(d);
+    // Update the live contenteditable if visible
+    const el = document.getElementById('diss-weekly-goals');
+    if (el) el.innerHTML = tmp.innerHTML;
+  }
+}
+
 // Map JS day number (0=Sun) to our day keys
 function getTodayDayKey() {
   const map = ['sun','mon','tue','wed','thu','fri','sat'];

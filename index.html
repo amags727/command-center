@@ -213,6 +213,16 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .diss-day-btn[data-day="mon"]{background:#FFB3B3;color:#8B0000}.diss-day-btn[data-day="tue"]{background:#FFD9B3;color:#8B4513}.diss-day-btn[data-day="wed"]{background:#FFFFB3;color:#6B6B00}.diss-day-btn[data-day="thu"]{background:#B3FFB3;color:#006400}.diss-day-btn[data-day="fri"]{background:#B3D9FF;color:#00008B}.diss-day-btn[data-day="sat"]{background:#D9B3FF;color:#4B0082}.diss-day-btn[data-day="sun"]{background:#FFB3E6;color:#8B0060}
 .diss-day-btn.active{box-shadow:0 0 0 2px currentColor;transform:scale(1.1);font-weight:700}
 #diss-weekly-goals [data-day]{border-radius:2px;padding:0 2px}
+/* --- Goal Chips --- */
+.chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
+.goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:13px; line-height:1.5; max-width:100%; }
+.goal-chip.linked { border-left:3px solid #B3D9FF; }
+.goal-chip .chip-text { outline:none; min-width:20px; word-break:break-word; }
+.goal-chip .chip-text:empty::before { content:attr(data-placeholder); color:var(--muted); }
+.goal-chip .chip-x { cursor:pointer; color:var(--muted); font-size:11px; margin-left:2px; line-height:1; }
+.goal-chip .chip-x:hover { color:var(--red,#e74c3c); }
+.chip-add { cursor:pointer; font-size:12px; color:var(--muted); border:1px dashed var(--border); border-radius:14px; padding:2px 10px; background:none; }
+.chip-add:hover { color:var(--accent); border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -276,10 +286,9 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
 <div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><textarea class="fin" id="t3-work" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4>
-<textarea class="fin" id="t3-school" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><textarea class="fin" id="t3-life" rows="1" placeholder="• ..." oninput="saveT3Intentions();autoResizeTextarea(this)" style="min-height:28px;resize:none;line-height:1.7;overflow:hidden"></textarea></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"></div></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"></div></div>
+<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"></div></div>
 </div>
 </div>
 <div class="card">
