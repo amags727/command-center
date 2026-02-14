@@ -381,7 +381,6 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 <p style="font-size:11px;color:var(--muted);margin-top:4px">Select text, then click a day button to assign it</p>
 </div>
-<div class="card"><h3>📊 Overall Progress</h3><div class="pbar"><div class="pfill" id="diss-pbar" style="width:0%"></div></div><p style="font-size:12px;color:var(--muted)" id="diss-total">0 / 0 words</p></div>
 
 <div id="diss-chapter-cards">
 <div class="diss-ch-card" data-ch="ch1">
@@ -410,18 +409,6 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 </div>
 
-<div class="card"><h3>📑 Chapter Outline</h3><div id="ch-list"></div><div class="flex mt8"><input class="fin" id="ch-name" placeholder="Chapter/section name" style="width:200px"><input type="number" class="fin" id="ch-target" placeholder="Target words" style="width:120px"><button class="btn btn-s" onclick="addCh()">Add Chapter</button></div></div>
-<div class="card"><h3>⏱ Deep Work Timer</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">90-min blocks with forced break. Pauses when tab is hidden. Only logged time counts.</p>
-<div class="timer-d" id="diss-timer">00:00:00</div>
-<p style="text-align:center;font-size:12px;color:var(--muted)" id="diss-timer-status">Ready</p>
-<div class="timer-c mt8">
-<button class="pri" id="diss-start" onclick="dissTimer('start')">▶ Start 90min</button>
-<button id="diss-5min" onclick="dissTimer('5min')">Just 5 Minutes</button>
-<button class="dan" id="diss-stop" onclick="dissTimer('stop')" disabled>⏹ Stop & Log</button>
-</div>
-<div class="mt8"><select class="fin" id="diss-ch-sel"><option value="">Working on...</option></select></div>
-</div>
-<div class="card"><h3>📋 Session Log</h3><div id="diss-log" style="max-height:300px;overflow-y:auto"></div></div>
 </div>
 
 <!-- INBOX -->
