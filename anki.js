@@ -1,4 +1,3 @@
-// ============ ANKI / CARDS MODULE ============
 // ============ CARDS TAB (SM-2 Spaced Repetition) ============
 function getCards() { const d = load(); if (!d.cards) d.cards = []; if (!d.cardSettings) d.cardSettings = { newPerDay: 20 }; return d; }
 function todayDayNum() { return Math.floor(Date.now() / 86400000); }
@@ -226,7 +225,7 @@ function startStudy() {
   // Shuffle to avoid always starting from the same place
   for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
   studyQueue = queue;
-  studyIdx = 0; studyFlipped = false; lastCardAction = null;
+  studyIdx = 0; studyFlipped = false;
   document.getElementById('study-area').style.display = 'block';
   showStudyCard();
 }
@@ -299,29 +298,23 @@ function undoCardResponse() {
   const d = getCards();
   const idx = d.cards.findIndex(c => c.id === lastCardAction.cardId);
   if (idx === -1) { lastCardAction = null; return; }
-  // Restore card state
   d.cards[idx] = lastCardAction.cardBefore;
   save(d);
-  // If "Again" was pressed, it appended a copy — remove it
   if (lastCardAction.quality === 1 && studyQueue.length > lastCardAction.queueLenBefore) {
     studyQueue.pop();
   }
-  // Restore study index
   studyIdx = lastCardAction.studyIdxBefore;
-  // Update the queue entry too
   studyQueue[studyIdx] = lastCardAction.cardBefore;
   lastCardAction = null;
-  // Hide undo button
   const undoBtn = document.getElementById('undo-card-btn');
   if (undoBtn) { undoBtn.style.opacity = '.35'; undoBtn.style.pointerEvents = 'none'; }
-  // Update counters
   const reviewedNow = getTotalReviewedToday();
   document.getElementById('cards-reviewed-today').textContent = reviewedNow;
   updateAnkiHabitFromCards(reviewedNow);
   showStudyCard();
 }
 
-// Cmd+Z / Ctrl+Z undo listener
+// Cmd+Z / Ctrl+Z undo listener for flashcard review
 document.addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
     const studyArea = document.getElementById('study-area');

@@ -1,4 +1,3 @@
-// ============ ARTICLE OF THE DAY MODULE ============
 // ============ ARTICLE OF THE DAY ============
 const AOTD_FEEDS = {
   italian: [
@@ -411,3 +410,4 @@ function forceNewArticle() {
   localStorage.removeItem('aotd_date');
   localStorage.removeItem('aotd_data');
   fetchArticleOfTheDay(true);
+}

@@ -1,4 +1,3 @@
-// ============ CHAT / CLAUDE MODULE ============
 // ============ CLAUDE TAB ============
 function initClaude() {
   const key = localStorage.getItem('cc_apikey');
@@ -29,7 +28,6 @@ function buildContext() {
   ctx += '- Top 3: ' + (day.top3 || []).map(t => t.text + (t.done ? ' ✓' : '')).join(', ') + '\n';
   ctx += '- Dissertation sessions today: ' + (g.dissSessions || []).filter(s => s.date === today()).reduce((a, s) => a + s.minutes, 0) + ' min\n';
   ctx += '- Chapters: ' + (g.chapters || []).map(c => c.name + ' ' + c.current + '/' + c.target).join(', ') + '\n';
-  ctx += '- Inbox items: ' + (g.inbox || []).filter(x => x.status === 'unsorted').length + ' unsorted\n';
   return ctx;
 }
 async function sendChat() {

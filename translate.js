@@ -1,4 +1,3 @@
-// ============ TRANSLATE MODULE ============
 // ============ TRANSLATE TAB ============
 let trArticleCards = [];
 function renderTranslate() {
@@ -271,13 +270,13 @@ async function trSubmitReflection(num) {
     d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc });
     save(d);
     // Also persist article habit to day data so Today tab checkmark survives reload
-    const dd = dayData(today());
-    const dayObj = dd.days[today()];
+    const dd2 = dayData(today());
+    const dayObj = dd2.days[today()];
     const artKey = 'art' + num;
     dayObj.habits[artKey] = true;
     dayObj.habits[artKey + 'Title'] = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     dayObj.habits[artKey + 'Thoughts'] = txt;
-    save(dd);
+    save(dd2);
     // Now generate flashcards from the reflection corrections
     const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard pairs (definition + cloze for each item) following the rules.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);

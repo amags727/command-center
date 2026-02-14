@@ -1,4 +1,3 @@
-// ============ WEEK MODULE ============
 // ============ WEEK TAB ============
 function renderWeek() {
   const wk = weekId(); document.getElementById('wk-date').textContent = wk;
@@ -18,68 +17,25 @@ function renderWeek() {
 }
 function addCWG() { const v = document.getElementById('cw-in').value.trim(), cat = document.getElementById('cw-cat').value; if (!v) return; const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.push({ text: v, cat, done: false }); save(wd); document.getElementById('cw-in').value = ''; renderCWG(); }
 function renderDailySummaries() {
-  const btnBar = document.getElementById('ds-buttons');
-  const content = document.getElementById('ds-content');
-  if (!btnBar || !content) return;
+  const container = document.getElementById('daily-summaries');
+  if (!container) return;
   const wk = weekId();
   const mon = new Date(wk);
   const d = load();
-  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let html = '';
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const todayKey = today();
-  const todayDate = new Date(todayKey);
-  btnBar.innerHTML = '';
-  // Build day info array
-  const dayInfos = [];
   for (let i = 0; i < 7; i++) {
     const dt = new Date(mon);
     dt.setDate(mon.getDate() + i);
     const key = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+    if (key === todayKey) continue;
     const notes = d.days && d.days[key] && d.days[key].notes;
-    const hasNotes = notes && notes.replace(/<[^>]*>/g,'').trim();
-    const isFuture = dt > todayDate;
-    const isToday = key === todayKey;
-    dayInfos.push({ key, label: dayNames[i], dt, notes, hasNotes, isFuture, isToday });
+    if (!notes || !notes.replace(/<[^>]*>/g,'').trim()) continue;
+    const label = days[dt.getDay()] + ', ' + dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    html += '<details class="card" style="margin-bottom:6px"><summary style="cursor:pointer;font-weight:600;font-size:13px">' + label + ' — Daily Notes</summary><div style="padding:8px;font-size:13px;line-height:1.6">' + notes + '</div></details>';
   }
-  dayInfos.forEach((info, i) => {
-    const btn = document.createElement('button');
-    btn.textContent = info.label;
-    btn.className = 'btn btn-s';
-    btn.style.cssText = 'font-size:11px;padding:4px 10px;border-radius:12px;' +
-      (info.isToday ? 'border-color:var(--blue);font-weight:700;' : '') +
-      (info.hasNotes ? 'background:var(--gl);border-color:var(--green);' : '') +
-      (info.isFuture ? 'opacity:0.5;' : '');
-    btn.onclick = function() { showDaySummary(i, dayInfos); };
-    btnBar.appendChild(btn);
-  });
-  // Default: show most recent past day with notes, or Monday
-  let defaultIdx = 0;
-  for (let i = dayInfos.length - 1; i >= 0; i--) {
-    if (dayInfos[i].hasNotes && !dayInfos[i].isToday) { defaultIdx = i; break; }
-  }
-  showDaySummary(defaultIdx, dayInfos);
-}
-function showDaySummary(idx, dayInfos) {
-  const content = document.getElementById('ds-content');
-  const btnBar = document.getElementById('ds-buttons');
-  if (!content || !btnBar) return;
-  // Update button active state
-  Array.from(btnBar.children).forEach((btn, i) => {
-    btn.style.outline = i === idx ? '2px solid var(--blue)' : 'none';
-    btn.style.outlineOffset = i === idx ? '1px' : '0';
-  });
-  const info = dayInfos[idx];
-  const fullDay = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][idx];
-  const dateStr = info.dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const header = '<div style="font-weight:600;margin-bottom:6px;font-size:14px">' + fullDay + ', ' + dateStr + '</div>';
-  if (info.isToday) {
-    content.innerHTML = header + '<p style="color:var(--muted);font-style:italic">Today — notes will appear here after the day is saved.</p>';
-  } else if (info.isFuture) {
-    content.innerHTML = header + '<p style="color:var(--muted);font-style:italic">This day hasn\'t happened yet.</p>';
-  } else if (info.hasNotes) {
-    content.innerHTML = header + info.notes;
-  } else {
-    content.innerHTML = header + '<p style="color:var(--muted);font-style:italic">No notes were logged for this day.</p>';
-  }
+  container.innerHTML = html || '<p style="font-size:12px;color:var(--muted);font-style:italic">No daily notes from this week yet.</p>';
 }
 function renderCWG() {
   const wk = weekId(), wd = weekData(wk), goals = wd.weeks[wk].goals || [];
@@ -94,4 +50,5 @@ function submitWR() {
   const wk = weekId(), wd = weekData(wk); wd.weeks[wk].review = { well, bad, imp, push, ts: new Date().toISOString() }; save(wd);
   document.getElementById('wr-res').style.display = 'block'; document.getElementById('wr-res').innerHTML = '<p style="color:var(--green);font-weight:600">✅ Weekly review submitted!</p>'; addLog('action', 'Weekly review: ' + wk);
 }
+
 

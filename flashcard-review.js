@@ -229,3 +229,31 @@ function _parseCardsJSON(resp) {
   return [];
 }
 
+// ============ REFLECTION SUBMIT (Daily Composition) ============
+async function submitRefl() {
+  const txt = document.getElementById('refl-txt').value.trim();
+  const wc = txt.split(/\s+/).filter(w => w).length;
+  if (wc < 200) { alert('Min 200 words required. Currently: ' + wc); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const res = document.getElementById('refl-res');
+  res.style.display = 'block'; res.innerHTML = '<p>⏳ Sending to Claude for correction + flashcard generation...</p>';
+  try {
+    const feedbackPrompt = `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:\n\n"${txt}"\n\nIstruzioni:\n1. Per prima cosa, riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine — il testo intero, non solo frammenti.\n2. Poi elenca ogni errore: originale → corretto, con una spiegazione IN ITALIANO del perché era sbagliato.\n3. Valuta il livello (A2/B1/B2/C1/C2).\n\nSii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti. Solo correzioni e spiegazioni.\n\nFormatta la risposta con intestazioni chiare.`;
+    const feedbackResp = await callClaude(key, feedbackPrompt);
+    res.innerHTML = '<div style="background:var(--bg);padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap;border:1px solid var(--border)">' + escHtml(feedbackResp) + '</div>';
+    // Save correction
+    const d = getGlobal();
+    d.corrections.push({ date: today(), text: txt, response: feedbackResp });
+    save(d);
+    // Now generate flashcards
+    const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+    const cardResp = await callClaude(key, cardPrompt);
+    const cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      renderFlashcardReview('refl-card-review', cards, 'Daily composition:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'composition');
+    }
+    addLog('action', 'Italian composition submitted + corrected + ' + cards.length + ' cards generated');
+  } catch (e) { res.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>'; }
+}
+

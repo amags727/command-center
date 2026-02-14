@@ -1,4 +1,4 @@
-// ============ CALENDAR MODULE ============
+// ============ DAY CALENDAR ============
 // ============ DAY CALENDAR ============
 const CAL = {
   START_HOUR: 6, END_HOUR: 23, PX_PER_HOUR: 60, SNAP_MIN: 30,
@@ -519,3 +519,17 @@ function importICS(event) {
 
 // Legacy compat
 function addBlock() {} function renderBlocks() { renderCal(); } function rmBlock() {}
+
+// saveT3Intentions and loadT3Intentions moved to today.js (chip-based)
+function updRC() {
+  const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
+  el.textContent = wc + ' / 200 words'; el.className = 'wc' + (wc > 0 && wc < 200 ? ' bad' : '');
+  const dd = dayData(today()); dd.days[today()].reflection = txt; save(dd);
+}
+
+
+function sealDay() {
+  if (!confirm('Lock all entries for today permanently?')) return;
+  const dd = dayData(today()); dd.days[today()].sealed = true; save(dd); lockToday(); addLog('sealed', 'Day sealed: ' + today());
+}
+
