@@ -147,8 +147,13 @@ function _t3MakeChip(chipData, containerId, prefix) {
   chk.textContent = '✓';
   chk.onclick = function() {
     chip.classList.toggle('done');
-    chip.dataset.done = chip.classList.contains('done') ? 'true' : '';
+    const isDone = chip.classList.contains('done');
+    chip.dataset.done = isDone ? 'true' : '';
     saveT3Intentions();
+    // Cross out on dissertation page if linked
+    if (chipData.dissLinked && typeof toggleDissGoalDone === 'function' && typeof getTodayDayKey === 'function') {
+      toggleDissGoalDone(getTodayDayKey(), chipData.spanIndex, isDone);
+    }
   };
   chip.appendChild(chk);
   const txt = document.createElement('span');

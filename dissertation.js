@@ -486,6 +486,19 @@ function getDissWeeklyGoalsForDayArray(dayKey) {
 }
 
 // Update the nth span for dayKey in dissWeeklyGoals HTML, re-save
+function toggleDissGoalDone(dayKey, spanIndex, isDone) {
+  var el = document.getElementById('diss-weekly-goals');
+  if (!el) return;
+  var spans = el.querySelectorAll('span[data-day="' + dayKey + '"]');
+  if (spans[spanIndex]) {
+    spans[spanIndex].style.textDecoration = isDone ? 'line-through' : '';
+    spans[spanIndex].style.opacity = isDone ? '0.5' : '';
+    var g = getGlobal(); var wk = weekId();
+    if (!g.dissWeeklyGoals) g.dissWeeklyGoals = {};
+    g.dissWeeklyGoals[wk] = el.innerHTML; save(g);
+  }
+}
+
 function updateDissWeeklyGoalSpan(dayKey, spanIndex, newText) {
   const d = getGlobal();
   if (!d.dissWeeklyGoals) return;
