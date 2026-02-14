@@ -1269,7 +1269,7 @@ function fmtIvl(days) {
 
 function previewIvl(card, quality) { return fmtIvl(sm2(card, quality).ivl); }
 
-let studyQueue = [], studyIdx = 0, studyFlipped = false;
+let studyQueue = [], studyIdx = 0, studyFlipped = false, lastCardAction = null;
 
 function getDueCards() {
   const d = getCards(), now = todayDayNum();
@@ -1447,6 +1447,8 @@ function rateCard(quality) {
   const card = studyQueue[studyIdx];
   const idx = d.cards.findIndex(c => c.id === card.id);
   if (idx === -1) return;
+  // Snapshot for undo
+  lastCardAction = { cardId: card.id, cardBefore: JSON.parse(JSON.stringify(d.cards[idx])), studyIdxBefore: studyIdx, quality, queueLenBefore: studyQueue.length };
   const updated = sm2(d.cards[idx], quality);
   d.cards[idx] = updated;
   save(d);
@@ -1454,6 +1456,9 @@ function rateCard(quality) {
     studyQueue.push(updated);
   }
   studyIdx++;
+  // Show undo button
+  const undoBtn = document.getElementById('undo-card-btn');
+  if (undoBtn) { undoBtn.style.opacity = '1'; undoBtn.style.pointerEvents = 'auto'; }
   // Live-update the reviewed-today counter
   const reviewedNow = getTotalReviewedToday();
   document.getElementById('cards-reviewed-today').textContent = reviewedNow;
@@ -1461,9 +1466,41 @@ function rateCard(quality) {
   showStudyCard();
 }
 
+function undoCardResponse() {
+  if (!lastCardAction) return;
+  const d = getCards();
+  const idx = d.cards.findIndex(c => c.id === lastCardAction.cardId);
+  if (idx === -1) { lastCardAction = null; return; }
+  d.cards[idx] = lastCardAction.cardBefore;
+  save(d);
+  if (lastCardAction.quality === 1 && studyQueue.length > lastCardAction.queueLenBefore) {
+    studyQueue.pop();
+  }
+  studyIdx = lastCardAction.studyIdxBefore;
+  studyQueue[studyIdx] = lastCardAction.cardBefore;
+  lastCardAction = null;
+  const undoBtn = document.getElementById('undo-card-btn');
+  if (undoBtn) { undoBtn.style.opacity = '.35'; undoBtn.style.pointerEvents = 'none'; }
+  const reviewedNow = getTotalReviewedToday();
+  document.getElementById('cards-reviewed-today').textContent = reviewedNow;
+  updateAnkiHabitFromCards(reviewedNow);
+  showStudyCard();
+}
+
+// Cmd+Z / Ctrl+Z undo listener for flashcard review
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+    const studyArea = document.getElementById('study-area');
+    if (studyArea && studyArea.style.display !== 'none' && lastCardAction) {
+      e.preventDefault();
+      undoCardResponse();
+    }
+  }
+});
+
 function endStudy() {
   document.getElementById('study-area').style.display = 'none';
-  studyQueue = []; studyIdx = 0;
+  studyQueue = []; studyIdx = 0; lastCardAction = null;
   renderCards();
   addLog('action', 'Flashcard study session');
 }

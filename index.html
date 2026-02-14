@@ -176,6 +176,39 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .tr-sel-popup input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:6px}
 .tr-card-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;background:var(--card);font-size:13px}
 .tr-card-item .front{font-weight:600;flex:1}.tr-card-item .back{color:var(--muted);flex:1}
+/* Dissertation Chapter Cards */
+.diss-ch-card{border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.diss-ch-header{display:flex;align-items:center;padding:10px 14px;cursor:pointer;background:var(--card);user-select:none;font-weight:600;font-size:15px;gap:8px}
+.diss-ch-header:hover{background:#f5f5f3}
+.diss-ch-arrow{transition:transform .2s;font-size:12px}
+.diss-ch-arrow.open{transform:rotate(90deg)}
+.diss-ch-body{padding:0 14px 14px;display:none}
+.diss-ch-body.open{display:block}
+.diss-ch-actions{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.diss-ch-actions .btn{font-size:11px;padding:3px 8px}
+.diss-md-edit{width:100%;min-height:300px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.6;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:vertical;display:none}
+.diss-md-edit.active{display:block}
+.diss-md-rendered{font-size:14px;line-height:1.7;min-height:40px}
+.diss-md-rendered h1,.diss-md-rendered h2,.diss-md-rendered h3,.diss-md-rendered h4{margin:16px 0 8px;cursor:pointer}
+.diss-md-rendered h1{font-size:22px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.diss-md-rendered h2{font-size:18px}
+.diss-md-rendered h3{font-size:15px}
+.diss-md-rendered h4{font-size:14px;color:var(--muted)}
+.diss-md-rendered p{margin:6px 0}
+.diss-md-rendered ul,.diss-md-rendered ol{margin:6px 0;padding-left:24px}
+.diss-md-rendered li{margin:3px 0}
+.diss-md-rendered blockquote{border-left:3px solid var(--purple);padding:4px 12px;margin:8px 0;color:var(--muted);background:var(--pl)}
+.diss-md-rendered code{background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:12px;font-family:'SF Mono',monospace}
+.diss-md-rendered pre{background:#f3f4f6;padding:10px;border-radius:6px;overflow-x:auto;margin:8px 0}
+.diss-md-rendered pre code{background:none;padding:0}
+.diss-md-rendered hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+.diss-md-rendered a{color:var(--blue);text-decoration:underline}
+.diss-md-rendered .diss-section{position:relative}
+.diss-md-rendered .diss-section-collapsed>.diss-section-content{display:none}
+.diss-md-rendered .diss-section-heading .sec-arrow{font-size:10px;margin-right:4px;display:inline-block;transition:transform .2s}
+.diss-md-rendered .diss-section-collapsed>.diss-section-heading .sec-arrow{transform:rotate(-90deg)}
+.diss-section-inline-edit{width:100%;min-height:100px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.5;padding:8px;border:1px solid var(--purple);border-radius:4px;background:var(--bg);color:var(--text);resize:vertical;margin:4px 0}
+.diss-sync-status{font-size:11px;color:var(--muted);margin-left:auto}
 </style>
 </head>
 <body>
@@ -322,6 +355,34 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="tab" id="tab-dissertation">
 <h1>📝 Dissertation</h1>
 <div class="card"><h3>📊 Overall Progress</h3><div class="pbar"><div class="pfill" id="diss-pbar" style="width:0%"></div></div><p style="font-size:12px;color:var(--muted)" id="diss-total">0 / 0 words</p></div>
+
+<div id="diss-chapter-cards">
+<div class="diss-ch-card" data-ch="ch1">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch1')"><span class="diss-ch-arrow open" id="diss-arrow-ch1">▶</span>Chapter 1: Migration<span class="diss-sync-status" id="diss-sync-ch1"></span></div>
+<div class="diss-ch-body open" id="diss-body-ch1">
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch1')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch1')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch1')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
+<textarea class="diss-md-edit" id="diss-edit-ch1" oninput="dissAutoSave('ch1')"></textarea>
+<div class="diss-md-rendered" id="diss-render-ch1"></div>
+</div>
+</div>
+<div class="diss-ch-card" data-ch="ch2">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch2')"><span class="diss-ch-arrow open" id="diss-arrow-ch2">▶</span>Chapter 2: Data Economy (Closed)<span class="diss-sync-status" id="diss-sync-ch2"></span></div>
+<div class="diss-ch-body open" id="diss-body-ch2">
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
+<textarea class="diss-md-edit" id="diss-edit-ch2" oninput="dissAutoSave('ch2')"></textarea>
+<div class="diss-md-rendered" id="diss-render-ch2"></div>
+</div>
+</div>
+<div class="diss-ch-card" data-ch="ch3">
+<div class="diss-ch-header" onclick="toggleDissChapter('ch3')"><span class="diss-ch-arrow open" id="diss-arrow-ch3">▶</span>Chapter 3: Data Economy (Open)<span class="diss-sync-status" id="diss-sync-ch3"></span></div>
+<div class="diss-ch-body open" id="diss-body-ch3">
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
+<textarea class="diss-md-edit" id="diss-edit-ch3" oninput="dissAutoSave('ch3')"></textarea>
+<div class="diss-md-rendered" id="diss-render-ch3"></div>
+</div>
+</div>
+</div>
+
 <div class="card"><h3>📑 Chapter Outline</h3><div id="ch-list"></div><div class="flex mt8"><input class="fin" id="ch-name" placeholder="Chapter/section name" style="width:200px"><input type="number" class="fin" id="ch-target" placeholder="Target words" style="width:120px"><button class="btn btn-s" onclick="addCh()">Add Chapter</button></div></div>
 <div class="card"><h3>⏱ Deep Work Timer</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">90-min blocks with forced break. Pauses when tab is hidden. Only logged time counts.</p>
 <div class="timer-d" id="diss-timer">00:00:00</div>
@@ -541,6 +602,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="firebase-sync.js"></script>
+<script src="dissertation.js"></script>
 <script src="app.js"></script>
 <script>
 // Register service worker for PWA
