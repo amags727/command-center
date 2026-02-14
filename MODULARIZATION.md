@@ -33,13 +33,13 @@ Day calendar rendering + goal management:
 Shared flashcard review modal used by Cards, Translate, and Claude tabs:
 `startReview()`, `showCard()`, `flipCard()`, `rateCard()`, `endReview()`
 
-### today.js (~120 lines)
+### today.js (~170 lines)
 Today tab orchestration:
-`renderToday()`, `initToday()`
+`renderToday()`, `initToday()`, `getWeeklyGoalsForToday()`, `populateFromWeeklyGoals()`
 
-### week.js (~53 lines)
-Week tab:
-`renderWeek()`, `addCWG()`, `submitWR()`
+### week.js (~150 lines)
+Week tab + Weekly Goals (Work/School/Life):
+`renderWeek()`, `addCWG()`, `submitWR()`, `switchWeekGoalTab()`, `saveWeekGoals()`, `loadWeekGoals()`, `weekGoalAssignDay()`, `weekGoalClearHighlights()`, `populateSchoolWeeklyGoals()`, `populateDissWeeklyGoals()`
 
 ### dissertation.js (~200 lines)
 Dissertation tab:
