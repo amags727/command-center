@@ -1,77 +1,55 @@
-# Command Center Cleanup — Continuation Prompt
+# Continuation Prompt for Codebase Cleanup
 
-> **How to use**: Paste "Read continuation.md and follow the instructions" into a fresh Cline task.
+## What Was Done (commit 53179ba)
+1. Deleted `habits.js`, `inbox.js`, `focus.js` module files
+2. Cleaned `app.js` tab switching:
+   - Removed habits/inbox/focus from the `names` array in `switchTab()`
+   - Removed `renderHabits()`, `renderInbox()`, `renderFocus()` calls from `switchTab()` and `loadAll()`
 
-## Project Context
-- This is a PWA ("Command Center") at `cline_5_to_9/`
-- All JS is global functions loaded via `<script>` tags (no ES modules)
-- `core.js` is the data layer (load, save, today, weekId, dayData, weekData, getGlobal, addLog, escHtml)
-- `app.js` WAS a 2,643-line monolith. We are splitting it into proper module files.
+## What Still Needs To Be Done
 
-## What We're Doing
-1. Delete Habits, Inbox, Focus tabs (HTML + JS + nav + all references)
-2. Complete the modularization: extract remaining functions from app.js into their module files, removing duplicates
-3. Wire up all script tags in index.html in correct load order
-4. Audit cross-references to deleted features
-5. Trim dissertation.js (remove overall progress, chapter outline, deep work timer)
-6. Final audit + browser test
+### Phase 1 (continued): Remove HTML + nav + dead JS
 
-## What STAYS
-- Today (today.js + calendar.js)
-- Week (week.js)
-- Dissertation (dissertation.js) — minus overall progress, chapter outline, deep work timer
-- Cards (anki.js)
-- Read/Translate (translate.js)
-- Claude (chat.js)
-- Log (stays in slimmed app.js)
-- Article of the Day (aotd.js)
-- Flashcard Review (flashcard-review.js)
-- Firebase Sync (firebase-sync.js)
-- Core data layer (core.js)
+**index.html** — use `grep -n` to find these sections, then remove them:
+- Nav buttons for Habits, Inbox, Focus (search for `switchTab('habits')`, `switchTab('inbox')`, `switchTab('focus')`)
+- The entire `<div id="tab-habits" class="tab">` section
+- The entire `<div id="tab-inbox" class="tab">` section  
+- The entire `<div id="tab-focus" class="tab">` section
+- Remove `<script src="habits.js">`, `<script src="inbox.js">`, `<script src="focus.js">` tags
 
-## What GOES
-- Habits (habits.js) — DELETED
-- Inbox (inbox.js) — DELETED
-- Focus (focus.js) — DELETED
+**app.js** — dead function bodies to remove (use `grep -n` to find line numbers, then `sed -n` to read just those functions):
+- `renderHabits()` function and related: `addIFT()`, `renderIFT()`, `rmIFT()`
+- `renderInbox()` function and related: `inboxItem()`, `addInbox()`, `moveInbox()`, `rmInbox()`
+- `renderFocus()` function and related: `setFocus()`, `focusTimer()`, `updFocusDisplay()`, `addDist()`, `logEnergy()`
+- Focus timer variables: `focusInt`, `focusSec`, `focusTotal`, `focusRunning`
 
-## Current Status
-- **Phase 0**: ✅ Created this file
-- **Phase 1**: ⬜ Not started — Delete Habits/Inbox/Focus tabs
-- **Phase 2**: ⬜ Not started — Extract functions from app.js into modules
-- **Phase 3**: ⬜ Not started — Wire up script tags in index.html + sw.js
-- **Phase 4**: ⬜ Not started — Audit cross-references to deleted features
-- **Phase 5**: ⬜ Not started — Trim dissertation.js
-- **Phase 6**: ⬜ Not started — Final audit + browser test
+**sw.js** — remove habits.js, inbox.js, focus.js from the service worker cache list
 
-## Key Rules (for the AI continuing this work)
-1. NEVER read all of app.js — use `grep -n` and `sed -n 'START,ENDp'` for targeted reads
-2. NEVER read all of index.html — use grep to find section boundaries first
-3. One module at a time during extraction
-4. Git commit after every successful phase
-5. If above 80% context: stop, update this file, commit, and generate a fresh-task handoff
+### Phase 2: Audit cross-references
+- Search app.js for any remaining references to habits/inbox/focus functions
+- Check `getGlobal()` — it initializes `d.inbox` and `d.ifthens` arrays; these can stay (data layer, harmless) or be removed
+- Check `buildContext()` in Claude tab — references inbox items count
+- Check `dayData()` — has habits object, this is used by Today tab too so KEEP it
 
-## Script Load Order (target state)
-```html
-<script src="core.js"></script>
-<script src="calendar.js"></script>
-<script src="today.js"></script>
-<script src="flashcard-review.js"></script>
-<script src="week.js"></script>
-<script src="dissertation.js"></script>
-<script src="chat.js"></script>
-<script src="anki.js"></script>
-<script src="translate.js"></script>
-<script src="aotd.js"></script>
-<script src="app.js"></script>
-<script src="firebase-sync.js"></script>
-```
+### Phase 3: Trim dissertation.js
+Per user request, remove from dissertation tab:
+- Overall progress section
+- Chapter outline section  
+- Deep work timer section
+Use `grep -n` on dissertation.js to find these, then `sed -n` to read targeted sections before removing.
 
-## Next Step
-Start Phase 1: Delete Habits/Inbox/Focus. Specifically:
-1. `grep -n 'tab-habits\|tab-inbox\|tab-focus' index.html` to find HTML section boundaries
-2. Remove those tab `<div>` sections from index.html
-3. Remove the nav buttons for those 3 tabs
-4. Delete `habits.js`, `inbox.js`, `focus.js` files
-5. In app.js, remove `renderHabits()`, `renderInbox()`, `renderFocus()` functions and their references in `loadAll()` and nav switching
-6. Also remove `renderIFT()` (if-then habits), `renderCWG()` (current week goals tied to habits)
-7. Git commit
+### Phase 4: Final audit + test
+- Run the site in browser to verify Today, Dissertation (minus removed features), Cards, Read/Translate, and Claude tabs all work
+- Git commit and push
+
+## Critical Rules (from .clinerules)
+- NEVER read all of app.js (2600+ lines) — use grep/sed for targeted reads
+- NEVER read all of index.html at once — use grep to find section boundaries
+- If above 80% context: stop, commit, write continuation prompt
+- One module at a time
+- Always commit working states
+
+## Architecture Notes
+- Data layer functions (load, save, today, weekId, dayData, weekData, getGlobal, addLog, escHtml) are in lines 1-10 of app.js — always available globally
+- Tab → File mapping: Today=today.js, Week=week.js, Dissertation=dissertation.js, Cards=anki.js, Translate=translate.js, Claude=chat.js, Calendar=calendar.js
+- The `habits` object inside `dayData()` is shared between Today tab and the now-deleted Habits tab — Today tab uses it for daily checkboxes, so don't remove it from `dayData()`
