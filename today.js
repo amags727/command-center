@@ -118,16 +118,14 @@ function _t3ReadChips(containerId) {
 function _t3RenderChips(containerId, chips, prefix) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  el.innerHTML = '';
+  // Remove only chip elements, preserve the static ＋ Add button
+  el.querySelectorAll('.goal-chip').forEach(function(c) { c.remove(); });
+  const addBtn = el.querySelector('.chip-add');
   (chips || []).forEach(function(c) {
-    el.appendChild(_t3MakeChip(c, containerId, prefix));
+    const chip = _t3MakeChip(c, containerId, prefix);
+    if (addBtn) el.insertBefore(chip, addBtn);
+    else el.appendChild(chip);
   });
-  // Add button
-  const addBtn = document.createElement('button');
-  addBtn.className = 'chip-add';
-  addBtn.textContent = '＋';
-  addBtn.onclick = function() { _t3AddNewChip(containerId, prefix); };
-  el.appendChild(addBtn);
 }
 
 function _t3MakeChip(chipData, containerId, prefix) {
