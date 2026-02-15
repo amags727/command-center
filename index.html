@@ -327,6 +327,11 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h1>📊 Week of <span id="wk-date"></span></h1>
 <div class="card">
 <h3>🎯 Weekly Goals</h3>
+<div style="display:flex;gap:6px;margin-bottom:10px">
+  <button id="wg-tab-btn-work" class="btn btn-s active" onclick="switchWeekGoalTab('work')" style="font-size:13px;padding:4px 12px">💼 Work</button>
+  <button id="wg-tab-btn-school" class="btn btn-s" onclick="switchWeekGoalTab('school')" style="font-size:13px;padding:4px 12px">🎓 School</button>
+  <button id="wg-tab-btn-life" class="btn btn-s" onclick="switchWeekGoalTab('life')" style="font-size:13px;padding:4px 12px">🌿 Life</button>
+</div>
 <div id="wg-panel-work" class="wg-panel">
   <h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4>
   <div id="wg-work" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('work')"></div>
