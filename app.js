@@ -107,46 +107,51 @@ function _handleNotesTab(e) {
   const isWgEditor = el.classList.contains('wg-editor');
   if (!isToday && !isWgEditor) return;
 
-  const li = _notesListContext();
-  if (!li) return; // only act when cursor is in a list item
-
+  // Always prevent default Tab inside our editors (prevents focus leaving)
   e.preventDefault();
 
-  // Save selection to restore after DOM changes
-  const sel = window.getSelection();
-  const range = sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+  const li = _notesListContext();
 
-  if (e.shiftKey) {
-    // OUTDENT: move li out of its nested list into the grandparent list
-    const parentList = li.parentNode; // the UL/OL containing this li
-    const grandLi = parentList.parentNode; // the LI containing the nested list
-    if (grandLi && grandLi.nodeName === 'LI') {
-      const grandList = grandLi.parentNode; // the outer UL/OL
-      // Insert li after grandLi in the grandparent list
-      grandList.insertBefore(li, grandLi.nextSibling);
-      // If the nested list is now empty, remove it
-      if (parentList.children.length === 0) parentList.remove();
+  if (li) {
+    // Inside a list item: do proper DOM-based indent/outdent
+    const sel = window.getSelection();
+    const range = sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+
+    if (e.shiftKey) {
+      // OUTDENT: move li out of its nested list into the grandparent list
+      const parentList = li.parentNode;
+      const grandLi = parentList.parentNode;
+      if (grandLi && grandLi.nodeName === 'LI') {
+        const grandList = grandLi.parentNode;
+        grandList.insertBefore(li, grandLi.nextSibling);
+        if (parentList.children.length === 0) parentList.remove();
+      }
+    } else {
+      // INDENT: move li into a nested list inside its previous sibling
+      const prevLi = li.previousElementSibling;
+      if (prevLi && prevLi.nodeName === 'LI') {
+        const parentList = li.parentNode;
+        const listTag = parentList.nodeName;
+        let nestedList = prevLi.querySelector(':scope > ul, :scope > ol');
+        if (!nestedList) {
+          nestedList = document.createElement(listTag);
+          prevLi.appendChild(nestedList);
+        }
+        nestedList.appendChild(li);
+      }
+    }
+
+    // Restore cursor position
+    if (range) {
+      try { sel.removeAllRanges(); sel.addRange(range); } catch(_) {}
     }
   } else {
-    // INDENT: move li into a nested list inside its previous sibling
-    const prevLi = li.previousElementSibling;
-    if (!prevLi || prevLi.nodeName !== 'LI') return; // can't indent first item
-
-    const parentList = li.parentNode;
-    const listTag = parentList.nodeName; // 'UL' or 'OL'
-
-    // Find or create a nested list inside prevLi
-    let nestedList = prevLi.querySelector(':scope > ul, :scope > ol');
-    if (!nestedList) {
-      nestedList = document.createElement(listTag);
-      prevLi.appendChild(nestedList);
+    // Not inside a list item: use execCommand as fallback
+    if (e.shiftKey) {
+      document.execCommand('outdent');
+    } else {
+      document.execCommand('indent');
     }
-    nestedList.appendChild(li);
-  }
-
-  // Restore cursor position
-  if (range) {
-    try { sel.removeAllRanges(); sel.addRange(range); } catch(_) {}
   }
 
   // Fire correct save
