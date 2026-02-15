@@ -267,6 +267,7 @@ const FirebaseSync = (() => {
 
   function pushAll() {
     if (!syncEnabled || !db || !userPath || _importing) return;
+    if (!_initialPullDone) return;  // never push before first pull completes
     if (Date.now() < _importCooldown) return;  // still in post-import cooldown
     
     // Debounce — don't push more than once per second
@@ -313,10 +314,82 @@ const FirebaseSync = (() => {
     return syncEnabled;
   }
 
+  // Pull latest remote data (used on tab re-focus)
+  async function pullLatest() {
+    if (!syncEnabled || !db || !userPath || _importing) return;
+    try {
+      const snap = await db.ref(userPath + '/data').once('value');
+      const remote = snap.val();
+      if (!remote) return;
+      const remoteTs = remote._lastSync || 0;
+      const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
+      if (remoteTs > localTs) {
+        _importing = true;
+        Object.keys(remote).forEach(k => {
+          if (k !== '_lastSync') {
+            localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+          }
+        });
+        localStorage.setItem('_lastSync', String(remoteTs));
+        if (typeof loadAll === 'function') loadAll();
+        _importing = false;
+        clearTimeout(debounceTimer);
+        _importCooldown = Date.now() + 2000;
+        setStatus(navigator.onLine ? 'synced' : 'offline');
+      }
+    } catch (e) {
+      console.error('Pull latest error:', e);
+    }
+  }
+
   // Call this after any localStorage write to trigger sync
   function onChange() {
     if (syncEnabled) pushAll();
   }
+
+  // --- Automatic sync triggers ---
+
+  // 1. Visibility change: pull on focus, push on blur
+  document.addEventListener('visibilitychange', () => {
+    if (!syncEnabled) return;
+    if (document.visibilityState === 'visible') {
+      // Tab became visible — pull latest from remote
+      pullLatest();
+    } else {
+      // Tab hidden — flush pending changes immediately
+      if (_initialPullDone) pushAll();
+    }
+  });
+
+  // 2. Periodic auto-push every 30s (fingerprint check makes no-ops cheap)
+  setInterval(() => {
+    if (syncEnabled && _initialPullDone) pushAll();
+  }, 30000);
+
+  // 3. Before unload — last-resort save
+  window.addEventListener('beforeunload', () => {
+    if (!syncEnabled || !db || !userPath || !_initialPullDone || _importing) return;
+    // Build payload synchronously
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k === 'sync_passphrase' || k === '_lastSync') continue;
+      data[encodeKey(k)] = localStorage.getItem(k);
+    }
+    const ts = Date.now();
+    data._lastSync = ts;
+    localStorage.setItem('_lastSync', String(ts));
+    // Use sendBeacon for reliability during page unload
+    const url = FIREBASE_CONFIG.databaseURL + '/' + userPath + '/data.json';
+    try {
+      navigator.sendBeacon(url, JSON.stringify(data));
+    } catch (e) {
+      // Fallback: fire-and-forget XHR
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', url, false); // sync XHR as last resort
+      xhr.send(JSON.stringify(data));
+    }
+  });
 
   return { init, connect, disconnect, onChange, isConnected, isInitialPullDone, pushAll };
 })();
