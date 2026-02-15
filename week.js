@@ -69,6 +69,18 @@ function loadWeekGoals() {
   });
 }
 
+/* Strip all [data-day] spans inside a range, keeping text content */
+function _stripHighlightsInRange(container, range) {
+  container.querySelectorAll('[data-day]').forEach(sp => {
+    if (range.intersectsNode(sp)) {
+      const parent = sp.parentNode;
+      while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
+      parent.removeChild(sp);
+    }
+  });
+  container.normalize(); // merge adjacent text nodes
+}
+
 function weekGoalAssignDay(cat, day) {
   const el = document.getElementById('wg-'+cat);
   if (!el) return;
@@ -76,11 +88,24 @@ function weekGoalAssignDay(cat, day) {
   if (!sel.rangeCount || sel.isCollapsed) return;
   const range = sel.getRangeAt(0);
   if (!el.contains(range.commonAncestorContainer)) return;
+
+  // 1) Strip any existing day-highlights in the selection first
+  _stripHighlightsInRange(el, range);
+
+  // 2) Re-acquire selection (stripping may have shifted nodes)
+  const sel2 = window.getSelection();
+  if (!sel2.rangeCount || sel2.isCollapsed) { saveWeekGoals(cat); return; }
+  const range2 = sel2.getRangeAt(0);
+
+  // 3) Robust wrap: extract → wrap in span → re-insert (avoids surroundContents failures)
+  const frag = range2.extractContents();
   const span = document.createElement('span');
   span.setAttribute('data-day', day);
   span.style.background = DAY_COLORS[day] || '#eee';
-  range.surroundContents(span);
-  sel.removeAllRanges();
+  span.appendChild(frag);
+  range2.insertNode(span);
+
+  sel2.removeAllRanges();
   saveWeekGoals(cat);
 }
 
@@ -89,21 +114,16 @@ function weekGoalClearHighlights(cat) {
   if (!el) return;
   const sel = window.getSelection();
   if (sel.rangeCount && !sel.isCollapsed && el.contains(sel.getRangeAt(0).commonAncestorContainer)) {
-    const range = sel.getRangeAt(0);
-    el.querySelectorAll('[data-day]').forEach(sp => {
-      if (range.intersectsNode(sp)) {
-        const parent = sp.parentNode;
-        while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
-        parent.removeChild(sp);
-      }
-    });
+    _stripHighlightsInRange(el, sel.getRangeAt(0));
     sel.removeAllRanges();
   } else {
+    // No selection: clear ALL highlights in this editor
     el.querySelectorAll('[data-day]').forEach(sp => {
       const parent = sp.parentNode;
       while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
       parent.removeChild(sp);
     });
+    el.normalize();
   }
   saveWeekGoals(cat);
 }
@@ -135,6 +155,47 @@ function weekGoalClearHighlightsAuto() {
   // no selection: clear all three
   ['work','school','life'].forEach(c => weekGoalClearHighlights(c));
 }
+
+/* Enter handler: strip inherited strikethrough + day-highlight on new lines */
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const el = document.activeElement;
+  if (!el || !el.classList.contains('wg-editor')) return;
+  // Let default Enter happen first, then clean up the new line
+  setTimeout(function() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    let node = sel.anchorNode;
+    // Walk up to check for strikethrough or highlight wrappers
+    let cursor = node;
+    while (cursor && cursor !== el) {
+      // Strip strikethrough
+      if (cursor.nodeName === 'S' || cursor.nodeName === 'DEL' ||
+          (cursor.style && cursor.style.textDecoration && cursor.style.textDecoration.includes('line-through'))) {
+        document.execCommand('strikethrough');
+        break;
+      }
+      cursor = cursor.parentNode;
+    }
+    // Strip day-highlight spans wrapping the new empty line
+    cursor = node;
+    while (cursor && cursor !== el) {
+      if (cursor.nodeType === 1 && cursor.hasAttribute('data-day')) {
+        // If span is empty or just has a BR, unwrap it
+        const txt = cursor.textContent.trim();
+        if (txt === '' || txt === '\n') {
+          const parent = cursor.parentNode;
+          while (cursor.firstChild) parent.insertBefore(cursor.firstChild, cursor);
+          parent.removeChild(cursor);
+          break;
+        }
+      }
+      cursor = cursor.parentNode;
+    }
+    const cat = el.id.replace('wg-','');
+    saveWeekGoals(cat);
+  }, 0);
+});
 
 function populateSchoolWeeklyGoals() {
   const d = getGlobal();

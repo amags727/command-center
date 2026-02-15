@@ -102,7 +102,10 @@ function _notesListContext() {
 function _handleNotesTab(e) {
   const el = document.activeElement;
   if (!el || el.getAttribute('contenteditable') !== 'true') return;
-  if (el.id !== 'today-notes') return;
+
+  const isToday = (el.id === 'today-notes');
+  const isWgEditor = el.classList.contains('wg-editor');
+  if (!isToday && !isWgEditor) return;
 
   const li = _notesListContext();
   if (!li) return; // only act when cursor is in a list item
@@ -110,15 +113,17 @@ function _handleNotesTab(e) {
   e.preventDefault();
 
   if (e.shiftKey) {
-    // Outdent
     document.execCommand('outdent');
   } else {
-    // Indent
     document.execCommand('indent');
   }
 
-  // Fire save
-  saveTodayNotes();
+  // Fire correct save
+  if (isToday) { saveTodayNotes(); }
+  else if (isWgEditor) {
+    const cat = el.id.replace('wg-','');
+    if (typeof saveWeekGoals === 'function') saveWeekGoals(cat);
+  }
 }
 
 // Auto-detect "1." or "1)" at the start of a line and convert to ordered list

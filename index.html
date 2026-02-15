@@ -341,14 +341,14 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 <div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:4px">
   <span style="font-size:11px;color:var(--muted);margin-right:2px">Highlight:</span>
-  <button class="btn btn-s wg-day-btn" data-day="mon" onclick="weekGoalAssignDayAuto('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
-  <button class="btn btn-s wg-day-btn" data-day="tue" onclick="weekGoalAssignDayAuto('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
-  <button class="btn btn-s wg-day-btn" data-day="wed" onclick="weekGoalAssignDayAuto('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
-  <button class="btn btn-s wg-day-btn" data-day="thu" onclick="weekGoalAssignDayAuto('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
-  <button class="btn btn-s wg-day-btn" data-day="fri" onclick="weekGoalAssignDayAuto('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
-  <button class="btn btn-s wg-day-btn" data-day="sat" onclick="weekGoalAssignDayAuto('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
-  <button class="btn btn-s wg-day-btn" data-day="sun" onclick="weekGoalAssignDayAuto('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
-  <button class="btn btn-s" onclick="weekGoalClearHighlightsAuto()" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove, or click with no selection to clear all in focused editor">✕ Clear</button>
+  <button class="btn btn-s wg-day-btn" data-day="mon" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
+  <button class="btn btn-s wg-day-btn" data-day="tue" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
+  <button class="btn btn-s wg-day-btn" data-day="wed" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
+  <button class="btn btn-s wg-day-btn" data-day="thu" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
+  <button class="btn btn-s wg-day-btn" data-day="fri" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
+  <button class="btn btn-s wg-day-btn" data-day="sat" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
+  <button class="btn btn-s wg-day-btn" data-day="sun" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
+  <button class="btn btn-s" onmousedown="event.preventDefault()" onclick="weekGoalClearHighlightsAuto()" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove, or click with no selection to clear all in focused editor">✕ Clear</button>
 </div>
 </div>
 <div class="card">
