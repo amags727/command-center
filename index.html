@@ -346,7 +346,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
     <button class="btn btn-s" onclick="weekGoalClearHighlights('work')" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
   </div>
 </div>
-<div id="wg-panel-school" class="wg-panel" style="margin-top:10px">
+<div id="wg-panel-school" class="wg-panel" style="display:none;margin-top:10px">
   <h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4>
   <div id="wg-school" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('school')"></div>
   <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;align-items:center">
@@ -360,7 +360,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
     <button class="btn btn-s" onclick="weekGoalClearHighlights('school')" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
   </div>
 </div>
-<div id="wg-panel-life" class="wg-panel" style="margin-top:10px">
+<div id="wg-panel-life" class="wg-panel" style="display:none;margin-top:10px">
   <h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌿 Life</h4>
   <div id="wg-life" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeekGoals('life')"></div>
   <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;align-items:center">

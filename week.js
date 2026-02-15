@@ -53,6 +53,7 @@ function switchWeekGoalTab(cat) {
   ['work','school','life'].forEach(c => {
     const p = document.getElementById('wg-panel-'+c);
     const b = document.getElementById('wg-tab-btn-'+c);
+    if (!p || !b) return;
     if (c === cat) { p.style.display=''; b.classList.add('active'); }
     else { p.style.display='none'; b.classList.remove('active'); }
   });
