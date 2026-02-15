@@ -199,8 +199,9 @@ document.addEventListener('keydown', function(e) {
   // Notes rich-text shortcuts (only when inside contenteditable)
   const el = document.activeElement;
   if (el && el.getAttribute('contenteditable') === 'true') {
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'Digit8') {
-      e.preventDefault(); document.execCommand('insertUnorderedList');
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === 'Digit8' || e.code === 'Digit7')) {
+      e.preventDefault();
+      document.execCommand(e.code === 'Digit7' ? 'insertOrderedList' : 'insertUnorderedList');
       // Save the appropriate editor
       if (el.id === 'today-notes') saveTodayNotes();
       else if (el.classList.contains('wg-editor') && typeof saveWeekGoals === 'function') {

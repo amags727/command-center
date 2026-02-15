@@ -1,176 +1,46 @@
-# Continuation: Weekly Goals Implementation (Part 2)
+# Continuation: Weekly Goals Bugs
 
-## What Was Done
-1. **index.html** — COMMITTED. Replaced "Weekly Notes" section on the Week tab with:
-   - "Weekly Goals" header with 3 sub-tab buttons (Work/School/Life) using `switchWeekGoalTab()`
-   - Each panel has a contenteditable div (`#wg-work`, `#wg-school`, `#wg-life`) with `oninput="saveWeekGoals('work')"` etc.
-   - Day-highlight buttons (MON–SUN) calling `weekGoalAssignDay(cat, day)` and a Clear button calling `weekGoalClearHighlights(cat)`
-   - Daily Summaries moved to its own separate `<div class="card">` below
-   - CSS added: `.wg-tab-btn.active`, `.wg-panel [data-day]`, per-panel `[data-day]` highlight styles
+## What was done
+1. **Tab indent fix (app.js):** Rewrote `_handleNotesTab` to always `preventDefault()` inside wg-editors and today-notes. When cursor is in an `<li>`, uses DOM manipulation (move `<li>` into nested list for indent, move out for outdent). When not in a list, falls back to `execCommand('indent')`/`execCommand('outdent')`.
 
-## What Remains
+2. **Cmd+Shift+8 shortcut:** Already works — fires `document.execCommand('insertUnorderedList')` when `metaKey && shiftKey && code === 'Digit8'` in any contenteditable.
 
-### 2. week.js — Add these functions (currently ~53 lines)
+## What remains
 
-Replace `saveWeekNotes()` and `loadWeekNotes()` with the new weekly goals system. Here's the full implementation to add:
+### Issue 2: Strikethrough propagation on Enter
+**Problem:** When pressing Enter after a crossed-off (checked) item in weekly goals, the new line inherits the strikethrough.
+**Location:** `week.js` lines ~160-196, the Enter keydown handler.
+**Current code:** The handler tries to detect `<s>`, `<del>`, or `style.textDecoration.includes('line-through')` and runs `document.execCommand('strikethrough')` to toggle it off. This may not be working because:
+- The strikethrough might be applied via CSS class rather than `<s>` tag
+- The `execCommand('strikethrough')` toggle might not work when the line is empty
+- The detection loop may not be reaching the right ancestor node
+**Fix approach:** After the default Enter creates the new line, forcibly remove any `<s>`, `<del>` wrapper tags around the cursor position and clear `textDecoration` style. Don't rely on `execCommand('strikethrough')` — do direct DOM unwrapping instead.
 
-```javascript
-// ── Weekly Goals (Work / School / Life) ─────────────────────────
-const DAY_COLORS = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
+### Issue 3: Highlight issues on School section
+**Problem:** Highlights not working properly on School.
+**Root cause:** `populateSchoolWeeklyGoals()` (week.js ~200) **overwrites** `wg-school` innerHTML from `d.dissWeeklyGoals` data. And `saveWeekGoals('school')` triggers `populateDissWeeklyGoals()` which syncs back. This bidirectional sync between dissertation weekly goals and school weekly goals may cause race conditions where highlights are stripped during save/load cycles.
+**Fix approach:** Check if the School→Diss sync is stripping highlight spans. The `populateSchoolWeeklyGoals` function reads from `d.dissWeeklyGoals[weekId()]` which may not have the highlight data. Need to ensure the canonical source for school weekly goals is `d.weekGoals[weekId()].school`, not `d.dissWeeklyGoals`.
 
-function switchWeekGoalTab(cat) {
-  ['work','school','life'].forEach(c => {
-    const p = document.getElementById('wg-panel-'+c);
-    const b = document.getElementById('wg-tab-btn-'+c);
-    if (c === cat) { p.style.display=''; b.classList.add('active'); }
-    else { p.style.display='none'; b.classList.remove('active'); }
-  });
-}
+### Issue 4: Highlight stacking (multiple colors)
+**Problem:** Multiple highlight colors can stack on the same text. Should only allow one day-color at a time.
+**Location:** `weekGoalAssignDay()` in week.js (~83-110)
+**Current code:** Step 1 calls `_stripHighlightsInRange()` to remove existing highlights before applying new ones. The stripping works by unwrapping `[data-day]` spans. However:
+- After stripping, the selection (`sel2`) may be collapsed or shifted, so the new highlight wrap may not cover the right text
+- Nested highlight spans may survive if the range doesn't fully intersect them
+**Fix approach:** After `_stripHighlightsInRange`, normalize the container and re-select the text before wrapping. Also ensure `_stripHighlightsInRange` handles partially-selected spans (where the span extends beyond the selection range).
 
-function saveWeekGoals(cat) {
-  const el = document.getElementById('wg-'+cat);
-  if (!el) return;
-  const d = getGlobal();
-  if (!d.weekGoals) d.weekGoals = {};
-  if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
-  d.weekGoals[weekId()][cat] = el.innerHTML;
-  save(d);
-  // If school tab, also sync to dissertation
-  if (cat === 'school' && typeof populateDissWeeklyGoals === 'function') populateDissWeeklyGoals();
-}
+## Files affected
+- `week.js` — Enter handler (strikethrough), highlight functions, school/diss sync
+- `app.js` — Tab handler (already fixed)
 
-function loadWeekGoals() {
-  const d = getGlobal();
-  const wk = d.weekGoals && d.weekGoals[weekId()] || {};
-  ['work','school','life'].forEach(cat => {
-    const el = document.getElementById('wg-'+cat);
-    if (el) el.innerHTML = wk[cat] || '';
-  });
-}
-
-function weekGoalAssignDay(cat, day) {
-  const el = document.getElementById('wg-'+cat);
-  if (!el) return;
-  const sel = window.getSelection();
-  if (!sel.rangeCount || sel.isCollapsed) return;
-  const range = sel.getRangeAt(0);
-  // Check selection is inside the correct editor
-  if (!el.contains(range.commonAncestorContainer)) return;
-  const span = document.createElement('span');
-  span.setAttribute('data-day', day);
-  span.style.background = DAY_COLORS[day] || '#eee';
-  range.surroundContents(span);
-  sel.removeAllRanges();
-  saveWeekGoals(cat);
-}
-
-function weekGoalClearHighlights(cat) {
-  const el = document.getElementById('wg-'+cat);
-  if (!el) return;
-  const sel = window.getSelection();
-  // If text is selected, only remove highlights touching the selection
-  if (sel.rangeCount && !sel.isCollapsed && el.contains(sel.getRangeAt(0).commonAncestorContainer)) {
-    const range = sel.getRangeAt(0);
-    const spans = el.querySelectorAll('[data-day]');
-    spans.forEach(sp => {
-      if (range.intersectsNode(sp)) {
-        const parent = sp.parentNode;
-        while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
-        parent.removeChild(sp);
-      }
-    });
-    sel.removeAllRanges();
-  } else {
-    // No selection — clear all
-    const spans = el.querySelectorAll('[data-day]');
-    spans.forEach(sp => {
-      const parent = sp.parentNode;
-      while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
-      parent.removeChild(sp);
-    });
-  }
-  saveWeekGoals(cat);
-}
-
-// Populate School tab from Dissertation weekly goals (called by dissertation.js)
-function populateSchoolWeeklyGoals() {
-  const d = getGlobal();
-  const html = d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()] || '';
-  const el = document.getElementById('wg-school');
-  if (el) el.innerHTML = html;
-  // Also save into weekGoals
-  if (!d.weekGoals) d.weekGoals = {};
-  if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
-  d.weekGoals[weekId()].school = html;
-  save(d);
-}
-
-// Populate Dissertation weekly goals from School tab (called by week.js saveWeekGoals('school'))
-function populateDissWeeklyGoals() {
-  const d = getGlobal();
-  const html = d.weekGoals && d.weekGoals[weekId()] && d.weekGoals[weekId()].school || '';
-  const el = document.getElementById('diss-weekly-goals');
-  if (el) el.innerHTML = html;
-  if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
-  d.dissWeeklyGoals[weekId()] = html;
-  save(d);
-}
+## Continuation prompt
 ```
+I need to fix 3 remaining bugs in the weekly goals page (week.js):
 
-Also, in the existing `renderWeek()` function, replace the call to `loadWeekNotes()` with `loadWeekGoals()`.
+1. **Strikethrough propagation:** When pressing Enter after a strikethrough item, the new line inherits the strikethrough. The Enter handler at ~line 160 tries to use execCommand('strikethrough') to toggle it off but it's not working. Fix by doing direct DOM unwrapping of <s>, <del> tags and clearing textDecoration style on the new line's ancestors, instead of relying on execCommand.
 
-Remove `saveWeekNotes()` and `loadWeekNotes()` functions if they exist.
+2. **Highlight on School section:** The bidirectional sync between school weekly goals and dissertation weekly goals (populateSchoolWeeklyGoals at ~line 200 and populateDissWeeklyGoals at ~line 212) may be stripping highlight spans during save/load. The canonical data source should be weekGoals[weekId()].school, and highlight data-day spans must survive the sync cycle.
 
-### 3. today.js — Add auto-populate from weekly goals
+3. **Highlight stacking:** weekGoalAssignDay() at ~line 83 strips existing highlights before applying new ones, but the selection may shift after stripping, causing the new highlight to not cover the right text, or nested spans to survive. After stripping, normalize the container, re-acquire the selection properly, and ensure partial-intersection spans are fully handled.
 
-In the `renderToday()` function (or wherever daily goals chips are populated), add logic to auto-populate daily goal chips from weekly goals. The approach:
-
-```javascript
-function getWeeklyGoalsForToday() {
-  const d = getGlobal();
-  const wk = d.weekGoals && d.weekGoals[weekId()] || {};
-  const dayMap = {1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat',0:'sun'};
-  const todayDay = dayMap[new Date().getDay()];
-  const results = {work:[], school:[], life:[]};
-  
-  ['work','school','life'].forEach(cat => {
-    const html = wk[cat] || '';
-    if (!html) return;
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    div.querySelectorAll('[data-day="'+todayDay+'"]').forEach(span => {
-      const text = span.textContent.trim();
-      if (text) results[cat].push(text);
-    });
-  });
-  return results;
-}
-```
-
-Then in `_t3Render()` or `_t3LoadDay()`, check if there are no chips yet for today and auto-populate from weekly goals. Each auto-populated chip should get a `linked:true` property and show the `.linked` CSS class (blue left border).
-
-### 4. dissertation.js — Bidirectional sync
-
-The `saveDissWeeklyGoals()` already calls `populateSchoolWeeklyGoals()` (line 314). That function is defined in week.js above, so it will work once week.js is updated.
-
-The reverse direction: `saveWeekGoals('school')` calls `populateDissWeeklyGoals()` which is also defined in week.js. That function updates `#diss-weekly-goals` innerHTML and saves to `dissWeeklyGoals`.
-
-**No changes needed to dissertation.js** — it already has the hook. The new `populateSchoolWeeklyGoals()` and `populateDissWeeklyGoals()` functions just need to exist in week.js.
-
-### 5. MODULARIZATION.md updates
-
-Add to week.js entry:
-- `switchWeekGoalTab`, `saveWeekGoals`, `loadWeekGoals`, `weekGoalAssignDay`, `weekGoalClearHighlights`, `populateSchoolWeeklyGoals`, `populateDissWeeklyGoals`
-
-Remove from week.js entry:
-- `saveWeekNotes`, `loadWeekNotes`
-
-Add to today.js entry:
-- `getWeeklyGoalsForToday`
-
-## Implementation Order
-1. Read week.js → apply the changes above (add new functions, replace loadWeekNotes call in renderWeek, remove old notes functions)
-2. Read today.js → add `getWeeklyGoalsForToday()` and integrate into `_t3LoadDay()` 
-3. Update MODULARIZATION.md
-4. Git commit each file after successful change
-5. Test via browser
+Read week.js (lines 70-230) to understand the current implementation, then fix all three issues.
