@@ -1,3 +1,22 @@
+// ============ FORCE UPDATE (mobile Cmd+Shift+R equivalent) ============
+function forceUpdate() {
+  if (!confirm('Clear cache and reload? This fetches the latest version.')) return;
+  const btn = document.querySelector('[onclick="forceUpdate()"]');
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+  Promise.all([
+    // Unregister all service workers
+    navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(regs =>
+      Promise.all(regs.map(r => r.unregister()))
+    ) : Promise.resolve(),
+    // Delete all caches
+    caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k))))
+  ]).then(() => {
+    window.location.reload(true);
+  }).catch(() => {
+    window.location.reload(true);
+  });
+}
+
 // ============ NAV ============
 function switchTab(id) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
