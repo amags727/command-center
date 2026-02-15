@@ -21,7 +21,7 @@ function getAnkiDailyTarget() {
   const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
   // Cap to review cap — you can't study more than this in one day
   const target = Math.min(dueReviews + availableNew, reviewCap);
-  if (d.cards.length > 0 && target > 0) localStorage.setItem(key, target);
+  if (d.cards.length > 0 && target > 0) { localStorage.setItem(key, target); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
   return target;
 }
 

@@ -1,4 +1,4 @@
-const CACHE = 'cc-v3';
+const CACHE = 'cc-v4';
 const ASSETS = ['./index.html', './core.js', './calendar.js', './flashcard-review.js', './today.js', './week.js', './dissertation.js', './chat.js', './anki.js', './translate.js', './aotd.js', './app.js', './firebase-sync.js', './manifest.json'];
 
 self.addEventListener('install', e => {
@@ -12,6 +12,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Only cache GET requests with http/https schemes
+  if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) return;
+
   e.respondWith(
     fetch(e.request).then(r => {
       const clone = r.clone();

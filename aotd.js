@@ -391,8 +391,11 @@ async function fetchArticleOfTheDay(force) {
       }
     } catch(e) { /* Wayback check is best-effort */ }
     localStorage.setItem('aotd_date', today);
+    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
     localStorage.setItem('aotd_data', JSON.stringify(result));
+    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
     localStorage.setItem('aotd_lastCategory', result.category || 'none');
+    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
     renderAOTD(result);
   } catch(e) {
     document.getElementById('aotd-loading').style.display = 'none';

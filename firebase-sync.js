@@ -30,6 +30,26 @@ const FirebaseSync = (() => {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  // Firebase key sanitization — encode/decode chars forbidden in RTDB keys: . # $ / [ ]
+  function encodeKey(k) {
+    return k.replace(/%/g, '%25')
+            .replace(/\./g, '%2E')
+            .replace(/#/g, '%23')
+            .replace(/\$/g, '%24')
+            .replace(/\//g, '%2F')
+            .replace(/\[/g, '%5B')
+            .replace(/\]/g, '%5D');
+  }
+  function decodeKey(k) {
+    return k.replace(/%2E/g, '.')
+            .replace(/%23/g, '#')
+            .replace(/%24/g, '$')
+            .replace(/%2F/g, '/')
+            .replace(/%5B/g, '[')
+            .replace(/%5D/g, ']')
+            .replace(/%25/g, '%');
+  }
+
   function setStatus(state) {
     if (!statusEl) statusEl = document.getElementById('sync-status');
     if (!statusEl) return;
@@ -101,7 +121,7 @@ const FirebaseSync = (() => {
           _importing = true;
           Object.keys(remote).forEach(k => {
             if (k !== '_lastSync') {
-              localStorage.setItem(k, typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+              localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
             }
           });
           localStorage.setItem('_lastSync', String(remoteTs));
@@ -136,7 +156,7 @@ const FirebaseSync = (() => {
             _importing = true;
             Object.keys(remote).forEach(k => {
               if (k !== '_lastSync') {
-                localStorage.setItem(k, typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+                localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
               }
             });
             localStorage.setItem('_lastSync', String(remoteTs));
@@ -177,7 +197,7 @@ const FirebaseSync = (() => {
         const k = localStorage.key(i);
         // Skip internal keys
         if (k === 'sync_passphrase' || k === '_lastSync') continue;
-        data[k] = localStorage.getItem(k);
+        data[encodeKey(k)] = localStorage.getItem(k);
       }
       // Fingerprint check — sort keys for stable comparison, skip if unchanged
       const sortedKeys = Object.keys(data).sort();
