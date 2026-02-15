@@ -61,6 +61,9 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .wg-editor ol { list-style-type:decimal }
 .wg-editor ol ol { list-style-type:lower-alpha; padding-left:40px }
 .wg-editor ol ol ol { list-style-type:lower-roman; padding-left:40px }
+.wg-columns { display:flex; gap:8px; width:100%; min-height:30px }
+.wg-col { flex:1; min-width:0; border-left:2px solid var(--border); padding-left:8px; min-height:20px; outline:none }
+.wg-col:first-child { border-left:none; padding-left:0 }
 #today-notes ul, #today-notes ol { margin:0; padding-left:40px }
 #today-notes ul { list-style-type:disc }
 #today-notes ul ul { list-style-type:circle; padding-left:40px }

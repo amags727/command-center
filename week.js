@@ -156,6 +156,160 @@ function weekGoalClearHighlightsAuto() {
   ['work','school','life'].forEach(c => weekGoalClearHighlights(c));
 }
 
+/* Shift+Tab → split into columns (max 3); Backspace at col start → merge back */
+document.addEventListener('keydown', function(e) {
+  const el = document.activeElement;
+  if (!el || !el.classList.contains('wg-editor')) return;
+
+  // ── Shift+Tab: create / add column ──
+  if (e.key === 'Tab' && e.shiftKey) {
+    e.preventDefault();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!el.contains(range.commonAncestorContainer)) return;
+
+    let colsWrap = el.querySelector('.wg-columns');
+    const colCount = colsWrap ? colsWrap.querySelectorAll(':scope > .wg-col').length : 1;
+    if (colCount >= 3) return; // max 3
+
+    if (!colsWrap) {
+      // First split: wrap all existing content into a columns container
+      const beforeRange = document.createRange();
+      beforeRange.setStart(el, 0);
+      beforeRange.setEnd(range.startContainer, range.startOffset);
+      const beforeFrag = beforeRange.extractContents();
+
+      const afterFrag = document.createRange();
+      afterFrag.selectNodeContents(el);
+      const afterContent = afterFrag.extractContents();
+
+      colsWrap = document.createElement('div');
+      colsWrap.className = 'wg-columns';
+
+      const col1 = document.createElement('div');
+      col1.className = 'wg-col';
+      col1.appendChild(beforeFrag);
+      if (!col1.innerHTML.trim()) col1.innerHTML = '<br>';
+
+      const col2 = document.createElement('div');
+      col2.className = 'wg-col';
+      col2.appendChild(afterContent);
+      if (!col2.innerHTML.trim()) col2.innerHTML = '<br>';
+
+      colsWrap.appendChild(col1);
+      colsWrap.appendChild(col2);
+      el.innerHTML = '';
+      el.appendChild(colsWrap);
+
+      // Place cursor at start of col2
+      const newRange = document.createRange();
+      newRange.setStart(col2, 0);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    } else {
+      // Already have columns — split the current column at cursor
+      let curCol = range.startContainer;
+      while (curCol && !curCol.classList?.contains('wg-col')) curCol = curCol.parentNode;
+      if (!curCol || !colsWrap.contains(curCol)) return;
+
+      const beforeRange = document.createRange();
+      beforeRange.setStart(curCol, 0);
+      beforeRange.setEnd(range.startContainer, range.startOffset);
+      const beforeFrag = beforeRange.extractContents();
+
+      const afterRange = document.createRange();
+      afterRange.selectNodeContents(curCol);
+      const afterFrag = afterRange.extractContents();
+
+      curCol.innerHTML = '';
+      curCol.appendChild(beforeFrag);
+      if (!curCol.innerHTML.trim()) curCol.innerHTML = '<br>';
+
+      const newCol = document.createElement('div');
+      newCol.className = 'wg-col';
+      newCol.appendChild(afterFrag);
+      if (!newCol.innerHTML.trim()) newCol.innerHTML = '<br>';
+
+      curCol.after(newCol);
+
+      const newRange = document.createRange();
+      newRange.setStart(newCol, 0);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+    const cat = el.id.replace('wg-', '');
+    saveWeekGoals(cat);
+    return;
+  }
+
+  // ── Backspace at start of a non-first column → merge into previous ──
+  if (e.key === 'Backspace') {
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+
+    let curCol = range.startContainer;
+    while (curCol && !curCol.classList?.contains('wg-col')) curCol = curCol.parentNode;
+    if (!curCol) return;
+
+    const colsWrap = curCol.parentElement;
+    if (!colsWrap || !colsWrap.classList.contains('wg-columns')) return;
+
+    // Check cursor is at very start of this column
+    const testRange = document.createRange();
+    testRange.setStart(curCol, 0);
+    testRange.setEnd(range.startContainer, range.startOffset);
+    if (testRange.toString().length > 0) return; // not at start
+
+    const cols = Array.from(colsWrap.querySelectorAll(':scope > .wg-col'));
+    const idx = cols.indexOf(curCol);
+    if (idx <= 0) return; // first column, nothing to merge into
+
+    e.preventDefault();
+    const prevCol = cols[idx - 1];
+
+    // Remove trailing <br> from prev col before merging
+    if (prevCol.lastChild && prevCol.lastChild.nodeName === 'BR' && prevCol.childNodes.length > 0) {
+      // only remove if there's other content
+      if (prevCol.textContent.trim()) prevCol.lastChild.remove();
+    }
+
+    // Mark merge point for cursor placement
+    const marker = document.createTextNode('\u200B');
+    prevCol.appendChild(marker);
+
+    // Move all children from current col to prev col
+    while (curCol.firstChild) {
+      prevCol.appendChild(curCol.firstChild);
+    }
+    curCol.remove();
+
+    // If only 1 column left, unwrap the columns structure
+    const remaining = colsWrap.querySelectorAll(':scope > .wg-col');
+    if (remaining.length <= 1) {
+      const lastCol = remaining[0];
+      while (lastCol.firstChild) colsWrap.before(lastCol.firstChild);
+      colsWrap.remove();
+    }
+
+    // Place cursor at merge point
+    const newRange = document.createRange();
+    newRange.setStartAfter(marker);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+    // Clean up zero-width space after a tick
+    setTimeout(() => { if (marker.parentNode) marker.remove(); }, 50);
+
+    const cat = el.id.replace('wg-', '');
+    saveWeekGoals(cat);
+    return;
+  }
+});
+
 /* Enter handler: strip inherited strikethrough + day-highlight on new lines */
 document.addEventListener('keydown', function(e) {
   if (e.key !== 'Enter') return;
