@@ -310,7 +310,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 <div class="card">
 <h3>📝 Notes</h3>
-<div id="today-notes" contenteditable="true" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
+<div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
 </div>
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
@@ -405,7 +405,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h1>📝 Dissertation</h1>
 <div class="card">
 <h3>🎯 Weekly Goals</h3>
-<div id="diss-weekly-goals" contenteditable="true" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
+<div id="diss-weekly-goals" contenteditable="true" class="wg-editor" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
 <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
 <span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
 <button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissAssignDay('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>

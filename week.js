@@ -48,6 +48,15 @@ function rmCWG(i) { const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.s
 // ── Weekly Goals (Work / School / Life) ─────────────────────────
 const DAY_COLORS = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
 
+/* Save helper: dispatches to the correct save function for any wg-editor */
+function _saveActiveEditor(el) {
+  if (!el) return;
+  if (el.id === 'today-notes' && typeof saveTodayNotes === 'function') { saveTodayNotes(); return; }
+  if (el.id === 'diss-weekly-goals' && typeof saveDissWeeklyGoals === 'function') { saveDissWeeklyGoals(); return; }
+  const cat = el.id.replace('wg-', '');
+  saveWeekGoals(cat);
+}
+
 
 function saveWeekGoals(cat) {
   const el = document.getElementById('wg-'+cat);
@@ -240,8 +249,7 @@ document.addEventListener('keydown', function(e) {
       sel.removeAllRanges();
       sel.addRange(newRange);
     }
-    const cat = el.id.replace('wg-', '');
-    saveWeekGoals(cat);
+    _saveActiveEditor(el);
     return;
   }
 
@@ -304,8 +312,7 @@ document.addEventListener('keydown', function(e) {
     // Clean up zero-width space after a tick
     setTimeout(() => { if (marker.parentNode) marker.remove(); }, 50);
 
-    const cat = el.id.replace('wg-', '');
-    saveWeekGoals(cat);
+    _saveActiveEditor(el);
     return;
   }
 });
@@ -346,8 +353,7 @@ document.addEventListener('keydown', function(e) {
       }
       cursor = cursor.parentNode;
     }
-    const cat = el.id.replace('wg-','');
-    saveWeekGoals(cat);
+    _saveActiveEditor(el);
   }, 0);
 });
 
