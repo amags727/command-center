@@ -83,20 +83,6 @@ function loadTodayNotes() {
   const el = document.getElementById('today-notes');
   if (el && dd.days[today()].notes) el.innerHTML = dd.days[today()].notes;
 }
-function saveWeekNotes() {
-  const el = document.getElementById('week-notes');
-  if (!el) return;
-  const wk = weekId();
-  const wd = weekData(wk);
-  wd.weeks[wk].notes = el.innerHTML;
-  save(wd);
-}
-function loadWeekNotes() {
-  const wk = weekId();
-  const wd = weekData(wk);
-  const el = document.getElementById('week-notes');
-  if (el && wd.weeks[wk] && wd.weeks[wk].notes) el.innerHTML = wd.weeks[wk].notes;
-}
 
 // ============ KEYBOARD SHORTCUTS ============
 
@@ -116,7 +102,7 @@ function _notesListContext() {
 function _handleNotesTab(e) {
   const el = document.activeElement;
   if (!el || el.getAttribute('contenteditable') !== 'true') return;
-  if (el.id !== 'today-notes' && el.id !== 'week-notes') return;
+  if (el.id !== 'today-notes') return;
 
   const li = _notesListContext();
   if (!li) return; // only act when cursor is in a list item
@@ -132,15 +118,14 @@ function _handleNotesTab(e) {
   }
 
   // Fire save
-  if (el.id === 'today-notes') saveTodayNotes();
-  else saveWeekNotes();
+  saveTodayNotes();
 }
 
 // Auto-detect "1." or "1)" at the start of a line and convert to ordered list
 function _handleAutoNumberedList(e) {
   const el = e.target;
   if (!el || el.getAttribute('contenteditable') !== 'true') return;
-  if (el.id !== 'today-notes' && el.id !== 'week-notes') return;
+  if (el.id !== 'today-notes') return;
 
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
@@ -155,8 +140,7 @@ function _handleAutoNumberedList(e) {
     // Insert ordered list via execCommand
     document.execCommand('insertOrderedList');
     // Fire save
-    if (el.id === 'today-notes') saveTodayNotes();
-    else saveWeekNotes();
+    saveTodayNotes();
   }
 }
 
@@ -230,11 +214,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   loadAll();
   loadTodayNotes();
-  loadWeekNotes();
   // Article of the Day — runs once daily on launch
   fetchArticleOfTheDay(false);
   // Auto-numbered list detection on notes
-  ['today-notes', 'week-notes'].forEach(function(id) {
+  ['today-notes'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', _handleAutoNumberedList);
   });
