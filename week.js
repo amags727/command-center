@@ -15,7 +15,6 @@ function renderWeek() {
   renderCWG();
   renderDailySummaries();
   loadWeekGoals();
-  switchWeekGoalTab('work');
 }
 function addCWG() { const v = document.getElementById('cw-in').value.trim(), cat = document.getElementById('cw-cat').value; if (!v) return; const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.push({ text: v, cat, done: false }); save(wd); document.getElementById('cw-in').value = ''; renderCWG(); }
 function renderDailySummaries() {
@@ -49,15 +48,6 @@ function rmCWG(i) { const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.s
 // ── Weekly Goals (Work / School / Life) ─────────────────────────
 const DAY_COLORS = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
 
-function switchWeekGoalTab(cat) {
-  ['work','school','life'].forEach(c => {
-    const p = document.getElementById('wg-panel-'+c);
-    const b = document.getElementById('wg-tab-btn-'+c);
-    if (!p || !b) return;
-    if (c === cat) { p.style.display=''; b.classList.add('active'); }
-    else { p.style.display='none'; b.classList.remove('active'); }
-  });
-}
 
 function saveWeekGoals(cat) {
   const el = document.getElementById('wg-'+cat);
