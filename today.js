@@ -342,7 +342,7 @@ function populateSchoolWeeklyGoals() {
   saveT3Intentions();
 }
 
-// --- Auto-populate daily chips from Weekly Goals (Work / Life) ---
+// --- Auto-populate daily chips from Weekly Goals (Work / School / Life) ---
 function getWeeklyGoalsForToday() {
   const d = getGlobal();
   const wk = d.weekGoals && d.weekGoals[weekId()] || {};
