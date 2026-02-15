@@ -348,8 +348,8 @@ function getWeeklyGoalsForToday() {
   const wk = d.weekGoals && d.weekGoals[weekId()] || {};
   const dayMap = {1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat',0:'sun'};
   const todayDay = dayMap[new Date().getDay()];
-  const results = {work:[], life:[]};
-  ['work','life'].forEach(cat => {
+  const results = {work:[], school:[], life:[]};
+  ['work','school','life'].forEach(cat => {
     const html = wk[cat] || '';
     if (!html) return;
     const div = document.createElement('div');
@@ -364,9 +364,9 @@ function getWeeklyGoalsForToday() {
 
 function populateFromWeeklyGoals() {
   const goals = getWeeklyGoalsForToday();
-  const catMap = {work:'t3-work', life:'t3-life'};
-  const prefixMap = {work:'w', life:'l'};
-  ['work','life'].forEach(cat => {
+  const catMap = {work:'t3-work', school:'t3-school', life:'t3-life'};
+  const prefixMap = {work:'w', school:'s', life:'l'};
+  ['work','school','life'].forEach(cat => {
     const items = goals[cat];
     if (!items.length) return;
     const container = document.getElementById(catMap[cat]);

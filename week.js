@@ -118,6 +118,34 @@ function weekGoalClearHighlights(cat) {
   saveWeekGoals(cat);
 }
 
+/* Auto-detect which wg-editor has the selection */
+function _wgDetectCat() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return null;
+  const node = sel.getRangeAt(0).commonAncestorContainer;
+  for (const cat of ['work','school','life']) {
+    const el = document.getElementById('wg-'+cat);
+    if (el && el.contains(node)) return cat;
+  }
+  return null;
+}
+function weekGoalAssignDayAuto(day) {
+  const cat = _wgDetectCat();
+  if (cat) { weekGoalAssignDay(cat, day); return; }
+  // fallback: if no selection, try last focused editor
+  const focused = document.activeElement;
+  if (focused && focused.classList.contains('wg-editor')) {
+    const id = focused.id.replace('wg-','');
+    weekGoalAssignDay(id, day);
+  }
+}
+function weekGoalClearHighlightsAuto() {
+  const cat = _wgDetectCat();
+  if (cat) { weekGoalClearHighlights(cat); return; }
+  // no selection: clear all three
+  ['work','school','life'].forEach(c => weekGoalClearHighlights(c));
+}
+
 function populateSchoolWeeklyGoals() {
   const d = getGlobal();
   const html = d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()] || '';
