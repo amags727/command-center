@@ -24,6 +24,43 @@ const FirebaseSync = (() => {
   let _lastPushFingerprint = ''; // fingerprint of last pushed data — skip if unchanged
   let _initialPullDone = false; // true once the first pull (or no-remote-data) has resolved
 
+  // Conflict guard — detect if remote data would regress local progress
+  function detectRegression(remoteData) {
+    // 1. Compare reviewed flashcard counts
+    let localReviewed = 0, remoteReviewed = 0;
+    try {
+      const localCards = JSON.parse(localStorage.getItem('cc_data') || '{}');
+      const localCardArr = (localCards && localCards.cards) ? localCards.cards : [];
+      localReviewed = localCardArr.filter(c => c.reps > 0 || c.queue !== 0).length;
+    } catch(e) { /* ignore parse errors */ }
+    try {
+      const remoteRaw = remoteData[encodeKey('cc_data')] || remoteData['cc_data'];
+      if (remoteRaw) {
+        const remoteCards = typeof remoteRaw === 'string' ? JSON.parse(remoteRaw) : remoteRaw;
+        const remoteCardArr = (remoteCards && remoteCards.cards) ? remoteCards.cards : [];
+        remoteReviewed = remoteCardArr.filter(c => c.reps > 0 || c.queue !== 0).length;
+      }
+    } catch(e) { /* ignore parse errors */ }
+
+    // 2. Compare total key counts (goals, notes, etc.)
+    const remoteKeyCount = Object.keys(remoteData).filter(k => k !== '_lastSync').length;
+    let localKeyCount = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k !== 'sync_passphrase' && k !== '_lastSync') localKeyCount++;
+    }
+
+    // Flag regression if local has meaningfully more reviewed cards
+    if (localReviewed > 10 && remoteReviewed < localReviewed * 0.5) {
+      return { regressed: true, localReviewed, remoteReviewed, localKeyCount, remoteKeyCount };
+    }
+    // Flag regression if local has substantially more data keys
+    if (localKeyCount > 20 && remoteKeyCount < localKeyCount * 0.5) {
+      return { regressed: true, localReviewed, remoteReviewed, localKeyCount, remoteKeyCount };
+    }
+    return { regressed: false };
+  }
+
   // SHA-256 hash
   async function hash(str) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -117,19 +154,47 @@ const FirebaseSync = (() => {
         const remoteTs = remote._lastSync || 0;
         const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
         if (remoteTs > localTs) {
-          // Remote is newer — import it
-          _importing = true;
-          Object.keys(remote).forEach(k => {
-            if (k !== '_lastSync') {
-              localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+          // Conflict guard — check if remote would regress local progress
+          const check = detectRegression(remote);
+          if (check.regressed) {
+            const keepLocal = confirm(
+              `⚠️ Sync conflict detected!\n\n` +
+              `Local: ${check.localReviewed} reviewed cards, ${check.localKeyCount} data keys\n` +
+              `Remote: ${check.remoteReviewed} reviewed cards, ${check.remoteKeyCount} data keys\n\n` +
+              `Remote appears to have less progress. Keep LOCAL data and push it to sync?\n\n` +
+              `OK = Keep local (recommended)\nCancel = Accept remote (overwrites local)`
+            );
+            if (keepLocal) {
+              // Push local to remote instead
+              pushAll();
+            } else {
+              // User chose to accept remote — import it
+              _importing = true;
+              Object.keys(remote).forEach(k => {
+                if (k !== '_lastSync') {
+                  localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+                }
+              });
+              localStorage.setItem('_lastSync', String(remoteTs));
+              if (typeof loadAll === 'function') loadAll();
+              _importing = false;
+              clearTimeout(debounceTimer);
+              _importCooldown = Date.now() + 2000;
             }
-          });
-          localStorage.setItem('_lastSync', String(remoteTs));
-          // Reload UI
-          if (typeof loadAll === 'function') loadAll();
-          _importing = false;
-          clearTimeout(debounceTimer);  // cancel any push queued during import
-          _importCooldown = Date.now() + 2000;  // suppress pushes for 2s after import
+          } else {
+            // No regression — import normally
+            _importing = true;
+            Object.keys(remote).forEach(k => {
+              if (k !== '_lastSync') {
+                localStorage.setItem(decodeKey(k), typeof remote[k] === 'string' ? remote[k] : JSON.stringify(remote[k]));
+              }
+            });
+            localStorage.setItem('_lastSync', String(remoteTs));
+            if (typeof loadAll === 'function') loadAll();
+            _importing = false;
+            clearTimeout(debounceTimer);
+            _importCooldown = Date.now() + 2000;
+          }
         } else {
           // Local is newer — push to remote
           pushAll();
@@ -153,6 +218,22 @@ const FirebaseSync = (() => {
           }
           const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
           if (remoteTs > localTs) {
+            // Conflict guard on real-time updates too
+            const check = detectRegression(remote);
+            if (check.regressed) {
+              const keepLocal = confirm(
+                `⚠️ Sync conflict detected!\n\n` +
+                `Local: ${check.localReviewed} reviewed cards, ${check.localKeyCount} data keys\n` +
+                `Remote: ${check.remoteReviewed} reviewed cards, ${check.remoteKeyCount} data keys\n\n` +
+                `Incoming sync appears to have less progress. Keep LOCAL data?\n\n` +
+                `OK = Keep local (recommended)\nCancel = Accept remote (overwrites local)`
+              );
+              if (keepLocal) {
+                pushAll();
+                setStatus(navigator.onLine ? 'synced' : 'offline');
+                return;
+              }
+            }
             _importing = true;
             Object.keys(remote).forEach(k => {
               if (k !== '_lastSync') {
@@ -162,8 +243,8 @@ const FirebaseSync = (() => {
             localStorage.setItem('_lastSync', String(remoteTs));
             if (typeof loadAll === 'function') loadAll();
             _importing = false;
-            clearTimeout(debounceTimer);  // cancel any push queued during import
-            _importCooldown = Date.now() + 2000;  // suppress pushes for 2s after import
+            clearTimeout(debounceTimer);
+            _importCooldown = Date.now() + 2000;
           }
           setStatus(navigator.onLine ? 'synced' : 'offline');
         });
