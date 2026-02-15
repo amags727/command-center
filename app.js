@@ -130,7 +130,9 @@ function _handleNotesTab(e) {
 function _handleAutoNumberedList(e) {
   const el = e.target;
   if (!el || el.getAttribute('contenteditable') !== 'true') return;
-  if (el.id !== 'today-notes') return;
+  const isToday = (el.id === 'today-notes');
+  const isWg = el.classList.contains('wg-editor');
+  if (!isToday && !isWg) return;
 
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
@@ -145,7 +147,8 @@ function _handleAutoNumberedList(e) {
     // Insert ordered list via execCommand
     document.execCommand('insertOrderedList');
     // Fire save
-    saveTodayNotes();
+    if (isToday) saveTodayNotes();
+    else if (isWg && typeof saveWeekGoals === 'function') saveWeekGoals(el.id.replace('wg-',''));
   }
 }
 
@@ -160,8 +163,13 @@ document.addEventListener('keydown', function(e) {
   // Notes rich-text shortcuts (only when inside contenteditable)
   const el = document.activeElement;
   if (el && el.getAttribute('contenteditable') === 'true') {
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === '8') {
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'Digit8') {
       e.preventDefault(); document.execCommand('insertUnorderedList');
+      // Save the appropriate editor
+      if (el.id === 'today-notes') saveTodayNotes();
+      else if (el.classList.contains('wg-editor') && typeof saveWeekGoals === 'function') {
+        saveWeekGoals(el.id.replace('wg-',''));
+      }
     }
     return; // don't process card shortcuts while editing
   }
@@ -221,8 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
   loadTodayNotes();
   // Article of the Day — runs once daily on launch
   fetchArticleOfTheDay(false);
-  // Auto-numbered list detection on notes
-  ['today-notes'].forEach(function(id) {
+  // Auto-numbered list detection on notes and weekly goal editors
+  ['today-notes','wg-work','wg-school','wg-life'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', _handleAutoNumberedList);
   });

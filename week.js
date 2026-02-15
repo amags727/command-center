@@ -197,27 +197,6 @@ document.addEventListener('keydown', function(e) {
   }, 0);
 });
 
-/* Auto-numbered list: typing "1. " or "1) " triggers an ordered list */
-document.addEventListener('input', function(e) {
-  const el = e.target;
-  if (!el || !el.classList.contains('wg-editor')) return;
-  const sel = window.getSelection();
-  if (!sel.rangeCount) return;
-  let node = sel.anchorNode;
-  if (!node || node.nodeType !== 3) return; // must be a text node
-  const text = node.textContent;
-  // Check if text starts with "1. " or "1) "
-  if (text === '1. ' || text === '1) ') {
-    // Clear the trigger text
-    node.textContent = '';
-    // Use execCommand to insert an ordered list
-    document.execCommand('insertOrderedList');
-    // Save
-    const cat = el.id.replace('wg-','');
-    saveWeekGoals(cat);
-  }
-});
-
 function populateSchoolWeeklyGoals() {
   const d = getGlobal();
   const html = d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()] || '';
