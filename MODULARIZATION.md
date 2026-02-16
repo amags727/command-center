@@ -15,6 +15,7 @@
 <script src="anki.js"></script>           <!-- Cards/SM-2 tab -->
 <script src="translate.js"></script>      <!-- Read/Translate tab -->
 <script src="aotd.js"></script>           <!-- Article of the Day -->
+<script src="meals.js"></script>          <!-- Meal Planning tab -->
 <script src="app.js"></script>            <!-- orchestration: nav, notes, keyboard, init -->
 <script src="firebase-sync.js"></script>  <!-- sync layer (last) -->
 ```
@@ -61,6 +62,10 @@ Italian reading & translation (Read tab):
 Article of the Day:
 `renderAOTD()`, `fetchArticle()`, `generateQuestions()`, `submitAnswers()`
 
+### meals.js (~407 lines)
+Meal Planning tab — day type toggle, food submission (photo/text/stored), Claude macro analysis, circular progress rings, stored meal library:
+`renderMeals()`, `setDayType()`, `renderMacroRings()`, `renderMealLog()`, `removeMealEntry()`, `renderStoredMeals()`, `toggleMealLibrary()`, `filterMealLibrary()`, `quickAddStoredMeal()`, `deleteStoredMeal()`, `editStoredMeal()`, `mealNameInput()`, `selectAutocomplete()`, `mealImageSelected()`, `clearMealImage()`, `initMealPasteHandler()`, `submitFood()`, `analyzeFoodWithClaude()`
+
 ### app.js (~241 lines)
 Orchestration shell:
 - `switchTab()` + NAV array
@@ -84,6 +89,7 @@ Firebase sync layer (loaded last):
 | Cards | anki.js + flashcard-review.js | tab-cards |
 | Read | translate.js + flashcard-review.js | tab-translate |
 | Claude | chat.js + flashcard-review.js | tab-claude |
+| Meals | meals.js | tab-meals |
 | Log | app.js (renderLog, addConfession, export/import) | tab-log |
 
 ## Backup

@@ -23,12 +23,13 @@ function switchTab(id) {
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   const btns = document.querySelectorAll('.nav button');
-  const names = ['today','week','dissertation','cards','translate','claude','log'];
+  const names = ['today','week','dissertation','cards','translate','claude','meals','log'];
   const idx = names.indexOf(id);
   if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
   if (id === 'today') initToday();
   if (id === 'week') renderWeek();
   if (id === 'log') renderLog();
+  if (id === 'meals') renderMeals();
   if (id === 'dissertation') renderDiss();
   if (id === 'cards') renderCards();
   if (id === 'translate') renderTranslate();

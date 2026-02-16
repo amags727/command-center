@@ -259,6 +259,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <button onclick="switchTab('cards')">🃏 Cards</button>
 <button onclick="switchTab('translate')">🇮🇹 Read</button>
 <button onclick="switchTab('claude')">🤖 Claude</button>
+<button onclick="switchTab('meals')">🍽️ Meals</button>
 <button onclick="switchTab('log')">📋 Log</button>
 <button onclick="forceUpdate()" title="Force update" style="margin-left:auto;font-size:16px;padding:8px 10px">⟳</button>
 </nav>
@@ -616,6 +617,81 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 </div>
 
 <!-- LOG -->
+<!-- MEALS -->
+<div class="tab" id="tab-meals">
+<h2>🍽️ Meal Planning</h2>
+
+<div class="card">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+<b style="font-size:13px">Day Type:</b>
+<button id="meal-day-workout" class="active" onclick="setDayType('workout')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:13px;background:var(--card);cursor:pointer">🏋️ Workout</button>
+<button id="meal-day-rest" onclick="setDayType('rest')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:13px;background:var(--card);cursor:pointer">😴 Rest</button>
+</div>
+<div id="meal-targets-display" style="font-size:13px;color:var(--muted)"></div>
+</div>
+
+<style>
+#meal-day-workout.active,#meal-day-rest.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.meal-rings{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:10px 0}
+.meal-ring-item{text-align:center}
+.meal-ring-label{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+.meal-entry{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--border)}
+.meal-entry:last-child{border-bottom:none}
+.meal-entry-name{font-weight:600;font-size:13px;flex:1}
+.meal-entry-macros{font-size:12px;color:var(--muted)}
+.meal-lib-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
+.meal-lib-item:last-child{border-bottom:none}
+.meal-lib-info{display:flex;flex-direction:column;gap:1px}
+.meal-lib-name{font-weight:600;font-size:13px}
+.meal-lib-macros{font-size:11px;color:var(--muted)}
+.meal-lib-actions{display:flex;gap:4px;align-items:center}
+.meal-ac-item{padding:6px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)}
+.meal-ac-item:hover{background:var(--bl)}
+#meal-autocomplete{position:absolute;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:4px;max-height:200px;overflow-y:auto;width:100%;box-shadow:var(--sh)}
+</style>
+
+<div id="meal-rings" class="meal-rings"></div>
+
+<div class="card">
+<h3>Add Food</h3>
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+<label style="padding:6px 12px;background:var(--bl);color:var(--blue);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+📷 Photo <input type="file" id="meal-img-input" accept="image/*" capture="environment" onchange="mealImageSelected(this)" style="display:none">
+</label>
+<span style="font-size:11px;color:var(--muted)">or paste image (Cmd+V)</span>
+</div>
+<div id="meal-img-preview" style="margin-bottom:8px"></div>
+<div style="position:relative;margin-bottom:8px">
+<input type="text" id="meal-name-in" placeholder="Food name (autocompletes from library)" oninput="mealNameInput()" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+<div id="meal-autocomplete" style="display:none"></div>
+</div>
+<textarea id="meal-desc-in" placeholder="Description (optional — helps Claude analyze photos)" rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;resize:vertical;margin-bottom:8px"></textarea>
+<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+<input type="number" id="meal-cal-in" placeholder="Calories" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+<input type="number" id="meal-prot-in" placeholder="Protein g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+<input type="number" id="meal-carb-in" placeholder="Carbs g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+<input type="number" id="meal-fat-in" placeholder="Fat g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+</div>
+<button id="meal-submit-btn" onclick="submitFood()" style="padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">➕ Add Food</button>
+</div>
+
+<div class="card">
+<h3>Today's Food Log</h3>
+<div id="meal-log"></div>
+</div>
+
+<div class="card">
+<div onclick="toggleMealLibrary()" style="cursor:pointer;display:flex;align-items:center;gap:8px">
+<span id="meal-lib-chevron" style="font-size:12px">▶</span>
+<h3 style="margin:0">Stored Meals</h3>
+</div>
+<div id="meal-library-body" style="display:none;margin-top:10px">
+<input type="text" id="meal-lib-search" placeholder="Search meals..." oninput="filterMealLibrary()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;margin-bottom:8px">
+<div id="meal-library-list"></div>
+</div>
+</div>
+</div>
+
 <div class="tab" id="tab-log">
 <h1>📋 Activity Log</h1>
 <div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
@@ -637,6 +713,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <script src="anki.js"></script>
 <script src="translate.js"></script>
 <script src="aotd.js"></script>
+<script src="meals.js"></script>
 <script src="app.js"></script>
 <script src="firebase-sync.js"></script>
 <script>

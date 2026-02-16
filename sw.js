@@ -1,5 +1,5 @@
 const CACHE = 'cc-v5';
-const ASSETS = ['./index.html', './core.js', './calendar.js', './flashcard-review.js', './today.js', './week.js', './dissertation.js', './chat.js', './anki.js', './translate.js', './aotd.js', './app.js', './firebase-sync.js', './manifest.json'];
+const ASSETS = ['./index.html', './core.js', './calendar.js', './flashcard-review.js', './today.js', './week.js', './dissertation.js', './chat.js', './anki.js', './translate.js', './aotd.js', './meals.js', './app.js', './firebase-sync.js', './manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
