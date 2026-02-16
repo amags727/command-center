@@ -104,7 +104,7 @@ function renderMealLog(entries) {
     const dc = Math.round(uc * q), dp = Math.round(up * q), dcb = Math.round(ucb * q), df = Math.round(uf * q);
     return '<div class="meal-entry">' +
       '<div class="meal-entry-name">' + escHtml(e.name) + '</div>' +
-      '<input type="number" class="meal-qty-input" value="' + q + '" min="0.25" step="0.25" onchange="updateMealQty(' + i + ',this.value)" title="Quantity">' +
+      '<input type="number" class="meal-qty-input" value="' + q + '" min="0.01" step="any" onchange="updateMealQty(' + i + ',this.value)" title="Servings">' +
       '<div class="meal-entry-macros">' + dc + ' kcal · ' + dp + 'g P · ' + dcb + 'g C · ' + df + 'g F</div>' +
       '<button onclick="removeMealEntry(' + i + ')" title="Remove" style="background:none;border:none;color:var(--red);font-size:16px;padding:2px 6px;cursor:pointer">✕</button>' +
       '</div>';
@@ -171,8 +171,9 @@ function filterMealLibrary() {
 }
 
 function quickAddStoredMeal(id) {
-  const lib = getMealLibrary();
-  const meal = lib.find(m => m.id === id);
+  const d = getGlobal();
+  if (!d.mealLibrary) d.mealLibrary = [];
+  const meal = d.mealLibrary.find(m => m.id === id);
   if (!meal) return;
   const dd = dayData(today());
   dd.days[today()].meals.entries.push({
@@ -181,7 +182,7 @@ function quickAddStoredMeal(id) {
   });
   meal.usageCount = (meal.usageCount || 0) + 1;
   save(dd);
-  const d = getGlobal(); save(d);
+  save(d);
   renderMeals();
 }
 
@@ -343,10 +344,64 @@ async function submitFood() {
     return;
   }
 
-  // Nothing useful provided
-  if (!name && !desc && !_mealPendingImage) {
-    alert('Enter a food name, description, or attach an image.');
+  // Name/desc provided but no macros and no image — ask Claude to estimate
+  if (name || desc) {
+    const key = localStorage.getItem('cc_apikey');
+    if (!key) { alert('Set your API key in the Claude tab first.'); return; }
+    btn.textContent = '⏳ Estimating...';
+    btn.disabled = true;
+    try {
+      const result = await estimateMacrosWithClaude(key, name, desc);
+      _addFoodEntry(result.name, result.calories, result.protein, result.carbs, result.fat);
+      _offerSaveMeal(result.name, result.calories, result.protein, result.carbs, result.fat);
+      _clearMealForm();
+      renderMeals();
+    } catch (e) {
+      alert('Estimation failed: ' + e.message);
+    } finally {
+      btn.textContent = '➕ Add Food';
+      btn.disabled = false;
+    }
+    return;
   }
+
+  // Nothing useful provided
+  alert('Enter a food name, description, or attach an image.');
+}
+
+async function estimateMacrosWithClaude(key, name, description) {
+  let prompt = 'Estimate the macronutrients for this food item. ';
+  if (name) prompt += 'Food: ' + name + '. ';
+  if (description) prompt += 'Details: ' + description + '. ';
+  prompt += 'Assume a single typical serving size. Return ONLY a JSON object with these exact keys: {"name": "food name", "calories": number, "protein": number, "carbs": number, "fat": number}. Protein, carbs, fat in grams. Be as accurate as possible.';
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!resp.ok) throw new Error('API error: ' + resp.status);
+  const data = await resp.json();
+  const text = data.content[0].text;
+  const jsonMatch = text.match(/\{[^}]+\}/);
+  if (!jsonMatch) throw new Error('Could not parse response');
+  const parsed = JSON.parse(jsonMatch[0]);
+  return {
+    name: parsed.name || name || 'Food',
+    calories: parseInt(parsed.calories) || 0,
+    protein: parseInt(parsed.protein) || 0,
+    carbs: parseInt(parsed.carbs) || 0,
+    fat: parseInt(parsed.fat) || 0
+  };
 }
 
 async function analyzeFoodWithClaude(key, imageDataUrl, name, description) {
@@ -406,16 +461,17 @@ function _addFoodEntry(name, cal, prot, carb, fat) {
 
 function _offerSaveMeal(name, cal, prot, carb, fat) {
   if (!name || name === 'Food' || name === 'Meal') return;
-  const lib = getMealLibrary();
-  const existing = lib.find(m => m.name.toLowerCase() === name.toLowerCase());
-  if (existing) { existing.usageCount = (existing.usageCount || 0) + 1; const d = getGlobal(); save(d); return; }
+  const d = getGlobal();
+  if (!d.mealLibrary) d.mealLibrary = [];
+  const existing = d.mealLibrary.find(m => m.name.toLowerCase() === name.toLowerCase());
+  if (existing) { existing.usageCount = (existing.usageCount || 0) + 1; save(d); return; }
   if (confirm('Save "' + name + '" to your meal library?')) {
-    lib.push({
+    d.mealLibrary.push({
       id: 'ml_' + Date.now(),
       name: name, calories: cal, protein: prot, carbs: carb, fat: fat,
       usageCount: 1
     });
-    const d = getGlobal(); save(d);
+    save(d);
   }
 }
 
