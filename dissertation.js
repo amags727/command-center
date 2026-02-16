@@ -304,21 +304,35 @@ async function restoreFileHandles() {
 
 const _dissHighlightColors = {mon:'#FFB3B3',tue:'#FFD9B3',wed:'#FFFFB3',thu:'#B3FFB3',fri:'#B3D9FF',sat:'#D9B3FF',sun:'#FFB3E6'};
 
+let _dissWeekOffset = 0;
+function _activeDissWeekId() { return _dissWeekOffset === 0 ? weekId() : offsetWeekId(weekId(), _dissWeekOffset); }
+function shiftDissWeekGoals(dir) {
+  const newOff = _dissWeekOffset + dir;
+  if (newOff < 0 || newOff > 1) return;
+  _dissWeekOffset = newOff;
+  loadDissWeeklyGoals();
+  const label = document.getElementById('diss-week-label');
+  if (label) label.textContent = _dissWeekOffset === 0 ? 'Weekly Goals' : 'Next Week (' + _activeDissWeekId() + ')';
+  const indicator = document.getElementById('diss-week-indicator');
+  if (indicator) indicator.style.display = _dissWeekOffset === 0 ? 'none' : 'inline';
+}
+
 function saveDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
   const d = getGlobal();
+  const targetWk = _activeDissWeekId();
   if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
-  d.dissWeeklyGoals[weekId()] = el.innerHTML;
+  d.dissWeeklyGoals[targetWk] = el.innerHTML;
   save(d);
-  if (typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
+  if (_dissWeekOffset === 0 && typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
 }
 
 function loadDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
   const d = getGlobal();
-  el.innerHTML = (d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()]) || '';
+  el.innerHTML = (d.dissWeeklyGoals && d.dissWeeklyGoals[_activeDissWeekId()]) || '';
 }
 
 // Called when a day button (MON–SUN) is clicked.

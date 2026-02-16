@@ -1,107 +1,51 @@
-# Continuation: Weekly Transition System
+# Continuation: Weekly Archive + Dissertation Arrow Navigation
 
 ## What Was Done
-1. **Log tab updated in `index.html`**: Added "Weekly Archives" section with `manualArchiveWeek()` button and `#week-archives` container div. Also added the `📋 Log` nav button.
+1. **core.js** — Added `offsetWeekId(baseId, delta)` helper function
+2. **week-archive.js** — Created new module (~200 lines) with:
+   - `archiveWeek(wid)` — snapshots week data into `d.weekArchives[wid]`
+   - `buildArchiveEmail(wid, archive)` — generates Gmail-friendly HTML email
+   - `sendArchiveEmail(wid)` — sends via EmailJS (needs setup)
+   - `manualArchiveWeek()` — button handler for manual archive+email
+   - `renderWeekArchives()` — renders collapsible Year→Month→Week tree on Log tab
+   - Auto-archive on week transition in `checkWeekTransition()`
+3. **week.js** — Added `shiftWeekGoals(delta)` with arrow nav (◀▶) for weekly goals, allowing viewing/editing next week's goals. Label shows "This Week" or "Next Week".
+4. **dissertation.js** — Added `shiftDissWeekGoals(delta)` with same arrow nav pattern. Functions: `_dissWeekOffset`, `shiftDissWeekGoals()`, updated `saveDissWeeklyGoals()` and `renderDissWeeklyGoals()` to use offset week IDs.
+5. **index.html** — Updated:
+   - Log tab: Added "📦 Weekly Archives" card with manual archive button and `#week-archives` div
+   - Week tab: Already had arrow buttons for weekly goals
+   - Dissertation tab: Added arrow buttons (◀▶) and indicator for weekly goals
+   - Script tag: Added `<script src="week-archive.js"></script>` before app.js
 
 ## What Remains
+1. **sw.js** — Add `'week-archive.js'` to the ASSETS array (it's not there yet)
+2. **MODULARIZATION.md** — Add week-archive.js entry to the module map
+3. **EmailJS Setup** — The email sending uses EmailJS. User needs to:
+   - Create free EmailJS account at emailjs.com
+   - Create an email service (Gmail) and template
+   - Replace placeholder IDs in `week-archive.js`: `service_xxx`, `template_xxx`, public key
+   - OR switch to a different email approach
+4. **Git commit** — All changes need to be committed
+5. **Testing** — Navigate to site, check:
+   - Week tab arrow buttons work (shows "This Week" / "Next Week")
+   - Dissertation tab arrow buttons work
+   - Log tab shows "📦 Weekly Archives" section
+   - Manual archive button works
+   - Auto-archive triggers on week transition
 
-### Task 1: Week Archive System (new module: `week-archive.js`)
-Create `week-archive.js` (~300 lines estimated) that handles:
+## Files Modified
+- `core.js` — added `offsetWeekId()`
+- `week.js` — added `shiftWeekGoals()`, `_weekGoalOffset` state, updated save/render
+- `dissertation.js` — added `shiftDissWeekGoals()`, `_dissWeekOffset` state, updated save/render
+- `week-archive.js` — NEW FILE
+- `index.html` — dissertation arrows, log archive section, script tag
+- `app.js` — calls `checkWeekTransition()` and `renderWeekArchives()` on init
 
-#### A. Snapshot/Freeze a Week
-- `archiveWeek(weekKey)` — takes a weekId like `2026-W07` and:
-  - Reads `weekData(wk)` for targets (gym, anki, articles, convo, refl, diss hours, social)
-  - Reads `weekGoals[wk]` for work/school/life rich-text goals
-  - Reads `dissWeeklyGoals[wk]` for dissertation weekly goals
-  - Reads `weeks[wk].goals` for custom weekly goals
-  - Reads `weeks[wk].review` for weekly review answers
-  - Reads daily summaries for each day of the week
-  - Stores all this as `d.weekArchives[wk] = { ...snapshot, archivedAt: ISO timestamp }`
-  - Calls `save(d)`
-
-#### B. Email Summary
-- `emailWeekSummary(weekKey)` — generates HTML email and opens `mailto:` link or uses a simple email API
-  - **Recommended approach**: Generate the HTML summary, then open `mailto:xmagnuson@gmail.com?subject=...&body=...` (but mailto has body length limits)
-  - **Better approach**: Use the existing Claude/Anthropic API key to format, then use a mailto with plain text, OR use EmailJS (free tier) or similar
-  - **Simplest approach**: Generate a nicely formatted plain-text summary and open mailto link. Gmail handles plain text well.
-  - Content: week targets vs actuals, weekly goals, review answers, daily summaries
-
-#### C. Log Page Rendering
-- `renderWeekArchives()` — renders into `#week-archives` div
-  - Collapsible hierarchy: Year → Month → Week
-  - Each year is a collapsible section (default collapsed)
-  - Each month within a year is collapsible (default collapsed)
-  - Each week shows the frozen snapshot when expanded
-  - Parse weekId `2026-W07` to determine year and month (use the Monday of that week)
-- `manualArchiveWeek()` — called from the button, archives current week + triggers email
-
-#### D. Auto-archive on Week Transition
-- In `app.js` or `week-archive.js`, on app init, check if the current weekId differs from `d.lastActiveWeek`
-  - If so, auto-archive the previous week (if not already archived)
-  - Update `d.lastActiveWeek = weekId()`
-  - This handles the "freeze in place" requirement
-
-### Task 2: Arrow Navigation for Weekly Goals (next-week planning)
-
-#### In `week.js`:
-- The weekly goals header currently shows `📊 Week of <span id="wk-date"></span>`
-- Add left/right arrow buttons: `◀ ▶` next to the week date
-- Track a `_weekGoalOffset` variable (0 = current week, 1 = next week, -1 would show previous but we only need +1)
-- `saveWeekGoals(cat)` currently keys on `weekId()` — needs to key on `weekId() + offset`
-- `loadWeekGoals()` needs the same offset awareness
-- Helper: `offsetWeekId(weekId, offset)` — returns the weekId N weeks ahead/behind
-  - Parse `2026-W07`, add offset to week number, handle year boundaries
-
-#### In `dissertation.js`:
-- Same pattern: `dissWeeklyGoals` already keys on `weekId()`
-- Add arrows to the dissertation weekly goals header
-- `saveDissWeeklyGoals()` and the load in `renderDiss()` need offset awareness
-- Since diss weekly goals sync to week.js school goals, the offset logic must be consistent
-
-#### Implementation Notes:
-- `weekId()` in `core.js` returns current week. We need an `offsetWeekId(base, n)` utility.
-- The simplest implementation of `offsetWeekId`: parse the ISO week, create a Date for Monday of that week, add `n*7` days, then recalculate weekId from that date.
-- Both tabs should show a visual indicator when viewing next week (e.g., "(Next Week)" label, different background)
-- Only allow offset 0 (current) and +1 (next week). Don't allow browsing arbitrarily far ahead.
-
-### Task 3: Wire Everything Together
-- Add `week-archive.js` to `index.html` script tags (before `app.js`)
-- Add to `sw.js` ASSETS array
-- Update `MODULARIZATION.md`
-- In `app.js` init, call the auto-archive check
-- Test the full flow
-
-## Key Data Structures (from what I learned)
-
-### In `core.js`:
-- `weekId()` returns e.g. `"2026-W07"`
-- `weekData(wk)` returns `d.weeks[wk]` ensuring it exists with `{goals:[], days:{}}`
-- `dayData()` returns today's data
-- `load()` / `save()` for localStorage
-
-### Weekly goals storage:
-- `d.weekGoals[weekId()] = { work: html, school: html, life: html }`
-- `d.dissWeeklyGoals[weekId()] = html` (this syncs to/from weekGoals.school)
-- `d.weeks[weekId()].goals` = array of custom goals `{text, cat, done}`
-- `d.weeks[weekId()].review` = `{well, bad, imp, push, ts}`
-
-### Week tab rendering:
-- `renderWeek()` in week.js line 2 — sets wk-date, computes targets
-- `loadWeekGoals()` in week.js line 72 — loads rich-text into wg-work/school/life editors
-- `saveWeekGoals(cat)` in week.js line 61 — saves from editors to data
-
-### Dissertation weekly goals:
-- Rendered in `renderDiss()` in dissertation.js around line 362
-- `saveDissWeeklyGoals()` saves to `d.dissWeeklyGoals[weekId()]`
-
-## Files to Create/Modify
-| File | Action |
-|------|--------|
-| `week-archive.js` | CREATE — archive, email, log rendering |
-| `week.js` | MODIFY — add arrow nav for goals offset |
-| `dissertation.js` | MODIFY — add arrow nav for diss goals offset |
-| `core.js` | MODIFY — add `offsetWeekId()` utility |
-| `index.html` | MODIFY — add arrow buttons to week/diss headers (already has archive section) |
-| `app.js` | MODIFY — call auto-archive check on init, add week-archive to render pipeline |
-| `sw.js` | MODIFY — add week-archive.js to ASSETS |
-| `MODULARIZATION.md` | MODIFY — document new module |
+## Continuation Prompt
+```
+Continue the weekly archive feature. Read continuation.md for context. Remaining tasks:
+1. Add 'week-archive.js' to sw.js ASSETS array
+2. Add week-archive.js entry to MODULARIZATION.md
+3. Git commit all changes
+4. Test the site in browser to verify everything works
+5. Consider EmailJS setup instructions for the user

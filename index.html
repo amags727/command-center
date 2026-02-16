@@ -339,7 +339,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="tab" id="tab-week">
 <h1>📊 Week of <span id="wk-date"></span></h1>
 <div class="card">
-<h3>🎯 Weekly Goals</h3>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="wk-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
 <div style="margin-bottom:10px">
   <h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4>
   <div id="wg-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
@@ -406,7 +406,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="tab" id="tab-dissertation">
 <h1>📝 Dissertation</h1>
 <div class="card">
-<h3>🎯 Weekly Goals</h3>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 <span id="diss-week-label">Weekly Goals</span></h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftDissWeekGoals(-1)">◀</button><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftDissWeekGoals(1)">▶</button><span id="diss-week-indicator" style="display:none;font-size:11px;color:var(--orange);font-weight:600">⚠ Next Week</span></div>
 <div id="diss-weekly-goals" contenteditable="true" class="wg-editor" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
 <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
 <span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
@@ -698,6 +698,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
 <div class="card"><h3>📖 Confession / Note</h3><div class="flex"><textarea class="fin flex-1" id="confess-in" placeholder="Honest note to future self..." rows="2"></textarea><button class="btn btn-s" onclick="addConfession()">Log</button></div></div>
 <div id="log-entries" style="max-height:500px;overflow-y:auto"></div>
+<div class="card" style="margin-top:12px"><h3>📦 Weekly Archives</h3><button class="btn btn-s" onclick="manualArchiveWeek()" style="margin-bottom:8px">📸 Archive Current Week + Email</button><div id="week-archives"></div></div>
 <div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
 </div>
 
@@ -715,6 +716,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <script src="translate.js"></script>
 <script src="aotd.js"></script>
 <script src="meals.js"></script>
+<script src="week-archive.js"></script>
 <script src="app.js"></script>
 <script src="firebase-sync.js"></script>
 <script>
