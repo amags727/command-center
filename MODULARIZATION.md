@@ -16,6 +16,7 @@
 <script src="translate.js"></script>      <!-- Read/Translate tab -->
 <script src="aotd.js"></script>           <!-- Article of the Day -->
 <script src="meals.js"></script>          <!-- Meal Planning tab -->
+<script src="week-archive.js"></script>   <!-- Weekly archive snapshots + log view -->
 <script src="app.js"></script>            <!-- orchestration: nav, notes, keyboard, init -->
 <script src="firebase-sync.js"></script>  <!-- sync layer (last) -->
 ```
@@ -62,6 +63,14 @@ Italian reading & translation (Read tab):
 Article of the Day:
 `renderAOTD()`, `fetchArticle()`, `generateQuestions()`, `submitAnswers()`
 
+### week-archive.js (~200 lines)
+- `archiveWeek(wid)` — snapshot week data into `d.weekArchives[wid]`
+- `buildArchiveEmail(wid, archive)` — generate Gmail-friendly HTML summary
+- `sendArchiveEmail(wid)` — send via EmailJS
+- `manualArchiveWeek()` — button handler for manual archive+email
+- `renderWeekArchives()` — collapsible Year→Month→Week tree on Log tab
+- `checkWeekTransition()` — auto-archive on week rollover
+
 ### meals.js (~407 lines)
 Meal Planning tab — day type toggle, food submission (photo/text/stored), Claude macro analysis, circular progress rings, stored meal library:
 `renderMeals()`, `setDayType()`, `renderMacroRings()`, `renderMealLog()`, `removeMealEntry()`, `renderStoredMeals()`, `toggleMealLibrary()`, `filterMealLibrary()`, `quickAddStoredMeal()`, `deleteStoredMeal()`, `editStoredMeal()`, `mealNameInput()`, `selectAutocomplete()`, `mealImageSelected()`, `clearMealImage()`, `initMealPasteHandler()`, `submitFood()`, `analyzeFoodWithClaude()`
@@ -90,7 +99,7 @@ Firebase sync layer (loaded last):
 | Read | translate.js + flashcard-review.js | tab-translate |
 | Claude | chat.js + flashcard-review.js | tab-claude |
 | Meals | meals.js | tab-meals |
-| Log | app.js (renderLog, addConfession, export/import) | tab-log |
+| Log | app.js (renderLog, addConfession, export/import), week-archive.js (renderWeekArchives) | tab-log |
 
 ## Backup
 `app.js.bak` contains the original 2,568-line monolith. Safe to delete once satisfied with the modularization.
