@@ -324,15 +324,33 @@ function saveDissWeeklyGoals() {
   const targetWk = _activeDissWeekId();
   if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
   d.dissWeeklyGoals[targetWk] = el.innerHTML;
+  // Always sync to weekGoals.school for the target week (not just current)
+  if (!d.weekGoals) d.weekGoals = {};
+  if (!d.weekGoals[targetWk]) d.weekGoals[targetWk] = {};
+  d.weekGoals[targetWk].school = el.innerHTML;
   save(d);
-  if (_dissWeekOffset === 0 && typeof populateSchoolWeeklyGoals === 'function') populateSchoolWeeklyGoals();
+  // If editing current week, also update the visible Week tab element
+  if (_dissWeekOffset === 0) {
+    const wgEl = document.getElementById('wg-school');
+    if (wgEl) wgEl.innerHTML = el.innerHTML;
+  }
 }
 
 function loadDissWeeklyGoals() {
   const el = document.getElementById('diss-weekly-goals');
   if (!el) return;
   const d = getGlobal();
-  el.innerHTML = (d.dissWeeklyGoals && d.dissWeeklyGoals[_activeDissWeekId()]) || '';
+  const targetWk = _activeDissWeekId();
+  let html = (d.dissWeeklyGoals && d.dissWeeklyGoals[targetWk]) || '';
+  // Fallback: if empty, check weekGoals.school
+  if (!html && d.weekGoals && d.weekGoals[targetWk] && d.weekGoals[targetWk].school) {
+    html = d.weekGoals[targetWk].school;
+    // Heal the split
+    if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
+    d.dissWeeklyGoals[targetWk] = html;
+    save(d);
+  }
+  el.innerHTML = html;
 }
 
 // Called when a day button (MON–SUN) is clicked.

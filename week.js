@@ -78,16 +78,37 @@ function saveWeekGoals(cat) {
   if (!d.weekGoals) d.weekGoals = {};
   if (!d.weekGoals[targetWk]) d.weekGoals[targetWk] = {};
   d.weekGoals[targetWk][cat] = el.innerHTML;
+  // Always sync school goals to dissWeeklyGoals for the target week
+  if (cat === 'school') {
+    if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
+    d.dissWeeklyGoals[targetWk] = el.innerHTML;
+  }
   save(d);
-  if (cat === 'school' && _weekGoalOffset === 0 && typeof populateDissWeeklyGoals === 'function') populateDissWeeklyGoals();
+  // If editing current week, also update the visible Dissertation tab element
+  if (cat === 'school' && _weekGoalOffset === 0) {
+    const dissEl = document.getElementById('diss-weekly-goals');
+    if (dissEl) dissEl.innerHTML = el.innerHTML;
+  }
 }
 
 function loadWeekGoals() {
   const d = getGlobal();
-  const wk = d.weekGoals && d.weekGoals[_activeWeekId()] || {};
+  const targetWk = _activeWeekId();
+  const wk = d.weekGoals && d.weekGoals[targetWk] || {};
   ['work','school','life'].forEach(cat => {
     const el = document.getElementById('wg-'+cat);
-    if (el) el.innerHTML = wk[cat] || '';
+    if (!el) return;
+    let html = wk[cat] || '';
+    // Fallback: if school is empty, check dissWeeklyGoals
+    if (cat === 'school' && !html && d.dissWeeklyGoals && d.dissWeeklyGoals[targetWk]) {
+      html = d.dissWeeklyGoals[targetWk];
+      // Heal the split: persist into weekGoals too
+      if (!d.weekGoals) d.weekGoals = {};
+      if (!d.weekGoals[targetWk]) d.weekGoals[targetWk] = {};
+      d.weekGoals[targetWk].school = html;
+      save(d);
+    }
+    el.innerHTML = html;
   });
 }
 
