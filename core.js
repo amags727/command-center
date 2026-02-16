@@ -3,7 +3,7 @@ const KEY = 'cmdcenter';
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
 function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
 function today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-function weekId(d) { const dt = new Date(d || today()); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(dt.setDate(diff)); return mon.getFullYear() + '-' + String(mon.getMonth() + 1).padStart(2, '0') + '-' + String(mon.getDate()).padStart(2, '0'); }
+function weekId(d) { const raw = d || today(); const dt = new Date(raw.length > 10 ? raw : raw + 'T00:00:00'); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); const mon = new Date(dt.setDate(diff)); return mon.getFullYear() + '-' + String(mon.getMonth() + 1).padStart(2, '0') + '-' + String(mon.getDate()).padStart(2, '0'); }
 function dayData(date) { const d = load(); if (!d.days) d.days = {}; if (!d.days[date]) d.days[date] = { habits: {}, blocks: [], top3: [], intentions: [], bundles: [], reflection: '', sealed: false, distractions: [], energy: [], dissTime: 0 }; return d; }
 function weekData(wk) { const d = load(); if (!d.weeks) d.weeks = {}; if (!d.weeks[wk]) d.weeks[wk] = { goals: [], review: null, pushGoal: '' }; return d; }
 function getGlobal() { const d = load(); if (!d.chapters) d.chapters = []; if (!d.dissSessions) d.dissSessions = []; if (!d.log) d.log = []; if (!d.chatHistory) d.chatHistory = []; if (!d.ankiCards) d.ankiCards = []; if (!d.corrections) d.corrections = []; return d; }
