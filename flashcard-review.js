@@ -7,8 +7,9 @@ const FLASH_CARD_RULES = `Core Structure Rules:
 
 Definition / Translation Card Rules:
 - The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
-- Default: Italian-language definition, idiomatic, modern, explanatory (not dictionary-literal).
-- Exception: Use English on prompt side for discourse markers, stance-setting expressions, long propositional phrases.
+- Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
+- The only exception for English on the prompt side is long extended phrases or introductory/discourse expressions (e.g. "per inciso", "As someone who...", "To decide what truly matters to me") where an Italian paraphrase would be disproportionately longer than just providing the English equivalent. If in doubt, use Italian.
+- When the target word is a conjugated verb, the definition card should present the word in its infinitive form. (Cloze cards can use whatever conjugation fits the sentence.)
 - Answer side always includes: the Italian target word/expression + a brief English gloss.
 - The gloss should flag register (colloquial, informal, legal, literary, vulgar, etc.) and if the term is archaic or has a more common modern alternative.
 - Prefer natural Italian over calques.
