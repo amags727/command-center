@@ -20,6 +20,7 @@ function archiveWeek(wk) {
         habits: day.habits || {},
         top3: day.top3 || [],
         reflection: day.reflection || '',
+        notes: day.notes || '',
         sealed: day.sealed || false,
         dissTime: day.dissTime || 0,
         energy: day.energy || []
@@ -115,6 +116,10 @@ function generateWeekEmailBody(snapshot) {
     if (!ds) { lines.push(`${date}: no data`); return; }
     const habits = Object.entries(ds.habits || {}).filter(([,v])=>v).map(([k])=>k).join(', ');
     lines.push(`${date}: ${habits || 'no habits'} | diss: ${ds.dissTime||0}m | ${ds.sealed ? 'sealed' : 'open'}`);
+    if (ds.notes) {
+      const noteText = strip(ds.notes).trim();
+      if (noteText) lines.push(`  daily notes: ${noteText.substring(0,200)}${noteText.length>200?'...':''}`);
+    }
     if (ds.reflection) lines.push(`  reflection: ${ds.reflection.substring(0,120)}${ds.reflection.length>120?'...':''}`);
   });
 
@@ -151,6 +156,13 @@ function checkWeekTransition() {
       archiveWeek(d.lastActiveWeek);
       // Don't auto-email — just archive silently
     }
+    // Clear old week's daily notes so they don't appear on the new week page
+    const oldDates = weekDates(d.lastActiveWeek);
+    oldDates.forEach(date => {
+      if (d.days && d.days[date] && d.days[date].notes) {
+        d.days[date].notes = '';
+      }
+    });
   }
   if (d.lastActiveWeek !== currentWk) {
     d.lastActiveWeek = currentWk;
@@ -253,6 +265,9 @@ function renderArchiveWeekCard(snap) {
     if (!ds) { html += `<div style="color:#555;">${date}: no data</div>`; return; }
     const habits = Object.entries(ds.habits||{}).filter(([,v])=>v).map(([k])=>k).join(', ');
     html += `<div style="margin:2px 0;color:#bbb;"><strong>${date}</strong>: ${habits||'—'} | diss:${ds.dissTime||0}m ${ds.sealed?'🔒':''}</div>`;
+    if (ds.notes && ds.notes.replace(/<[^>]*>/g,'').trim()) {
+      html += `<div style="margin:2px 0 8px 12px;padding:6px 10px;background:#222;border-left:3px solid #555;border-radius:4px;color:#ccc;font-size:0.9em;">${ds.notes}</div>`;
+    }
   });
   html += '</div></details>';
 
