@@ -142,8 +142,8 @@ function renderStoredMeals(filter) {
   el.innerHTML = filtered.map(m =>
     '<div class="meal-lib-item">' +
     '<div class="meal-lib-info">' +
-    '<span class="meal-lib-name">' + escHtml(m.name) + '</span>' +
-    (m.description ? '<span class="meal-lib-desc" style="font-size:11px;color:var(--muted);display:block;margin-top:1px">' + escHtml(m.description) + '</span>' : '') +
+    '<span class="meal-lib-name" contenteditable="true" data-meal-id="' + m.id + '" data-field="name" onblur="inlineEditStoredMeal(this)" title="Click to edit name">' + escHtml(m.name) + '</span>' +
+    '<span class="meal-lib-desc" contenteditable="true" data-meal-id="' + m.id + '" data-field="description" onblur="inlineEditStoredMeal(this)" style="font-size:11px;color:var(--muted);display:block;margin-top:1px" title="Click to edit description">' + escHtml(m.description || '') + '</span>' +
     '<span class="meal-lib-macros">' + m.calories + ' kcal · ' + m.protein + 'g P · ' + m.carbs + 'g C · ' + m.fat + 'g F</span>' +
     '</div>' +
     '<div class="meal-lib-actions">' +
@@ -164,6 +164,18 @@ function toggleMealLibrary() {
     body.style.display = 'none';
     chevron.textContent = '▶';
   }
+}
+
+function inlineEditStoredMeal(el) {
+  const id = el.dataset.mealId;
+  const field = el.dataset.field;
+  const val = el.textContent.trim();
+  const d = getGlobal();
+  const meal = (d.mealLibrary || []).find(m => m.id === id);
+  if (!meal) return;
+  if (field === 'name' && val) meal.name = val;
+  else if (field === 'description') meal.description = val;
+  save(d);
 }
 
 function filterMealLibrary() {
