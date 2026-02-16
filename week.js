@@ -335,6 +335,22 @@ document.addEventListener('keydown', function(e) {
   if (e.key !== 'Enter') return;
   const el = document.activeElement;
   if (!el || !el.classList.contains('wg-editor')) return;
+
+  // If cursor is inside a .wg-col, force <br> insertion to prevent
+  // the browser from creating a sibling div that looks like a new column
+  const sel0 = window.getSelection();
+  if (sel0.rangeCount) {
+    let n = sel0.getRangeAt(0).startContainer;
+    while (n && n !== el) {
+      if (n.nodeType === 1 && n.classList && n.classList.contains('wg-col')) {
+        e.preventDefault();
+        document.execCommand('insertLineBreak');
+        _saveActiveEditor(el);
+        return;
+      }
+      n = n.parentNode;
+    }
+  }
   // Let default Enter happen first, then clean up the new line
   setTimeout(function() {
     const sel = window.getSelection();
