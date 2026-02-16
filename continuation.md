@@ -1,46 +1,107 @@
-# Continuation: Weekly Goals Bugs
+# Continuation: Weekly Transition System
 
-## What was done
-1. **Tab indent fix (app.js):** Rewrote `_handleNotesTab` to always `preventDefault()` inside wg-editors and today-notes. When cursor is in an `<li>`, uses DOM manipulation (move `<li>` into nested list for indent, move out for outdent). When not in a list, falls back to `execCommand('indent')`/`execCommand('outdent')`.
+## What Was Done
+1. **Log tab updated in `index.html`**: Added "Weekly Archives" section with `manualArchiveWeek()` button and `#week-archives` container div. Also added the `📋 Log` nav button.
 
-2. **Cmd+Shift+8 shortcut:** Already works — fires `document.execCommand('insertUnorderedList')` when `metaKey && shiftKey && code === 'Digit8'` in any contenteditable.
+## What Remains
 
-## What remains
+### Task 1: Week Archive System (new module: `week-archive.js`)
+Create `week-archive.js` (~300 lines estimated) that handles:
 
-### Issue 2: Strikethrough propagation on Enter
-**Problem:** When pressing Enter after a crossed-off (checked) item in weekly goals, the new line inherits the strikethrough.
-**Location:** `week.js` lines ~160-196, the Enter keydown handler.
-**Current code:** The handler tries to detect `<s>`, `<del>`, or `style.textDecoration.includes('line-through')` and runs `document.execCommand('strikethrough')` to toggle it off. This may not be working because:
-- The strikethrough might be applied via CSS class rather than `<s>` tag
-- The `execCommand('strikethrough')` toggle might not work when the line is empty
-- The detection loop may not be reaching the right ancestor node
-**Fix approach:** After the default Enter creates the new line, forcibly remove any `<s>`, `<del>` wrapper tags around the cursor position and clear `textDecoration` style. Don't rely on `execCommand('strikethrough')` — do direct DOM unwrapping instead.
+#### A. Snapshot/Freeze a Week
+- `archiveWeek(weekKey)` — takes a weekId like `2026-W07` and:
+  - Reads `weekData(wk)` for targets (gym, anki, articles, convo, refl, diss hours, social)
+  - Reads `weekGoals[wk]` for work/school/life rich-text goals
+  - Reads `dissWeeklyGoals[wk]` for dissertation weekly goals
+  - Reads `weeks[wk].goals` for custom weekly goals
+  - Reads `weeks[wk].review` for weekly review answers
+  - Reads daily summaries for each day of the week
+  - Stores all this as `d.weekArchives[wk] = { ...snapshot, archivedAt: ISO timestamp }`
+  - Calls `save(d)`
 
-### Issue 3: Highlight issues on School section
-**Problem:** Highlights not working properly on School.
-**Root cause:** `populateSchoolWeeklyGoals()` (week.js ~200) **overwrites** `wg-school` innerHTML from `d.dissWeeklyGoals` data. And `saveWeekGoals('school')` triggers `populateDissWeeklyGoals()` which syncs back. This bidirectional sync between dissertation weekly goals and school weekly goals may cause race conditions where highlights are stripped during save/load cycles.
-**Fix approach:** Check if the School→Diss sync is stripping highlight spans. The `populateSchoolWeeklyGoals` function reads from `d.dissWeeklyGoals[weekId()]` which may not have the highlight data. Need to ensure the canonical source for school weekly goals is `d.weekGoals[weekId()].school`, not `d.dissWeeklyGoals`.
+#### B. Email Summary
+- `emailWeekSummary(weekKey)` — generates HTML email and opens `mailto:` link or uses a simple email API
+  - **Recommended approach**: Generate the HTML summary, then open `mailto:xmagnuson@gmail.com?subject=...&body=...` (but mailto has body length limits)
+  - **Better approach**: Use the existing Claude/Anthropic API key to format, then use a mailto with plain text, OR use EmailJS (free tier) or similar
+  - **Simplest approach**: Generate a nicely formatted plain-text summary and open mailto link. Gmail handles plain text well.
+  - Content: week targets vs actuals, weekly goals, review answers, daily summaries
 
-### Issue 4: Highlight stacking (multiple colors)
-**Problem:** Multiple highlight colors can stack on the same text. Should only allow one day-color at a time.
-**Location:** `weekGoalAssignDay()` in week.js (~83-110)
-**Current code:** Step 1 calls `_stripHighlightsInRange()` to remove existing highlights before applying new ones. The stripping works by unwrapping `[data-day]` spans. However:
-- After stripping, the selection (`sel2`) may be collapsed or shifted, so the new highlight wrap may not cover the right text
-- Nested highlight spans may survive if the range doesn't fully intersect them
-**Fix approach:** After `_stripHighlightsInRange`, normalize the container and re-select the text before wrapping. Also ensure `_stripHighlightsInRange` handles partially-selected spans (where the span extends beyond the selection range).
+#### C. Log Page Rendering
+- `renderWeekArchives()` — renders into `#week-archives` div
+  - Collapsible hierarchy: Year → Month → Week
+  - Each year is a collapsible section (default collapsed)
+  - Each month within a year is collapsible (default collapsed)
+  - Each week shows the frozen snapshot when expanded
+  - Parse weekId `2026-W07` to determine year and month (use the Monday of that week)
+- `manualArchiveWeek()` — called from the button, archives current week + triggers email
 
-## Files affected
-- `week.js` — Enter handler (strikethrough), highlight functions, school/diss sync
-- `app.js` — Tab handler (already fixed)
+#### D. Auto-archive on Week Transition
+- In `app.js` or `week-archive.js`, on app init, check if the current weekId differs from `d.lastActiveWeek`
+  - If so, auto-archive the previous week (if not already archived)
+  - Update `d.lastActiveWeek = weekId()`
+  - This handles the "freeze in place" requirement
 
-## Continuation prompt
-```
-I need to fix 3 remaining bugs in the weekly goals page (week.js):
+### Task 2: Arrow Navigation for Weekly Goals (next-week planning)
 
-1. **Strikethrough propagation:** When pressing Enter after a strikethrough item, the new line inherits the strikethrough. The Enter handler at ~line 160 tries to use execCommand('strikethrough') to toggle it off but it's not working. Fix by doing direct DOM unwrapping of <s>, <del> tags and clearing textDecoration style on the new line's ancestors, instead of relying on execCommand.
+#### In `week.js`:
+- The weekly goals header currently shows `📊 Week of <span id="wk-date"></span>`
+- Add left/right arrow buttons: `◀ ▶` next to the week date
+- Track a `_weekGoalOffset` variable (0 = current week, 1 = next week, -1 would show previous but we only need +1)
+- `saveWeekGoals(cat)` currently keys on `weekId()` — needs to key on `weekId() + offset`
+- `loadWeekGoals()` needs the same offset awareness
+- Helper: `offsetWeekId(weekId, offset)` — returns the weekId N weeks ahead/behind
+  - Parse `2026-W07`, add offset to week number, handle year boundaries
 
-2. **Highlight on School section:** The bidirectional sync between school weekly goals and dissertation weekly goals (populateSchoolWeeklyGoals at ~line 200 and populateDissWeeklyGoals at ~line 212) may be stripping highlight spans during save/load. The canonical data source should be weekGoals[weekId()].school, and highlight data-day spans must survive the sync cycle.
+#### In `dissertation.js`:
+- Same pattern: `dissWeeklyGoals` already keys on `weekId()`
+- Add arrows to the dissertation weekly goals header
+- `saveDissWeeklyGoals()` and the load in `renderDiss()` need offset awareness
+- Since diss weekly goals sync to week.js school goals, the offset logic must be consistent
 
-3. **Highlight stacking:** weekGoalAssignDay() at ~line 83 strips existing highlights before applying new ones, but the selection may shift after stripping, causing the new highlight to not cover the right text, or nested spans to survive. After stripping, normalize the container, re-acquire the selection properly, and ensure partial-intersection spans are fully handled.
+#### Implementation Notes:
+- `weekId()` in `core.js` returns current week. We need an `offsetWeekId(base, n)` utility.
+- The simplest implementation of `offsetWeekId`: parse the ISO week, create a Date for Monday of that week, add `n*7` days, then recalculate weekId from that date.
+- Both tabs should show a visual indicator when viewing next week (e.g., "(Next Week)" label, different background)
+- Only allow offset 0 (current) and +1 (next week). Don't allow browsing arbitrarily far ahead.
 
-Read week.js (lines 70-230) to understand the current implementation, then fix all three issues.
+### Task 3: Wire Everything Together
+- Add `week-archive.js` to `index.html` script tags (before `app.js`)
+- Add to `sw.js` ASSETS array
+- Update `MODULARIZATION.md`
+- In `app.js` init, call the auto-archive check
+- Test the full flow
+
+## Key Data Structures (from what I learned)
+
+### In `core.js`:
+- `weekId()` returns e.g. `"2026-W07"`
+- `weekData(wk)` returns `d.weeks[wk]` ensuring it exists with `{goals:[], days:{}}`
+- `dayData()` returns today's data
+- `load()` / `save()` for localStorage
+
+### Weekly goals storage:
+- `d.weekGoals[weekId()] = { work: html, school: html, life: html }`
+- `d.dissWeeklyGoals[weekId()] = html` (this syncs to/from weekGoals.school)
+- `d.weeks[weekId()].goals` = array of custom goals `{text, cat, done}`
+- `d.weeks[weekId()].review` = `{well, bad, imp, push, ts}`
+
+### Week tab rendering:
+- `renderWeek()` in week.js line 2 — sets wk-date, computes targets
+- `loadWeekGoals()` in week.js line 72 — loads rich-text into wg-work/school/life editors
+- `saveWeekGoals(cat)` in week.js line 61 — saves from editors to data
+
+### Dissertation weekly goals:
+- Rendered in `renderDiss()` in dissertation.js around line 362
+- `saveDissWeeklyGoals()` saves to `d.dissWeeklyGoals[weekId()]`
+
+## Files to Create/Modify
+| File | Action |
+|------|--------|
+| `week-archive.js` | CREATE — archive, email, log rendering |
+| `week.js` | MODIFY — add arrow nav for goals offset |
+| `dissertation.js` | MODIFY — add arrow nav for diss goals offset |
+| `core.js` | MODIFY — add `offsetWeekId()` utility |
+| `index.html` | MODIFY — add arrow buttons to week/diss headers (already has archive section) |
+| `app.js` | MODIFY — call auto-archive check on init, add week-archive to render pipeline |
+| `sw.js` | MODIFY — add week-archive.js to ASSETS |
+| `MODULARIZATION.md` | MODIFY — document new module |
