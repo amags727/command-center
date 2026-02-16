@@ -260,6 +260,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <button onclick="switchTab('translate')">🇮🇹 Read</button>
 <button onclick="switchTab('claude')">🤖 Claude</button>
 <button onclick="switchTab('log')">📋 Log</button>
+<button onclick="forceUpdate()" title="Force update" style="margin-left:auto;font-size:16px;padding:8px 10px">⟳</button>
 </nav>
 
 <!-- TODAY -->
@@ -486,10 +487,10 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <div id="study-back" style="display:none;padding:16px 10px;border-top:1px dashed var(--border);margin-top:12px">
 <div id="study-back-content" style="font-size:1.2em;margin-bottom:16px"></div>
 <div class="flex" style="justify-content:center;gap:6px;flex-wrap:wrap">
-<button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);min-width:70px" onclick="rateCard(1)">Again<br><span style="font-size:10px">&lt;1min</span></button>
-<button class="btn" style="background:var(--orange);color:#fff;border-color:var(--orange);min-width:70px" onclick="rateCard(2)">Hard<br><span style="font-size:10px" id="hard-ivl"></span></button>
-<button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);min-width:70px" onclick="rateCard(3)">Good<br><span style="font-size:10px" id="good-ivl"></span></button>
-<button class="btn" style="background:var(--blue);color:#fff;border-color:var(--blue);min-width:70px" onclick="rateCard(4)">Easy<br><span style="font-size:10px" id="easy-ivl"></span></button>
+<button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);min-width:70px" onclick="event.stopPropagation();rateCard(1)">Again<br><span style="font-size:10px">&lt;1min</span></button>
+<button class="btn" style="background:var(--orange);color:#fff;border-color:var(--orange);min-width:70px" onclick="event.stopPropagation();rateCard(2)">Hard<br><span style="font-size:10px" id="hard-ivl"></span></button>
+<button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);min-width:70px" onclick="event.stopPropagation();rateCard(3)">Good<br><span style="font-size:10px" id="good-ivl"></span></button>
+<button class="btn" style="background:var(--blue);color:#fff;border-color:var(--blue);min-width:70px" onclick="event.stopPropagation();rateCard(4)">Easy<br><span style="font-size:10px" id="easy-ivl"></span></button>
 </div>
 </div>
 <p style="font-size:11px;color:var(--muted);margin-top:10px;cursor:pointer" onclick="flipCard()" id="study-hint">tap to flip</p>
