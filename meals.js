@@ -28,14 +28,19 @@ function renderMeals() {
   document.getElementById('meal-day-rest').classList.toggle('active', m.dayType === 'rest');
   document.getElementById('meal-targets-display').innerHTML =
     '<b>' + targets.calories + '</b> kcal &nbsp; <b>' + targets.protein + 'g</b> P &nbsp; <b>' + targets.carbs + 'g</b> C &nbsp; <b>' + targets.fat + 'g</b> F';
-  // Totals
+  // Totals (qty-aware)
   const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   (m.entries || []).forEach(e => {
-    totals.calories += e.calories || 0;
-    totals.protein += e.protein || 0;
-    totals.carbs += e.carbs || 0;
-    totals.fat += e.fat || 0;
+    const q = e.qty || 1;
+    totals.calories += (e.unitCal != null ? e.unitCal : (e.calories || 0)) * q;
+    totals.protein += (e.unitProt != null ? e.unitProt : (e.protein || 0)) * q;
+    totals.carbs += (e.unitCarb != null ? e.unitCarb : (e.carbs || 0)) * q;
+    totals.fat += (e.unitFat != null ? e.unitFat : (e.fat || 0)) * q;
   });
+  totals.calories = Math.round(totals.calories);
+  totals.protein = Math.round(totals.protein);
+  totals.carbs = Math.round(totals.carbs);
+  totals.fat = Math.round(totals.fat);
   renderMacroRings(totals, targets);
   renderMealLog(m.entries || []);
   renderStoredMeals('');
@@ -90,13 +95,31 @@ function renderMealLog(entries) {
     el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:10px">No food logged yet today.</p>';
     return;
   }
-  el.innerHTML = entries.map((e, i) =>
-    '<div class="meal-entry">' +
-    '<div class="meal-entry-name">' + escHtml(e.name) + '</div>' +
-    '<div class="meal-entry-macros">' + (e.calories||0) + ' kcal · ' + (e.protein||0) + 'g P · ' + (e.carbs||0) + 'g C · ' + (e.fat||0) + 'g F</div>' +
-    '<button onclick="removeMealEntry(' + i + ')" title="Remove" style="background:none;border:none;color:var(--red);font-size:16px;padding:2px 6px;cursor:pointer">✕</button>' +
-    '</div>'
-  ).join('');
+  el.innerHTML = entries.map((e, i) => {
+    const q = e.qty || 1;
+    const uc = e.unitCal != null ? e.unitCal : (e.calories || 0);
+    const up = e.unitProt != null ? e.unitProt : (e.protein || 0);
+    const ucb = e.unitCarb != null ? e.unitCarb : (e.carbs || 0);
+    const uf = e.unitFat != null ? e.unitFat : (e.fat || 0);
+    const dc = Math.round(uc * q), dp = Math.round(up * q), dcb = Math.round(ucb * q), df = Math.round(uf * q);
+    return '<div class="meal-entry">' +
+      '<div class="meal-entry-name">' + escHtml(e.name) + '</div>' +
+      '<input type="number" class="meal-qty-input" value="' + q + '" min="0.25" step="0.25" onchange="updateMealQty(' + i + ',this.value)" title="Quantity">' +
+      '<div class="meal-entry-macros">' + dc + ' kcal · ' + dp + 'g P · ' + dcb + 'g C · ' + df + 'g F</div>' +
+      '<button onclick="removeMealEntry(' + i + ')" title="Remove" style="background:none;border:none;color:var(--red);font-size:16px;padding:2px 6px;cursor:pointer">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function updateMealQty(idx, val) {
+  const dd = dayData(today());
+  const entries = dd.days[today()].meals.entries;
+  if (!entries[idx]) return;
+  const q = parseFloat(val);
+  if (isNaN(q) || q <= 0) return;
+  entries[idx].qty = q;
+  save(dd);
+  renderMeals();
 }
 
 function removeMealEntry(idx) {
@@ -374,8 +397,9 @@ function _addFoodEntry(name, cal, prot, carb, fat) {
   const dd = dayData(today());
   if (!dd.days[today()].meals) dd.days[today()].meals = { dayType: 'workout', entries: [] };
   dd.days[today()].meals.entries.push({
-    name: name, calories: cal, protein: prot, carbs: carb, fat: fat,
-    timestamp: new Date().toISOString()
+    name: name, unitCal: cal, unitProt: prot, unitCarb: carb, unitFat: fat,
+    calories: cal, protein: prot, carbs: carb, fat: fat,
+    qty: 1, timestamp: new Date().toISOString()
   });
   save(dd);
 }
