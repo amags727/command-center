@@ -9,3 +9,6 @@ function weekData(wk) { const d = load(); if (!d.weeks) d.weeks = {}; if (!d.wee
 function getGlobal() { const d = load(); if (!d.chapters) d.chapters = []; if (!d.dissSessions) d.dissSessions = []; if (!d.log) d.log = []; if (!d.chatHistory) d.chatHistory = []; if (!d.ankiCards) d.ankiCards = []; if (!d.corrections) d.corrections = []; return d; }
 function addLog(type, msg) { const d = load(); if (!d.log) d.log = []; d.log.unshift({ type, msg, ts: new Date().toISOString() }); if (d.log.length > 500) d.log = d.log.slice(0, 500); save(d); }
 function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function offsetWeekId(baseWeek, n) { const dt = new Date(baseWeek + 'T00:00:00'); dt.setDate(dt.getDate() + n * 7); return weekId(dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0')); }
+function weekMonday(wk) { return new Date(wk + 'T00:00:00'); }
+function weekDates(wk) { const mon = weekMonday(wk); return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }); }

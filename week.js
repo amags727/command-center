@@ -1,4 +1,16 @@
 // ============ WEEK TAB ============
+let _weekGoalOffset = 0;
+function _activeWeekId() { return _weekGoalOffset === 0 ? weekId() : offsetWeekId(weekId(), _weekGoalOffset); }
+function shiftWeekGoals(dir) {
+  const newOff = _weekGoalOffset + dir;
+  if (newOff < 0 || newOff > 1) return;
+  _weekGoalOffset = newOff;
+  loadWeekGoals();
+  const label = document.getElementById('wk-goal-label');
+  if (label) label.textContent = _weekGoalOffset === 0 ? 'This Week' : 'Next Week (' + _activeWeekId() + ')';
+  const indicator = document.getElementById('wk-goal-indicator');
+  if (indicator) indicator.style.display = _weekGoalOffset === 0 ? 'none' : 'inline';
+}
 function renderWeek() {
   const wk = weekId(); document.getElementById('wk-date').textContent = wk;
   const d = load(), days = d.days || {};
@@ -62,16 +74,17 @@ function saveWeekGoals(cat) {
   const el = document.getElementById('wg-'+cat);
   if (!el) return;
   const d = getGlobal();
+  const targetWk = _activeWeekId();
   if (!d.weekGoals) d.weekGoals = {};
-  if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
-  d.weekGoals[weekId()][cat] = el.innerHTML;
+  if (!d.weekGoals[targetWk]) d.weekGoals[targetWk] = {};
+  d.weekGoals[targetWk][cat] = el.innerHTML;
   save(d);
-  if (cat === 'school' && typeof populateDissWeeklyGoals === 'function') populateDissWeeklyGoals();
+  if (cat === 'school' && _weekGoalOffset === 0 && typeof populateDissWeeklyGoals === 'function') populateDissWeeklyGoals();
 }
 
 function loadWeekGoals() {
   const d = getGlobal();
-  const wk = d.weekGoals && d.weekGoals[weekId()] || {};
+  const wk = d.weekGoals && d.weekGoals[_activeWeekId()] || {};
   ['work','school','life'].forEach(cat => {
     const el = document.getElementById('wg-'+cat);
     if (el) el.innerHTML = wk[cat] || '';
