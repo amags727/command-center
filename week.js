@@ -27,6 +27,7 @@ function renderWeek() {
   renderCWG();
   renderDailySummaries();
   loadWeekGoals();
+  syncWeekGoalsDoneState();
 }
 function addCWG() { const v = document.getElementById('cw-in').value.trim(), cat = document.getElementById('cw-cat').value; if (!v) return; const wk = weekId(), wd = weekData(wk); wd.weeks[wk].goals.push({ text: v, cat, done: false }); save(wd); document.getElementById('cw-in').value = ''; renderCWG(); }
 function renderDailySummaries() {
@@ -73,15 +74,18 @@ function _saveActiveEditor(el) {
 function saveWeekGoals(cat) {
   const el = document.getElementById('wg-'+cat);
   if (!el) return;
+  // Clone and strip visual-only done markers before saving
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('[data-wg-done]').forEach(sp => sp.removeAttribute('data-wg-done'));
   const d = getGlobal();
   const targetWk = _activeWeekId();
   if (!d.weekGoals) d.weekGoals = {};
   if (!d.weekGoals[targetWk]) d.weekGoals[targetWk] = {};
-  d.weekGoals[targetWk][cat] = el.innerHTML;
+  d.weekGoals[targetWk][cat] = clone.innerHTML;
   // Always sync school goals to dissWeeklyGoals for the target week
   if (cat === 'school') {
     if (!d.dissWeeklyGoals) d.dissWeeklyGoals = {};
-    d.dissWeeklyGoals[targetWk] = el.innerHTML;
+    d.dissWeeklyGoals[targetWk] = clone.innerHTML;
   }
   save(d);
   // If editing current week, also update the visible Dissertation tab element
@@ -357,19 +361,26 @@ document.addEventListener('keydown', function(e) {
   const el = document.activeElement;
   if (!el || !el.classList.contains('wg-editor')) return;
 
-  // If cursor is inside a .wg-col, force <br> insertion to prevent
-  // the browser from creating a sibling div that looks like a new column
+  // If cursor is inside a .wg-col but NOT inside a list, force <br> insertion
+  // to prevent the browser from creating a sibling div that looks like a new column.
+  // If inside a list (ul/ol/li), let the browser handle Enter normally to create new <li>.
   const sel0 = window.getSelection();
   if (sel0.rangeCount) {
     let n = sel0.getRangeAt(0).startContainer;
+    let inCol = false, inList = false;
     while (n && n !== el) {
-      if (n.nodeType === 1 && n.classList && n.classList.contains('wg-col')) {
-        e.preventDefault();
-        document.execCommand('insertLineBreak');
-        _saveActiveEditor(el);
-        return;
+      if (n.nodeType === 1) {
+        if (n.classList && n.classList.contains('wg-col')) inCol = true;
+        const tag = n.nodeName;
+        if (tag === 'LI' || tag === 'UL' || tag === 'OL') inList = true;
       }
       n = n.parentNode;
+    }
+    if (inCol && !inList) {
+      e.preventDefault();
+      document.execCommand('insertLineBreak');
+      _saveActiveEditor(el);
+      return;
     }
   }
   // Let default Enter happen first, then clean up the new line
@@ -406,6 +417,43 @@ document.addEventListener('keydown', function(e) {
     _saveActiveEditor(el);
   }, 0);
 });
+
+/* Sync done state: scan this week's daily chips, mark matching weekly goal spans */
+function syncWeekGoalsDoneState() {
+  const d = load();
+  const wk = weekId();
+  const days = d.days || {};
+  // Collect all done chip texts per category across the week
+  const doneTexts = { work: new Set(), school: new Set(), life: new Set() };
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(wk);
+    dt.setDate(dt.getDate() + i);
+    const key = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+    const day = days[key];
+    if (!day || !day.t3intentions) continue;
+    const t3 = day.t3intentions;
+    ['work','school','life'].forEach(cat => {
+      (t3[cat] || []).forEach(chip => {
+        if (chip.done && chip.text && chip.text.trim()) {
+          doneTexts[cat].add(chip.text.trim());
+        }
+      });
+    });
+  }
+  // Apply/remove data-wg-done on [data-day] spans in each editor
+  ['work','school','life'].forEach(cat => {
+    const el = document.getElementById('wg-'+cat);
+    if (!el) return;
+    el.querySelectorAll('[data-day]').forEach(span => {
+      const text = span.textContent.trim();
+      if (doneTexts[cat].has(text)) {
+        span.setAttribute('data-wg-done', 'true');
+      } else {
+        span.removeAttribute('data-wg-done');
+      }
+    });
+  });
+}
 
 function populateSchoolWeeklyGoals() {
   const d = getGlobal();

@@ -227,6 +227,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 #diss-weekly-goals [data-day]{border-radius:2px;padding:0 2px}
 .wg-panel [data-day]{border-radius:2px;padding:0 2px}
 #wg-work [data-day],#wg-school [data-day],#wg-life [data-day]{border-radius:2px;padding:0 2px}
+#wg-work [data-wg-done],#wg-school [data-wg-done],#wg-life [data-wg-done]{text-decoration:line-through!important;opacity:.45}
 /* --- Goal Chips --- */
 .chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
 .goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:13px; line-height:1.5; max-width:100%; }
@@ -340,18 +341,18 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h1>📊 Week of <span id="wk-date"></span></h1>
 <div class="card">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="wk-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
-<div style="margin-bottom:10px">
-  <h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4>
+<details style="margin-bottom:10px">
+  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:4px">💼 Work</summary>
   <div id="wg-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
-</div>
-<div style="margin-bottom:10px">
-  <h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4>
+</details>
+<details style="margin-bottom:10px">
+  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🎓 School</summary>
   <div id="wg-school" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('school')"></div>
-</div>
-<div style="margin-bottom:10px">
-  <h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌿 Life</h4>
+</details>
+<details style="margin-bottom:10px">
+  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px">🌿 Life</summary>
   <div id="wg-life" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('life')"></div>
-</div>
+</details>
 <div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:4px">
   <span style="font-size:11px;color:var(--muted);margin-right:2px">Highlight:</span>
   <button class="btn btn-s wg-day-btn" data-day="mon" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>

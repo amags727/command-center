@@ -225,6 +225,8 @@ function _t3MakeChip(chipData, containerId, prefix) {
     if (chipData.dissLinked && typeof toggleDissGoalDone === 'function' && typeof getTodayDayKey === 'function') {
       toggleDissGoalDone(getTodayDayKey(), chipData.spanIndex, isDone);
     }
+    // Sync strikethrough on weekly goals page
+    if (typeof syncWeekGoalsDoneState === 'function') syncWeekGoalsDoneState();
   };
   chip.appendChild(chk);
   // Overdue badge
