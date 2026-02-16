@@ -143,6 +143,7 @@ function renderStoredMeals(filter) {
     '<div class="meal-lib-item">' +
     '<div class="meal-lib-info">' +
     '<span class="meal-lib-name">' + escHtml(m.name) + '</span>' +
+    (m.description ? '<span class="meal-lib-desc" style="font-size:11px;color:var(--muted);display:block;margin-top:1px">' + escHtml(m.description) + '</span>' : '') +
     '<span class="meal-lib-macros">' + m.calories + ' kcal · ' + m.protein + 'g P · ' + m.carbs + 'g C · ' + m.fat + 'g F</span>' +
     '</div>' +
     '<div class="meal-lib-actions">' +
@@ -199,11 +200,13 @@ function editStoredMeal(id) {
   const meal = (d.mealLibrary || []).find(m => m.id === id);
   if (!meal) return;
   const name = prompt('Meal name:', meal.name); if (name === null) return;
+  const descVal = prompt('Description:', meal.description || ''); if (descVal === null) return;
   const cal = prompt('Calories:', meal.calories); if (cal === null) return;
   const prot = prompt('Protein (g):', meal.protein); if (prot === null) return;
   const carb = prompt('Carbs (g):', meal.carbs); if (carb === null) return;
   const fat = prompt('Fat (g):', meal.fat); if (fat === null) return;
   meal.name = name.trim() || meal.name;
+  meal.description = descVal.trim();
   meal.calories = parseInt(cal) || meal.calories;
   meal.protein = parseInt(prot) || meal.protein;
   meal.carbs = parseInt(carb) || meal.carbs;
@@ -317,7 +320,7 @@ async function submitFood() {
     const carb = parseInt(document.getElementById('meal-carb-in').value) || 0;
     const fat = parseInt(document.getElementById('meal-fat-in').value) || 0;
     _addFoodEntry(name || desc || 'Meal', cal, prot, carb, fat);
-    _offerSaveMeal(name || desc || 'Meal', cal, prot, carb, fat);
+    _offerSaveMeal(name || desc || 'Meal', cal, prot, carb, fat, desc);
     _clearMealForm();
     renderMeals();
     return;
@@ -332,7 +335,7 @@ async function submitFood() {
     try {
       const result = await analyzeFoodWithClaude(key, _mealPendingImage, name, desc);
       _addFoodEntry(result.name, result.calories, result.protein, result.carbs, result.fat);
-      _offerSaveMeal(result.name, result.calories, result.protein, result.carbs, result.fat);
+      _offerSaveMeal(result.name, result.calories, result.protein, result.carbs, result.fat, desc);
       _clearMealForm();
       renderMeals();
     } catch (e) {
@@ -353,7 +356,7 @@ async function submitFood() {
     try {
       const result = await estimateMacrosWithClaude(key, name, desc);
       _addFoodEntry(result.name, result.calories, result.protein, result.carbs, result.fat);
-      _offerSaveMeal(result.name, result.calories, result.protein, result.carbs, result.fat);
+      _offerSaveMeal(result.name, result.calories, result.protein, result.carbs, result.fat, desc);
       _clearMealForm();
       renderMeals();
     } catch (e) {
@@ -459,7 +462,7 @@ function _addFoodEntry(name, cal, prot, carb, fat) {
   save(dd);
 }
 
-function _offerSaveMeal(name, cal, prot, carb, fat) {
+function _offerSaveMeal(name, cal, prot, carb, fat, desc) {
   if (!name || name === 'Food' || name === 'Meal') return;
   const d = getGlobal();
   if (!d.mealLibrary) d.mealLibrary = [];
@@ -468,7 +471,7 @@ function _offerSaveMeal(name, cal, prot, carb, fat) {
   if (confirm('Save "' + name + '" to your meal library?')) {
     d.mealLibrary.push({
       id: 'ml_' + Date.now(),
-      name: name, calories: cal, protein: prot, carbs: carb, fat: fat,
+      name: name, description: desc || '', calories: cal, protein: prot, carbs: carb, fat: fat,
       usageCount: 1
     });
     save(d);
