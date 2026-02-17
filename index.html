@@ -326,6 +326,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <button onclick="switchTab('translate')"><span class="nav-icon">🇮🇹</span><span class="nav-label">Read</span></button>
 <button onclick="switchTab('claude')"><span class="nav-icon">🤖</span><span class="nav-label">Claude</span></button>
 <button onclick="switchTab('meals')"><span class="nav-icon">🍽️</span><span class="nav-label">Meals</span></button>
+<button onclick="switchTab('progress')"><span class="nav-icon">📈</span><span class="nav-label">Progress</span></button>
 <button onclick="switchTab('log')"><span class="nav-icon">📋</span><span class="nav-label">Log</span></button>
 <button onclick="forceUpdate()" title="Force update" style="font-size:16px;padding:8px 10px;flex:none">⟳</button>
 </nav>
@@ -807,6 +808,21 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 </div>
 
+<!-- PROGRESS -->
+<div class="tab" id="tab-progress">
+<h2>📈 Progress</h2>
+<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+<button class="btn btn-s prog-range-btn" data-range="7d" onclick="setProgressRange('7d')">7d</button>
+<button class="btn btn-s prog-range-btn active" data-range="30d" onclick="setProgressRange('30d')">30d</button>
+<button class="btn btn-s prog-range-btn" data-range="ytd" onclick="setProgressRange('ytd')">YTD</button>
+<button class="btn btn-s prog-range-btn" data-range="all" onclick="setProgressRange('all')">All</button>
+</div>
+<p id="progress-empty" style="display:none;color:var(--muted);font-size:13px">No data yet — start using the app and charts will appear here.</p>
+<div class="card"><h3>🃏 Anki Activity</h3><div style="position:relative;height:280px"><canvas id="chart-anki"></canvas></div></div>
+<div class="card"><h3>🇮🇹 Italian Scores</h3><div style="position:relative;height:280px"><canvas id="chart-italian"></canvas></div></div>
+<div class="card"><h3>🍽️ Calories &amp; Protein</h3><div style="position:relative;height:280px"><canvas id="chart-nutrition"></canvas></div></div>
+</div>
+
 <div class="tab" id="tab-log">
 <h1>📋 Activity Log</h1>
 <div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
@@ -830,7 +846,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <script src="translate.js"></script>
 <script src="aotd.js"></script>
 <script src="meals.js"></script>
+<script src="progress.js"></script>
 <script src="week-archive.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
 <script src="firebase-sync.js"></script>
 <script>

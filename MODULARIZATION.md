@@ -16,6 +16,7 @@
 <script src="translate.js"></script>      <!-- Read/Translate tab -->
 <script src="aotd.js"></script>           <!-- Article of the Day -->
 <script src="meals.js"></script>          <!-- Meal Planning tab -->
+<script src="progress.js"></script>       <!-- Progress charts tab -->
 <script src="week-archive.js"></script>   <!-- Weekly archive snapshots + log view -->
 <script src="app.js"></script>            <!-- orchestration: nav, notes, keyboard, init -->
 <script src="firebase-sync.js"></script>  <!-- sync layer (last) -->
@@ -71,6 +72,10 @@ Article of the Day:
 - `renderWeekArchives()` — collapsible Year→Month→Week tree on Log tab
 - `checkWeekTransition()` — auto-archive on week rollover
 
+### progress.js (~290 lines)
+Progress tab with Chart.js graphs:
+`renderProgress()`, `setProgressRange()`, `_getAllDatesInRange()`, `_getCardsData()`, `_renderAnkiChart()`, `_renderItalianChart()`, `_renderNutritionChart()`
+
 ### meals.js (~407 lines)
 Meal Planning tab — day type toggle, food submission (photo/text/stored), Claude macro analysis, circular progress rings, stored meal library:
 `renderMeals()`, `setDayType()`, `renderMacroRings()`, `renderMealLog()`, `removeMealEntry()`, `renderStoredMeals()`, `toggleMealLibrary()`, `filterMealLibrary()`, `quickAddStoredMeal()`, `deleteStoredMeal()`, `editStoredMeal()`, `mealNameInput()`, `selectAutocomplete()`, `mealImageSelected()`, `clearMealImage()`, `initMealPasteHandler()`, `submitFood()`, `analyzeFoodWithClaude()`
@@ -99,6 +104,7 @@ Firebase sync layer (loaded last):
 | Read | translate.js + flashcard-review.js | tab-translate |
 | Claude | chat.js + flashcard-review.js | tab-claude |
 | Meals | meals.js | tab-meals |
+| Progress | progress.js | tab-progress |
 | Log | app.js (renderLog, addConfession, export/import), week-archive.js (renderWeekArchives) | tab-log |
 
 ## Backup
