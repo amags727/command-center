@@ -252,8 +252,10 @@ async function trSubmitReflection(num) {
   const status = document.getElementById('tr-refl-status');
   status.textContent = '⏳ Sending reflection to Claude for feedback + flashcard generation...';
   try {
-    const feedbackPrompt = `Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:\n\n"${txt}"\n\nIstruzioni:\n1. Per prima cosa, riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine — il testo intero, non solo frammenti.\n2. Poi elenca ogni errore: originale → corretto, con una spiegazione IN ITALIANO del perché era sbagliato.\n3. Valuta il livello (A2/B1/B2/C1/C2).\n\nSii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti. Solo correzioni e spiegazioni.`;
+    const feedbackPrompt = CORRECTION_PROMPT_ARTICLE(title, txt);
     const feedbackResp = await callClaude(key, feedbackPrompt);
+    // Parse and save score
+    const scoreData = _parseReflectionScore(feedbackResp);
     document.getElementById('tr-refl-result').style.display = 'block';
     document.getElementById('tr-refl-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');
     // Log as article on Today tab
@@ -267,7 +269,7 @@ async function trSubmitReflection(num) {
     if (st) st.textContent = '✅ ' + title;
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
-    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc });
+    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc, score: scoreData });
     save(d);
     // Also persist article habit to day data so Today tab checkmark survives reload
     const dd2 = dayData(today());
@@ -278,7 +280,7 @@ async function trSubmitReflection(num) {
     dayObj.habits[artKey + 'Thoughts'] = txt;
     save(dd2);
     // Now generate flashcards from the reflection corrections
-    const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard pairs (definition + cloze for each item) following the rules.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     const cards = _parseCardsJSON(cardResp);
     if (cards.length > 0) {

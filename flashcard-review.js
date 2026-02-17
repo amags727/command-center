@@ -26,6 +26,10 @@ Register, Usage, and Accuracy Rules:
 - Avoid over-formalization. Prefer contemporary usage.
 - The two cards don't need to mirror each other structurally. Together they must lock down meaning, usage, and form.
 
+Exceptions to the Two-Card Rule:
+- For tense/mood errors (wrong tense, missed congiuntivo, indicativo vs congiuntivo, etc.) where the learner knows the word but produced the wrong form: generate ONLY a cloze card testing the correct tense/mood in context. No definition card needed.
+- Do NOT generate any cards for: gender/number agreement errors, article choice errors, or typographic/punctuation fixes. These are mechanical and not worth flashcard space.
+
 Scope Rules:
 - One lexical target per pair. No combining unrelated words.
 - Mixed directionality (IT→EN or EN→IT) is allowed depending on learning value.
@@ -40,18 +44,22 @@ A. Extraction Priority (What to Pull First):
 4. Corrections that reduce explicitness without losing meaning (Italian prefers implication over specification).
 5. Idiomatic compression: longer phrase replaced by shorter idiomatic unit.
 
-B. What NOT to Extract:
-- Pure grammar fixes (agreement, gender/number, article choice) with no semantic/stylistic upgrade.
+B. What NOT to Extract (no flashcards for these):
+- Gender/number agreement errors, article choice errors — these are mechanical, not vocabulary gaps.
+- Typographic/punctuation errors (missed commas, capitalization) — not learning items.
 - Transparent, obvious, predictable, stylistically neutral synonyms.
 - Hyper-local phrasing that only works in that precise context and doesn't generalize.
+
+B2. Cloze-Only Items (no definition card, just a cloze card):
+- Tense or mood errors (wrong tense, missed congiuntivo, indicativo where congiuntivo needed, etc.) where the learner clearly knows the word but produced the wrong form. Generate ONLY a cloze card testing the correct tense/mood in a natural sentence.
 
 C. Extraction Granularity:
 - Prefer constructions over single words (verb+complement patterns, stance-setting frames, concessive/contrastive structures).
 - Allow partial propositions ("da persona che + verbo", "non tanto X quanto Y", "il fatto che + congiuntivo").
 
 D. Card Framing:
-- Default to English-led definition cards (these encode thought moves, not objects).
-- English prompt should describe the function, not literal wording.
+- Default to Italian-language definition cards (consistent with the flash card rules). Use English only for long propositional phrases or discourse moves where Italian paraphrase would be disproportionately longer.
+- Definition prompts should describe the function, not literal wording.
 - Cloze cards must recreate the rhetorical move, not just the word.
 
 E. Frequency Control:
@@ -230,6 +238,60 @@ function _parseCardsJSON(resp) {
   return [];
 }
 
+// ============ SHARED FEEDBACK PROMPT ============
+const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:
+
+"${txt}"
+
+Istruzioni — segui questo formato ESATTAMENTE:
+
+1. TESTO CORRETTO
+Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
+
+2. ERRORI MECCANICI (concordanza genere/numero/articoli)
+Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio.
+
+3. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+
+4. PUNTEGGIO
+Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
+dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
+Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+
+Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
+
+const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:
+
+"${txt}"
+
+Istruzioni — segui questo formato ESATTAMENTE:
+
+1. TESTO CORRETTO
+Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
+
+2. ERRORI MECCANICI (concordanza genere/numero/articoli)
+Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio.
+
+3. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+
+4. PUNTEGGIO
+Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
+dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
+Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+
+Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
+
+function _parseReflectionScore(resp) {
+  const m = resp.match(/SCORE:\s*(\d+)\s*\/\s*100\s*\(([^)]+)\)/i);
+  if (m) return { score: parseInt(m[1]), level: m[2].trim() };
+  // Fallback: try to find just a level
+  const m2 = resp.match(/\b(A2|B1|B2\+?|C1\+?|C2)\b/);
+  if (m2) return { score: null, level: m2[1] };
+  return { score: null, level: null };
+}
+
 // ============ REFLECTION SUBMIT (Daily Composition) ============
 async function submitRefl() {
   const txt = document.getElementById('refl-txt').value.trim();
@@ -240,12 +302,14 @@ async function submitRefl() {
   const res = document.getElementById('refl-res');
   res.style.display = 'block'; res.innerHTML = '<p>⏳ Sending to Claude for correction + flashcard generation...</p>';
   try {
-    const feedbackPrompt = `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:\n\n"${txt}"\n\nIstruzioni:\n1. Per prima cosa, riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine — il testo intero, non solo frammenti.\n2. Poi elenca ogni errore: originale → corretto, con una spiegazione IN ITALIANO del perché era sbagliato.\n3. Valuta il livello (A2/B1/B2/C1/C2).\n\nSii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti. Solo correzioni e spiegazioni.\n\nFormatta la risposta con intestazioni chiare.`;
+    const feedbackPrompt = CORRECTION_PROMPT_DAILY(txt);
     const feedbackResp = await callClaude(key, feedbackPrompt);
     res.innerHTML = '<div style="background:var(--bg);padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap;border:1px solid var(--border)">' + escHtml(feedbackResp) + '</div>';
-    // Save correction
+    // Parse and save score
+    const scoreData = _parseReflectionScore(feedbackResp);
+    // Save correction with score
     const d = getGlobal();
-    d.corrections.push({ date: today(), text: txt, response: feedbackResp });
+    d.corrections.push({ date: today(), text: txt, response: feedbackResp, score: scoreData });
     save(d);
     // Now generate flashcards
     const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
