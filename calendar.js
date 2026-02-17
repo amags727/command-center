@@ -59,7 +59,7 @@ function renderCal() {
   const isToday = vd === today();
   const totalH = CAL.END_HOUR - CAL.START_HOUR;
   const totalPx = totalH * CAL.PX_PER_HOUR;
-  const collapsed = CAL._collapsed || false;
+  const collapsed = CAL._collapsed !== undefined ? CAL._collapsed : true;
   // Date nav header — collapsible
   let html = '<div class="cal-header" onclick="calToggleCollapse(event)">';
   html += '<button class="btn" style="padding:3px 10px;font-size:16px" onclick="event.stopPropagation();calSetDate(-1)">‹</button>';
