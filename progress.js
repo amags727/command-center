@@ -164,14 +164,14 @@ function _renderAnkiChart(dates) {
         y: {
           position: 'left',
           title: { display: true, text: 'Reviewed', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { color: 'rgba(0,0,0,0.06)' },
           beginAtZero: true
         },
         y1: {
           position: 'right',
           title: { display: true, text: 'Added', color: '#ef4444', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { drawOnChartArea: false },
           beginAtZero: true
         }
@@ -252,7 +252,7 @@ function _renderItalianChart(dates) {
         y: {
           min: 0, max: 100,
           title: { display: true, text: 'Score', color: '#555', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { color: 'rgba(0,0,0,0.08)' }
         }
       }
@@ -327,14 +327,14 @@ function _renderNutritionChart(dates) {
         y: {
           position: 'left',
           title: { display: true, text: 'Calories', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { color: 'rgba(0,0,0,0.06)' },
           beginAtZero: true
         },
         y1: {
           position: 'right',
           title: { display: true, text: 'Protein (g)', color: '#ef4444', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { drawOnChartArea: false },
           beginAtZero: true
         }
@@ -415,7 +415,7 @@ function _renderWeightChart(dates) {
         },
         y: {
           title: { display: true, text: 'Weight (lbs)', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE }, maxTicksLimit: 5 },
           grid: { color: 'rgba(0,0,0,0.08)' }
         }
       }
