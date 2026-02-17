@@ -205,8 +205,6 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .btn{font-size:20px;padding:8px 14px}
 .btn-s{font-size:17px;padding:6px 12px}
 .btn-p{font-size:20px;padding:10px 18px}
-.goal-chip{font-size:26px;padding:4px 12px}
-.chip-add{font-size:23px;padding:4px 14px}
 .tr-table{font-size:21px}
 .tr-table td{padding:12px 14px}
 .rprompt label{font-size:20px}
@@ -304,6 +302,10 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .goal-chip.done .chip-text { text-decoration:line-through; opacity:.55; }
 .goal-chip.overdue { border-left:3px solid var(--red,#e74c3c); background:rgba(231,76,60,.06); }
 .goal-chip.overdue .chip-overdue-badge { font-size:9px; color:var(--red,#e74c3c); margin-right:2px; }
+@media(min-width:1024px){
+  .goal-chip { font-size:20px !important; }
+  .chip-add { font-size:20px !important; }
+}
 </style>
 </head>
 <body>
