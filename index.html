@@ -556,6 +556,15 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <!-- TRANSLATE / READ -->
 <div class="tab" id="tab-translate">
 <h1>🇮🇹 Italian Reading</h1>
+<div class="card" style="text-align:center;padding:10px 16px">
+<div style="display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+<button id="tr-mode-article" class="btn" onclick="trSwitchMode('article')" style="border:none;border-radius:0;font-weight:600;background:var(--blue);color:#fff;padding:8px 20px">📰 Article</button>
+<button id="tr-mode-book" class="btn" onclick="trSwitchMode('book')" style="border:none;border-radius:0;font-weight:600;background:var(--card);color:var(--muted);padding:8px 20px">📖 Book</button>
+</div>
+</div>
+
+<!-- ARTICLE MODE -->
+<div id="tr-article-mode">
 <div class="card">
 <h3>📰 Fetch & Translate Article</h3>
 <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Paste an Italian article URL or text. Claude will produce a side-by-side translation. Select any Italian word/phrase to create a flashcard.</p>
@@ -615,6 +624,64 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h3>📚 Reading History</h3>
 <div id="tr-history" style="max-height:300px;overflow-y:auto"></div>
 </div>
+</div><!-- end tr-article-mode -->
+
+<!-- BOOK MODE -->
+<div id="tr-book-mode" style="display:none">
+<div class="card">
+<h3>📖 Book Translation</h3>
+<p style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload Kindle screenshots or photos of book pages. Claude will OCR and translate them page by page.</p>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+<span style="font-size:13px;font-weight:600">Direction:</span>
+<button id="bk-dir-it2en" class="btn btn-s" onclick="bkSetDir('it2en')" style="background:var(--blue);color:#fff;border-color:var(--blue)">🇮🇹 → 🇬🇧</button>
+<button id="bk-dir-en2it" class="btn btn-s" onclick="bkSetDir('en2it')">🇬🇧 → 🇮🇹</button>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<label class="btn btn-p" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+📷 Upload Pages <input type="file" id="bk-img-input" accept="image/*" multiple onchange="bkImagesSelected(this)" style="display:none">
+</label>
+<span style="font-size:11px;color:var(--muted)">Select multiple images at once</span>
+</div>
+<div id="bk-upload-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+</div>
+
+<div class="card" id="bk-thumbs-card" style="display:none">
+<h3>📑 Pages (<span id="bk-page-total">0</span>)</h3>
+<div id="bk-thumbs" style="display:flex;gap:6px;overflow-x:auto;padding:6px 0"></div>
+<div style="margin-top:8px;text-align:center">
+<button class="btn btn-s" onclick="bkClearAll()" style="color:var(--red);border-color:var(--red)">✕ Clear All Pages</button>
+</div>
+</div>
+
+<div class="card" id="bk-reader-card" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<button class="btn btn-s" id="bk-prev-btn" onclick="bkPrevPage()" disabled>◀ Prev</button>
+<span style="font-weight:600;font-size:14px" id="bk-page-label">Page 1 of 1</span>
+<button class="btn btn-s" id="bk-next-btn" onclick="bkNextPage()" disabled>Next ▶</button>
+</div>
+<div id="bk-page-status" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px"></div>
+<div style="overflow-x:auto">
+<table class="tr-table" id="bk-table">
+<thead><tr><th style="width:50%" id="bk-th-src">🇮🇹 Italiano</th><th style="width:50%" id="bk-th-tgt">🇬🇧 English</th></tr></thead>
+<tbody id="bk-tbody"></tbody>
+</table>
+</div>
+<p style="font-size:11px;color:var(--muted);margin-top:10px">💡 Highlight words in the source column to collect them for flashcards.</p>
+</div>
+
+<div class="card" id="bk-collected-card" style="display:none">
+<h3>🃏 Collected Words (<span id="bk-coll-ct">0</span>)</h3>
+<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Words you highlighted while reading. Submit them all at once below.</p>
+<div class="flex mb8">
+<button class="btn btn-p" onclick="bkSubmitWords()">🤖 Generate Flashcards</button>
+<button class="btn btn-s" onclick="bkClearCollected()">Clear All</button>
+</div>
+<div id="bk-words-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+<div id="bk-collected-list"></div>
+<div id="bk-words-card-review" style="display:none;margin-top:10px" class="card"></div>
+</div>
+</div><!-- end tr-book-mode -->
+
 </div>
 
 <!-- LOG -->
@@ -658,7 +725,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 <h3>Add Food</h3>
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
 <label style="padding:6px 12px;background:var(--bl);color:var(--blue);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
-📷 Photo <input type="file" id="meal-img-input" accept="image/*" capture="environment" onchange="mealImageSelected(this)" style="display:none">
+📷 Photo <input type="file" id="meal-img-input" accept="image/*" onchange="mealImageSelected(this)" style="display:none">
 </label>
 <span style="font-size:11px;color:var(--muted)">or paste image (Cmd+V)</span>
 </div>
