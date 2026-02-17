@@ -8,6 +8,7 @@ const FLASH_CARD_RULES = `Core Structure Rules:
 Definition / Translation Card Rules:
 - The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
 - Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
+- CRITICAL: Italian definitions must be DECLARATIVE, never interrogative. Use direct paraphrases or explanations. NEVER use question format like "Cosa significa quando..." or "Che cosa vuol dire...". Example: For "rivolgersi contro" → "produrre l'effetto opposto a quello desiderato" NOT "Cosa significa quando una situazione produce l'effetto opposto?"
 - The only exception for English on the prompt side is long extended phrases or introductory/discourse expressions (e.g. "per inciso", "As someone who...", "To decide what truly matters to me") where an Italian paraphrase would be disproportionately longer than just providing the English equivalent. If in doubt, use Italian.
 - When the target word is a conjugated verb, the definition card should present the word in its infinitive form. (Cloze cards can use whatever conjugation fits the sentence.)
 - Answer side always includes: the Italian target word/expression + a brief English gloss.
@@ -184,7 +185,7 @@ async function fcChat(containerId) {
   log.scrollTop = log.scrollHeight;
   try {
     const currentCards = rev.cards.map(c => 'Front: ' + c.front + ' | Back: ' + c.back).join('\n');
-    const prompt = `Context: ${rev.context}\n\nCurrent flashcards:\n${currentCards}\n\nUser question: ${q}\n\nIf the user asks to add/modify/generate cards, return any new cards as a JSON array with "front" and "back" fields, wrapped in <cards>[...]</cards> tags, IN ADDITION to your normal response. Otherwise just answer the question helpfully.`;
+    const prompt = `Context: ${rev.context}\n\nCurrent flashcards:\n${currentCards}\n\nUser question: ${q}\n\nTone instructions: Be direct and factual. No motivational language, no emojis in your response, no encouragement or cheerleading. Assume the user is competent. Precision over politeness. Be concise but not shallow. If something is complex, explain why rather than summarizing it away.\n\nIf the user asks to add/modify/generate cards, return any new cards as a JSON array with "front" and "back" fields, wrapped in <cards>[...]</cards> tags, IN ADDITION to your normal response. Otherwise answer the question analytically.`;
     const resp = await callClaude(key, prompt);
     // Remove the "Thinking..." message
     const msgs = log.querySelectorAll('div');
