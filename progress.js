@@ -135,8 +135,8 @@ function _renderAnkiChart(dates) {
           type: 'bar',
           label: 'Cards Added',
           data: addedData,
-          backgroundColor: 'rgba(249, 115, 22, 0.6)',
-          borderColor: 'rgba(249, 115, 22, 1)',
+          backgroundColor: 'rgba(239, 68, 68, 0.6)',
+          borderColor: 'rgba(239, 68, 68, 1)',
           borderWidth: 1,
           yAxisID: 'y1',
           order: 2
@@ -170,8 +170,8 @@ function _renderAnkiChart(dates) {
         },
         y1: {
           position: 'right',
-          title: { display: true, text: 'Added', color: '#f97316', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#f97316', font: { size: _CHART_TICK_SIZE } },
+          title: { display: true, text: 'Added', color: '#ef4444', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE } },
           grid: { drawOnChartArea: false },
           beginAtZero: true
         }
@@ -303,8 +303,8 @@ function _renderNutritionChart(dates) {
         {
           label: 'Protein (g)',
           data: protData,
-          borderColor: 'rgba(34, 197, 94, 1)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          borderColor: 'rgba(239, 68, 68, 1)',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
           tension: 0.3, fill: true,
           pointRadius: 6, pointHoverRadius: 10,
           borderWidth: 2, yAxisID: 'y1'
@@ -333,8 +333,8 @@ function _renderNutritionChart(dates) {
         },
         y1: {
           position: 'right',
-          title: { display: true, text: 'Protein (g)', color: '#22c55e', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#22c55e', font: { size: _CHART_TICK_SIZE } },
+          title: { display: true, text: 'Protein (g)', color: '#ef4444', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#ef4444', font: { size: _CHART_TICK_SIZE } },
           grid: { drawOnChartArea: false },
           beginAtZero: true
         }
@@ -386,8 +386,8 @@ function _renderWeightChart(dates) {
       datasets: [{
         label: 'Weight (lbs)',
         data: weightData,
-        borderColor: 'rgba(139, 92, 246, 1)',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
         tension: 0.3, fill: true,
         pointRadius: 8, pointHoverRadius: 12,
         borderWidth: 2.5
@@ -414,8 +414,8 @@ function _renderWeightChart(dates) {
           grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
-          title: { display: true, text: 'Weight (lbs)', color: '#8b5cf6', font: { size: _CHART_TITLE_SIZE } },
-          ticks: { color: '#8b5cf6', font: { size: _CHART_TICK_SIZE } },
+          title: { display: true, text: 'Weight (lbs)', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
           grid: { color: 'rgba(0,0,0,0.08)' }
         }
       }
