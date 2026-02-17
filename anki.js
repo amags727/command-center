@@ -67,6 +67,7 @@ function sm2(card, quality) {
   c.ease = c.ease || 2500; // factor * 1000
   c.ivl = c.ivl || 0;
   c.reviewedToday = today();
+  c.lastMod = Date.now();
   // Track when a new card gets its first review
   if (card.queue === 0 && !c.firstReviewDate) c.firstReviewDate = today();
 
@@ -279,6 +280,8 @@ function rateCard(quality) {
   const updated = sm2(d.cards[idx], quality);
   d.cards[idx] = updated;
   save(d);
+  // Immediate sync push — don't lose card review progress
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
   if (quality === 1) { // Again: re-queue at end
     studyQueue.push(updated);
   }
@@ -341,7 +344,7 @@ function addCard(front, back, tags) {
   tags = tags || (tagsEl ? tagsEl.value.trim() : '');
   if (!front || !back) return;
   const d = getCards();
-  d.cards.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), front, back, tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())) : [], queue: 0, due: todayDayNum(), ivl: 0, ease: 2500, reps: 0, lapses: 0, created: today(), reviewedToday: null });
+  d.cards.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2, 8), front, back, tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())) : [], queue: 0, due: todayDayNum(), ivl: 0, ease: 2500, reps: 0, lapses: 0, created: today(), reviewedToday: null, lastMod: Date.now() });
   save(d);
   if (frontEl) frontEl.value = '';
   if (backEl) backEl.value = '';
