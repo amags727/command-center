@@ -16,7 +16,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(
 h1{font-size:1.4em;font-weight:600}h2{font-size:1.2em;margin-bottom:10px;font-weight:600}h3{font-size:1.05em;margin-bottom:8px;font-weight:600}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
 .top-bar{position:sticky;top:0;z-index:100;background:var(--card)}
-.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto}
+.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto;position:sticky;top:0;z-index:100}
 .nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
 .nav-icon{font-size:1em}.nav-label{font-size:inherit}
 .sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12px}
@@ -27,7 +27,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .nav button.active{color:var(--text);border-bottom-color:var(--blue);font-weight:600}
 .nav button:hover{background:var(--bl)}
 .tab{display:none;max-width:880px;margin:0 auto;padding:20px 16px}.tab.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh);font-size:1.3em}
 .label{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
 .l-work{background:var(--bl);color:var(--blue)}.l-gym{background:var(--gl);color:var(--green)}.l-ital{background:var(--ol);color:var(--orange)}.l-diss{background:var(--pl);color:var(--purple)}.l-social{background:var(--pkl);color:var(--pink)}.l-misc{background:var(--yl);color:var(--yellow)}
 .tblock{display:flex;border-left:3px solid var(--border);padding:7px 12px;margin:3px 0;border-radius:0 4px 4px 0;font-size:14px}
@@ -160,7 +160,7 @@ body{font-size:19px}
 h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 .tab{max-width:1400px;padding:28px 40px}
 .nav{justify-content:center}
-.nav button{padding:10px 20px;font-size:14px;flex-direction:column;align-items:center;gap:2px}
+.nav button{padding:10px 20px;font-size:14px;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
 .nav-icon{font-size:22px;display:block;text-align:center}
 .nav-label{font-size:13px;font-weight:500}
 .sync-bar{font-size:14px;padding:8px 20px}
