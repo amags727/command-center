@@ -86,18 +86,18 @@ function renderFlashcardReview(containerId, cards, context, tags) {
   container.style.display = 'block';
   container.innerHTML = `
     <div class="fc-review">
-      <h4 style="font-size:14px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
+      <h4 style="font-size:18px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
+      <p style="font-size:18px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
       <div id="${containerId}-list" class="fc-review-list" style="max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:8px"></div>
       <div class="flex mt8" style="gap:8px">
         <button class="btn btn-p" onclick="fcSubmitAll('${containerId}')">✅ Submit All to Deck</button>
-        <span id="${containerId}-submit-status" style="font-size:12px;color:var(--muted)"></span>
+        <span id="${containerId}-submit-status" style="font-size:18px;color:var(--muted)"></span>
       </div>
       <div class="fc-chat-section" style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px">
-        <h4 style="font-size:13px;margin-bottom:6px">💬 Ask about these cards</h4>
-        <div id="${containerId}-chat-log" style="max-height:200px;overflow-y:auto;font-size:12px;margin-bottom:6px"></div>
+        <h4 style="font-size:20px;margin-bottom:6px">💬 Ask about these cards</h4>
+        <div id="${containerId}-chat-log" style="max-height:200px;overflow-y:auto;font-size:18px;margin-bottom:6px"></div>
         <div class="flex" style="gap:6px">
-          <input class="fin flex-1" id="${containerId}-chat-input" placeholder="Ask a follow-up question..." onkeydown="if(event.key==='Enter')fcChat('${containerId}')">
+          <input class="fin flex-1" id="${containerId}-chat-input" placeholder="Ask a follow-up question..." style="font-size:18px" onkeydown="if(event.key==='Enter')fcChat('${containerId}')">
           <button class="btn btn-s" onclick="fcChat('${containerId}')">Send</button>
         </div>
       </div>

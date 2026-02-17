@@ -392,20 +392,24 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
-<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="hchk" id="h-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-refl" disabled style="pointer-events:none"><b>Reflection</b></label>
 </div>
 <div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div>
 <input type="hidden" id="anki-ct-val"><input type="hidden" id="art1-t"><input type="hidden" id="art1-th"><input type="hidden" id="art2-t"><input type="hidden" id="art2-th"><span id="art1-status" style="display:none"></span><span id="art2-status" style="display:none"></span>
 <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
 <h3 style="margin-bottom:6px">📝 Riflessione Giornaliera</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Write in Italian. Any format. Min 200 words. Submitted to Claude for correction + Anki cards.</p>
+<p style="font-size:18px;color:var(--muted);margin-bottom:6px">Write in Italian. Any format. Min 200 words. Submitted to Claude for correction + Anki cards.</p>
 <div class="rarea"><textarea id="refl-txt" placeholder="Scrivi qui in italiano..." onkeyup="updRC()"></textarea></div>
 <div class="wc" id="refl-wc">0 / 200 words</div>
 <div class="flex mt8"><button class="btn btn-p" onclick="submitRefl()">Submit for Correction + Cards</button></div>
 <div id="refl-res" style="display:none" class="mt8"></div>
-<div id="refl-card-review" style="display:none;margin-top:10px" class="card"></div>
+<div id="refl-card-review" style="display:none;margin-top:10px" class="card">
+  <h3 style="font-size:20px">🎴 Review Flashcards</h3>
+  <div id="refl-card-review-content"></div>
+</div>
 </div>
 <div class="card" style="text-align:center"><button class="btn btn-d" onclick="sealDay()">🔒 Seal Today (Cannot Undo)</button><p style="font-size:11px;color:var(--muted);margin-top:4px">Locks all entries for today. Auto-seals at midnight.</p></div>
 </div>

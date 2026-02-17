@@ -28,6 +28,23 @@ function initToday() {
     if (el && day.habits[h]) el.checked = true;
     if (day.sealed) el && (el.disabled = true);
   });
+  // Check if reflection was submitted today
+  const corrections = dd.corrections || [];
+  const todayReflection = corrections.find(c => c.date === today());
+  if (todayReflection) {
+    // Check reflection checkbox
+    const reflChk = document.getElementById('h-refl');
+    if (reflChk) reflChk.checked = true;
+    // Lock textarea and hide submit button
+    const reflTxt = document.getElementById('refl-txt');
+    if (reflTxt) {
+      reflTxt.disabled = true;
+      reflTxt.style.background = '#f5f5f5';
+      reflTxt.style.cursor = 'not-allowed';
+    }
+    const submitBtn = document.querySelector('.btn.btn-p[onclick="submitRefl()"]');
+    if (submitBtn) submitBtn.style.display = 'none';
+  }
   if (day.habits.ankiCount) document.getElementById('anki-ct').textContent = day.habits.ankiCount;
   if (day.habits.art1Title) document.getElementById('art1-t').value = day.habits.art1Title;
   if (day.habits.art1Thoughts) document.getElementById('art1-th').value = day.habits.art1Thoughts;
@@ -411,7 +428,7 @@ async function submitRefl() {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const res = document.getElementById('refl-res');
-  res.style.display = 'block'; res.innerHTML = '<p>⏳ Sending to Claude for correction + flashcard generation...</p>';
+  res.style.display = 'block'; res.innerHTML = '<p style="font-size:18px">⏳ Sending to Claude for correction + flashcard generation...</p>';
   try {
     const feedbackPrompt = CORRECTION_PROMPT_DAILY(txt);
     const feedbackResp = await callClaude(key, feedbackPrompt);
@@ -429,6 +446,17 @@ async function submitRefl() {
     if (cards.length > 0) {
       renderFlashcardReview('refl-card-review', cards, 'Daily composition:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'composition');
     }
+    // Lock textarea and hide submit button
+    document.getElementById('refl-txt').disabled = true;
+    document.getElementById('refl-txt').style.background = '#f5f5f5';
+    document.getElementById('refl-txt').style.cursor = 'not-allowed';
+    const submitBtn = document.querySelector('.btn.btn-p[onclick="submitRefl()"]');
+    if (submitBtn) submitBtn.style.display = 'none';
+    
+    // Check reflection checkbox
+    const reflChk = document.getElementById('h-refl');
+    if (reflChk) reflChk.checked = true;
+    
     addLog('action', 'Italian composition submitted + corrected + ' + cards.length + ' cards generated');
   } catch (e) { res.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>'; }
 }
