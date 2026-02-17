@@ -126,8 +126,8 @@ function _renderAnkiChart(dates) {
           data: dates.map((dt, i) => ({ x: i, y: reviewedPerDay[dt] || 0 })),
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
-          pointRadius: 5,
-          pointHoverRadius: 8,
+          pointRadius: 8,
+          pointHoverRadius: 12,
           yAxisID: 'y',
           order: 1
         },
@@ -158,7 +158,7 @@ function _renderAnkiChart(dates) {
       scales: {
         x: {
           type: 'category', labels: labels,
-          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 },
           grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
@@ -215,7 +215,7 @@ function _renderItalianChart(dates) {
           data: reflPoints,
           backgroundColor: 'rgba(239, 68, 68, 0.7)',
           borderColor: 'rgba(239, 68, 68, 1)',
-          pointRadius: 6, pointHoverRadius: 9,
+          pointRadius: 9, pointHoverRadius: 13,
           showLine: true, tension: 0.3, borderWidth: 2
         },
         {
@@ -223,7 +223,7 @@ function _renderItalianChart(dates) {
           data: artPoints,
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
-          pointRadius: 6, pointHoverRadius: 9,
+          pointRadius: 9, pointHoverRadius: 13,
           showLine: true, tension: 0.3, borderWidth: 2
         }
       ]
@@ -246,7 +246,7 @@ function _renderItalianChart(dates) {
       scales: {
         x: {
           type: 'category', labels: labels,
-          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 },
           grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
@@ -297,7 +297,7 @@ function _renderNutritionChart(dates) {
           borderColor: 'rgba(59, 130, 246, 1)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           tension: 0.3, fill: true,
-          pointRadius: 4, pointHoverRadius: 7,
+          pointRadius: 6, pointHoverRadius: 10,
           borderWidth: 2, yAxisID: 'y'
         },
         {
@@ -306,7 +306,7 @@ function _renderNutritionChart(dates) {
           borderColor: 'rgba(34, 197, 94, 1)',
           backgroundColor: 'rgba(34, 197, 94, 0.1)',
           tension: 0.3, fill: true,
-          pointRadius: 4, pointHoverRadius: 7,
+          pointRadius: 6, pointHoverRadius: 10,
           borderWidth: 2, yAxisID: 'y1'
         }
       ]
@@ -321,7 +321,7 @@ function _renderNutritionChart(dates) {
       },
       scales: {
         x: {
-          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 },
           grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
@@ -389,7 +389,7 @@ function _renderWeightChart(dates) {
         borderColor: 'rgba(139, 92, 246, 1)',
         backgroundColor: 'rgba(139, 92, 246, 0.1)',
         tension: 0.3, fill: true,
-        pointRadius: 5, pointHoverRadius: 8,
+        pointRadius: 8, pointHoverRadius: 12,
         borderWidth: 2.5
       }]
     },
@@ -410,7 +410,7 @@ function _renderWeightChart(dates) {
       },
       scales: {
         x: {
-          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 },
           grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
