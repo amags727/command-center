@@ -15,8 +15,10 @@
 body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
 h1{font-size:1.4em;font-weight:600}h2{font-size:1.2em;margin-bottom:10px;font-weight:600}h3{font-size:1.05em;margin-bottom:8px;font-weight:600}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
-.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);position:sticky;top:0;z-index:100;overflow-x:auto}
-.nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.top-bar{position:sticky;top:0;z-index:100;background:var(--card)}
+.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto}
+.nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.nav-icon{font-size:1em}.nav-label{font-size:inherit}
 .sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12px}
 .sync-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;width:180px}
 .sync-bar button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:var(--card);cursor:pointer}
@@ -154,36 +156,51 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 }
 /* Desktop: bigger text, wider content, readable nav */
 @media(min-width:1024px){
-body{font-size:17px}
-h1{font-size:1.5em}h2{font-size:1.3em}h3{font-size:1.1em}
-.tab{max-width:1100px;padding:24px 32px}
-.nav button{padding:12px 18px;font-size:15px}
-.sync-bar{font-size:13px;padding:8px 18px}
-.sync-bar input{font-size:13px;width:220px;padding:6px 10px}
-.sync-bar button{font-size:12px;padding:5px 12px}
-.card{padding:20px;margin-bottom:18px}
-.hname{font-size:15px}
-.hdet{font-size:13px}
-.hev input,.hev textarea{font-size:14px;padding:7px 10px}
-.label{font-size:12px;padding:3px 9px}
-.tblock{font-size:15px;padding:9px 14px}
-.tblock .tm{font-size:14px;min-width:95px}
-.iitem{font-size:14px;padding:10px}
-.iinput input{font-size:15px;padding:10px 13px}
-.iinput button{font-size:15px;padding:10px 16px}
-.lentry{font-size:13px;padding:9px 12px}
-.lentry .lt{font-size:11px}
-.rarea textarea{font-size:15px;min-height:160px;padding:13px}
-.chatia input{font-size:14px;padding:9px 12px}
-.chatia button{font-size:14px;padding:9px 16px}
-.cmsg .bbl{font-size:14px;padding:9px 14px}
-.atable{font-size:13px}
-.atable th,.atable td{padding:7px 10px}
-.timer-d{font-size:3.2em}
-.sgrid{max-width:320px}
-.aotd-title{font-size:17px}
-.wc{font-size:12px}
-.ewarn{font-size:12px}
+body{font-size:19px}
+h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
+.tab{max-width:1400px;padding:28px 40px}
+.nav{justify-content:center}
+.nav button{padding:10px 20px;font-size:14px;flex-direction:column;align-items:center;gap:2px}
+.nav-icon{font-size:22px;display:block;text-align:center}
+.nav-label{font-size:13px;font-weight:500}
+.sync-bar{font-size:14px;padding:8px 20px}
+.sync-bar input{font-size:14px;width:240px;padding:7px 12px}
+.sync-bar button{font-size:13px;padding:6px 14px}
+.card{padding:24px;margin-bottom:20px}
+.hname{font-size:16px}
+.hdet{font-size:14px}
+.hev input,.hev textarea{font-size:16px;padding:8px 12px}
+.label{font-size:13px;padding:3px 10px}
+.tblock{font-size:17px;padding:10px 16px}
+.tblock .tm{font-size:15px;min-width:100px}
+.iitem{font-size:16px;padding:12px}
+.iinput input{font-size:17px;padding:12px 14px}
+.iinput button{font-size:17px;padding:12px 18px}
+.lentry{font-size:14px;padding:10px 14px}
+.lentry .lt{font-size:12px}
+.rarea textarea{font-size:17px;min-height:180px;padding:14px}
+.chatia input{font-size:16px;padding:10px 14px}
+.chatia button{font-size:16px;padding:10px 18px}
+.cmsg .bbl{font-size:16px;padding:10px 16px}
+.atable{font-size:15px}
+.atable th,.atable td{padding:8px 12px}
+.timer-d{font-size:3.6em}
+.sgrid{max-width:360px}
+.aotd-title{font-size:19px}
+.aotd-blurb{font-size:16px}
+.aotd-meta{font-size:13px}
+.aotd-cat{font-size:12px}
+.wc{font-size:13px}
+.ewarn{font-size:13px}
+.btn{font-size:15px;padding:8px 14px}
+.btn-s{font-size:13px;padding:6px 12px}
+.btn-p{font-size:15px;padding:10px 18px}
+.goal-chip{font-size:15px;padding:3px 10px}
+.chip-add{font-size:14px;padding:3px 12px}
+.tr-table{font-size:16px}
+.tr-table td{padding:12px 14px}
+.rprompt label{font-size:15px}
+.rprompt textarea{font-size:15px;padding:10px}
 }
 /* Article of the Day */
 .aotd{display:flex;gap:14px;align-items:flex-start}
@@ -280,6 +297,7 @@ h1{font-size:1.5em}h2{font-size:1.3em}h3{font-size:1.1em}
 </style>
 </head>
 <body>
+<div class="top-bar">
 <div class="sync-bar" id="sync-bar">
 <span id="sync-status">⚪ <span style="font-size:11px">Local only</span></span>
 <input id="sync-pass" type="password" placeholder="Sync passphrase…">
@@ -287,16 +305,17 @@ h1{font-size:1.5em}h2{font-size:1.3em}h3{font-size:1.1em}
 <button class="btn-disc" onclick="doSyncDisconnect()" style="display:none" id="sync-disc-btn">Disconnect</button>
 </div>
 <nav class="nav" id="nav">
-<button class="active" onclick="switchTab('today')">📅 Today</button>
-<button onclick="switchTab('week')">📊 Week</button>
-<button onclick="switchTab('dissertation')">📝 Dissertation</button>
-<button onclick="switchTab('cards')">🃏 Cards</button>
-<button onclick="switchTab('translate')">🇮🇹 Read</button>
-<button onclick="switchTab('claude')">🤖 Claude</button>
-<button onclick="switchTab('meals')">🍽️ Meals</button>
-<button onclick="switchTab('log')">📋 Log</button>
+<button class="active" onclick="switchTab('today')"><span class="nav-icon">📅</span><span class="nav-label">Today</span></button>
+<button onclick="switchTab('week')"><span class="nav-icon">📊</span><span class="nav-label">Week</span></button>
+<button onclick="switchTab('dissertation')"><span class="nav-icon">📝</span><span class="nav-label">Dissertation</span></button>
+<button onclick="switchTab('cards')"><span class="nav-icon">🃏</span><span class="nav-label">Cards</span></button>
+<button onclick="switchTab('translate')"><span class="nav-icon">🇮🇹</span><span class="nav-label">Read</span></button>
+<button onclick="switchTab('claude')"><span class="nav-icon">🤖</span><span class="nav-label">Claude</span></button>
+<button onclick="switchTab('meals')"><span class="nav-icon">🍽️</span><span class="nav-label">Meals</span></button>
+<button onclick="switchTab('log')"><span class="nav-icon">📋</span><span class="nav-label">Log</span></button>
 <button onclick="forceUpdate()" title="Force update" style="margin-left:auto;font-size:16px;padding:8px 10px">⟳</button>
 </nav>
+</div>
 
 <!-- TODAY -->
 <div class="tab active" id="tab-today">
