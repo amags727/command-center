@@ -54,7 +54,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .lentry.action{border-left-color:var(--blue)}.lentry.warning{border-left-color:var(--orange)}.lentry.sealed{border-left-color:var(--red);background:var(--rl)}.lentry.confession{border-left-color:var(--purple);background:var(--pl)}
 .pgb{background:linear-gradient(135deg,var(--pl),var(--pkl));border:2px solid var(--purple);border-radius:8px;padding:14px;margin-bottom:14px}
 .pgb h3{color:var(--purple)}
-.rarea textarea{width:100%;min-height:140px;padding:11px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;resize:vertical}
+.rarea textarea{width:100%;min-height:140px;padding:11px;border:1px solid var(--border);border-radius:6px;font-size:16px;line-height:1.7;resize:vertical}
 .wc{font-size:11px;color:var(--muted);text-align:right;margin-top:3px}.wc.bad{color:var(--red);font-weight:600}
 /* Nested list styles for contenteditable notes */
 .wg-editor ul, .wg-editor ol { margin:0; padding-left:40px }
@@ -67,6 +67,8 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .wg-columns { display:flex; gap:8px; width:100%; min-height:30px }
 .wg-col { flex:1; min-width:0; border-left:2px solid var(--border); padding-left:8px; min-height:20px; outline:none }
 .wg-col:first-child { border-left:none; padding-left:0 }
+#today-notes { font-size:16px !important; }
+#today-notes * { font-size:inherit !important; }
 #today-notes ul, #today-notes ol { margin:0; padding-left:40px }
 #today-notes ul { list-style-type:disc }
 #today-notes ul ul { list-style-type:circle; padding-left:40px }
@@ -183,7 +185,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .iinput button{font-size:29px;padding:14px 20px}
 .lentry{font-size:23px;padding:12px 16px}
 .lentry .lt{font-size:21px}
-.rarea textarea{font-size:29px;min-height:200px;padding:16px}
+.rarea textarea{font-size:16px;min-height:200px;padding:16px}
 .chatia input{font-size:21px;padding:10px 14px}
 .chatia button{font-size:21px;padding:10px 18px}
 .cmsg .bbl{font-size:21px;padding:10px 16px}
@@ -370,7 +372,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 <div class="card">
 <h3>📝 Notes</h3>
-<div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
+<div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:16px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
 </div>
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
