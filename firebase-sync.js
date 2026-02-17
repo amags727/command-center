@@ -70,6 +70,45 @@ const FirebaseSync = (() => {
     const result = Object.assign({}, local, remote);
     result.cards = mergedCards;
 
+    // Merge days per-date: keep whichever has higher lastMod
+    if (local.days || remote.days) {
+      const localDays = local.days || {};
+      const remoteDays = remote.days || {};
+      const mergedDays = Object.assign({}, localDays);
+      for (const date of Object.keys(remoteDays)) {
+        const ld = mergedDays[date];
+        const rd = remoteDays[date];
+        if (!ld) {
+          mergedDays[date] = rd;
+        } else {
+          const lm = ld.lastMod || 0;
+          const rm = rd.lastMod || 0;
+          if (rm > lm) mergedDays[date] = rd;
+          // else keep local (already in mergedDays)
+        }
+      }
+      result.days = mergedDays;
+    }
+
+    // Merge weeks per-weekId: keep whichever has higher lastMod
+    if (local.weeks || remote.weeks) {
+      const localWeeks = local.weeks || {};
+      const remoteWeeks = remote.weeks || {};
+      const mergedWeeks = Object.assign({}, localWeeks);
+      for (const wk of Object.keys(remoteWeeks)) {
+        const lw = mergedWeeks[wk];
+        const rw = remoteWeeks[wk];
+        if (!lw) {
+          mergedWeeks[wk] = rw;
+        } else {
+          const lm = lw.lastMod || 0;
+          const rm = rw.lastMod || 0;
+          if (rm > lm) mergedWeeks[wk] = rw;
+        }
+      }
+      result.weeks = mergedWeeks;
+    }
+
     // Merge cardSettings: keep whichever has a dailyBonusNew entry for today
     if (local.cardSettings && remote.cardSettings) {
       result.cardSettings = Object.assign({}, local.cardSettings, remote.cardSettings);
@@ -77,6 +116,29 @@ const FirebaseSync = (() => {
       if (local.cardSettings.dailyBonusNew || remote.cardSettings.dailyBonusNew) {
         result.cardSettings.dailyBonusNew = Object.assign({}, local.cardSettings.dailyBonusNew || {}, remote.cardSettings.dailyBonusNew || {});
       }
+    }
+
+    // Merge log: union by timestamp, keep most recent 500
+    if (local.log || remote.log) {
+      const seen = new Set();
+      const merged = [];
+      for (const entry of [...(local.log || []), ...(remote.log || [])]) {
+        const key = entry.ts + '|' + entry.type + '|' + (entry.msg || '').slice(0, 50);
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      merged.sort((a, b) => (b.ts || '').localeCompare(a.ts || ''));
+      result.log = merged.slice(0, 500);
+    }
+
+    // Merge chatHistory: union by content hash, preserve order
+    if (local.chatHistory || remote.chatHistory) {
+      const seen = new Set();
+      const merged = [];
+      for (const entry of [...(remote.chatHistory || []), ...(local.chatHistory || [])]) {
+        const key = entry.role + '|' + (entry.content || '').slice(0, 80);
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      result.chatHistory = merged;
     }
 
     return result;

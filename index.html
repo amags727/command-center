@@ -13,7 +13,9 @@
 :root{--bg:#fafaf8;--text:#1a1a1a;--muted:#6b7280;--border:#e5e5e3;--blue:#3b82f6;--bl:#dbeafe;--green:#22c55e;--gl:#dcfce7;--orange:#f97316;--ol:#ffedd5;--purple:#8b5cf6;--pl:#ede9fe;--pink:#ec4899;--pkl:#fce7f3;--red:#ef4444;--rl:#fee2e2;--yellow:#eab308;--yl:#fef9c3;--card:#fff;--sh:0 1px 3px rgba(0,0,0,.08)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
-h1{font-size:1.4em;font-weight:600}h2{font-size:1.2em;margin-bottom:10px;font-weight:600}h3{font-size:1.05em;margin-bottom:8px;font-weight:600}
+h1{font-size:1.4em;font-weight:600}h2{font-size:0.84em;margin-bottom:10px;font-weight:600}h3{font-size:0.74em;margin-bottom:8px;font-weight:600}
+#cards-summary b{font-size:1.4em;font-weight:400}
+#cards-summary .cards-stat-label{font-size:15px}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
 .top-bar{position:sticky;top:0;z-index:100;background:var(--card)}
 .nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto;position:sticky;top:0;z-index:100;max-width:880px;margin:0 auto}
@@ -156,7 +158,9 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 /* Desktop: bigger text, wider content, readable nav */
 @media(min-width:1024px){
 body{font-size:33px}
-h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
+h1{font-size:1.6em}h2{font-size:0.95em}h3{font-size:0.8em}
+#cards-summary b{font-size:1.2em}
+#cards-summary .cards-stat-label{font-size:24px}
 .tab{max-width:1487px;padding:28px 40px}
 .nav{max-width:1487px;margin:0 auto;padding:0 40px;position:relative}
 .nav{justify-content:flex-start}
@@ -167,7 +171,7 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 .sync-bar input{font-size:18px;width:240px;padding:7px 12px}
 .sync-bar button{font-size:17px;padding:6px 14px}
 .card{padding:24px;margin-bottom:20px;font-size:1.69em}
-.card h2{font-size:0.8em}.card h3{font-size:0.68em}
+.card h2{font-size:0.56em}.card h3{font-size:0.48em}
 .hname{font-size:27px}
 .hdet{font-size:23px}
 .hev input,.hev textarea{font-size:27px;padding:10px 14px}
@@ -521,10 +525,10 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 <h1>🃏 Flashcards</h1>
 <div class="card" id="cards-summary">
 <div class="flex" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<div><b id="cards-new-remaining" style="color:#3b82f6">0</b> <span style="color:var(--muted);font-size:13px">new</span></div>
-<div><b id="cards-learning-ct" style="color:#ef4444">0</b> <span style="color:var(--muted);font-size:13px">learning</span></div>
-<div><b id="cards-review-remaining" style="color:#22c55e">0</b> <span style="color:var(--muted);font-size:13px">to review</span></div>
-<div><b id="cards-reviewed-today" style="color:#8b5cf6">0</b> <span style="color:var(--muted);font-size:13px">reviewed today</span></div>
+<div><b id="cards-new-remaining" style="color:#3b82f6">0</b> <span class="cards-stat-label" style="color:var(--muted)">new</span></div>
+<div><b id="cards-learning-ct" style="color:#ef4444">0</b> <span class="cards-stat-label" style="color:var(--muted)">learning</span></div>
+<div><b id="cards-review-remaining" style="color:#22c55e">0</b> <span class="cards-stat-label" style="color:var(--muted)">to review</span></div>
+<div><b id="cards-reviewed-today" style="color:#8b5cf6">0</b> <span class="cards-stat-label" style="color:var(--muted)">reviewed today</span></div>
 <div style="margin-top:8px;font-size:12px;color:var(--muted)">
   <label>New/day: <input type="number" id="cards-new-limit" class="fin" style="width:55px;font-size:12px" value="20" min="1" max="200" onchange="saveCardSettings()"></label>
   <span style="margin-left:8px">Review cap: <b id="cards-review-cap">200</b></span>
