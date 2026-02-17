@@ -155,52 +155,52 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 }
 /* Desktop: bigger text, wider content, readable nav */
 @media(min-width:1024px){
-body{font-size:25px}
+body{font-size:33px}
 h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 .tab{max-width:1400px;padding:28px 40px}
 .nav{max-width:1400px;margin:0 auto}
 .nav{justify-content:center}
-.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:18px;min-width:60px}
-.nav-icon{font-size:28px;display:block;width:100%;text-align:center;line-height:1}
-.nav-label{font-size:17px;font-weight:500}
-.sync-bar{font-size:14px;padding:8px 20px}
-.sync-bar input{font-size:14px;width:240px;padding:7px 12px}
-.sync-bar button{font-size:13px;padding:6px 14px}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:23px;min-width:60px;flex:1}
+.nav-icon{font-size:36px;display:block;width:100%;text-align:center;line-height:1}
+.nav-label{font-size:22px;font-weight:500}
+.sync-bar{font-size:18px;padding:8px 20px}
+.sync-bar input{font-size:18px;width:240px;padding:7px 12px}
+.sync-bar button{font-size:17px;padding:6px 14px}
 .card{padding:24px;margin-bottom:20px}
-.hname{font-size:21px}
-.hdet{font-size:18px}
-.hev input,.hev textarea{font-size:21px;padding:10px 14px}
-.label{font-size:17px;padding:4px 12px}
-.tblock{font-size:22px;padding:12px 18px}
-.tblock .tm{font-size:20px;min-width:110px}
-.iitem{font-size:21px;padding:14px}
-.iinput input{font-size:22px;padding:14px 16px}
-.iinput button{font-size:22px;padding:14px 20px}
-.lentry{font-size:18px;padding:12px 16px}
-.lentry .lt{font-size:16px}
-.rarea textarea{font-size:22px;min-height:200px;padding:16px}
-.chatia input{font-size:16px;padding:10px 14px}
-.chatia button{font-size:16px;padding:10px 18px}
-.cmsg .bbl{font-size:16px;padding:10px 16px}
-.atable{font-size:15px}
+.hname{font-size:27px}
+.hdet{font-size:23px}
+.hev input,.hev textarea{font-size:27px;padding:10px 14px}
+.label{font-size:22px;padding:4px 12px}
+.tblock{font-size:29px;padding:12px 18px}
+.tblock .tm{font-size:26px;min-width:110px}
+.iitem{font-size:27px;padding:14px}
+.iinput input{font-size:29px;padding:14px 16px}
+.iinput button{font-size:29px;padding:14px 20px}
+.lentry{font-size:23px;padding:12px 16px}
+.lentry .lt{font-size:21px}
+.rarea textarea{font-size:29px;min-height:200px;padding:16px}
+.chatia input{font-size:21px;padding:10px 14px}
+.chatia button{font-size:21px;padding:10px 18px}
+.cmsg .bbl{font-size:21px;padding:10px 16px}
+.atable{font-size:20px}
 .atable th,.atable td{padding:8px 12px}
-.timer-d{font-size:3.6em}
+.timer-d{font-size:4.7em}
 .sgrid{max-width:360px}
-.aotd-title{font-size:19px}
-.aotd-blurb{font-size:16px}
-.aotd-meta{font-size:13px}
-.aotd-cat{font-size:12px}
-.wc{font-size:13px}
-.ewarn{font-size:13px}
-.btn{font-size:15px;padding:8px 14px}
-.btn-s{font-size:13px;padding:6px 12px}
-.btn-p{font-size:15px;padding:10px 18px}
-.goal-chip{font-size:20px;padding:4px 12px}
-.chip-add{font-size:18px;padding:4px 14px}
-.tr-table{font-size:16px}
+.aotd-title{font-size:25px}
+.aotd-blurb{font-size:21px}
+.aotd-meta{font-size:17px}
+.aotd-cat{font-size:16px}
+.wc{font-size:17px}
+.ewarn{font-size:17px}
+.btn{font-size:20px;padding:8px 14px}
+.btn-s{font-size:17px;padding:6px 12px}
+.btn-p{font-size:20px;padding:10px 18px}
+.goal-chip{font-size:26px;padding:4px 12px}
+.chip-add{font-size:23px;padding:4px 14px}
+.tr-table{font-size:21px}
 .tr-table td{padding:12px 14px}
-.rprompt label{font-size:15px}
-.rprompt textarea{font-size:15px;padding:10px}
+.rprompt label{font-size:20px}
+.rprompt textarea{font-size:20px;padding:10px}
 }
 /* Article of the Day */
 .aotd{display:flex;gap:14px;align-items:flex-start}
@@ -313,7 +313,7 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 <button onclick="switchTab('claude')"><span class="nav-icon">🤖</span><span class="nav-label">Claude</span></button>
 <button onclick="switchTab('meals')"><span class="nav-icon">🍽️</span><span class="nav-label">Meals</span></button>
 <button onclick="switchTab('log')"><span class="nav-icon">📋</span><span class="nav-label">Log</span></button>
-<button onclick="forceUpdate()" title="Force update" style="margin-left:auto;font-size:16px;padding:8px 10px">⟳</button>
+<button onclick="forceUpdate()" title="Force update" style="margin-left:auto;font-size:16px;padding:8px 10px;flex:none">⟳</button>
 </nav>
 </div>
 
@@ -358,9 +358,9 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
 <div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
-<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"><button class="chip-add" onclick="_t3AddNewChip('t3-work','w')">＋ Add</button></div></div>
-<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"><button class="chip-add" onclick="_t3AddNewChip('t3-school','s')">＋ Add</button></div></div>
-<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"><button class="chip-add" onclick="_t3AddNewChip('t3-life','l')">＋ Add</button></div></div>
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"><button class="chip-add" onclick="_t3AddNewChip('t3-work','w')">＋ Add</button></div></div>
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"><button class="chip-add" onclick="_t3AddNewChip('t3-school','s')">＋ Add</button></div></div>
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"><button class="chip-add" onclick="_t3AddNewChip('t3-life','l')">＋ Add</button></div></div>
 </div>
 </div>
 <div class="card">
