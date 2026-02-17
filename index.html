@@ -308,6 +308,13 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
   #tab-week .card > details > summary { font-size:22px !important; }
   #wg-work, #wg-school, #wg-life { font-size:18px !important; }
 }
+/* Progress grid: 2-col on desktop, 1-col on mobile */
+.prog-grid{display:flex;flex-direction:column;gap:14px}
+.prog-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+@media(min-width:1024px){
+  .prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .prog-cell{margin-bottom:0}
+}
 </style>
 </head>
 <body>
@@ -743,6 +750,11 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <button id="meal-day-rest" onclick="setDayType('rest')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:13px;background:var(--card);cursor:pointer">😴 Rest</button>
 </div>
 <div id="meal-targets-display" style="font-size:13px;color:var(--muted)"></div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+<b style="font-size:13px">⚖️ Weight:</b>
+<input type="number" id="meal-weight-in" placeholder="lbs" step="0.1" min="0" max="500" onchange="saveWeight()" style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+<span style="font-size:12px;color:var(--muted)">lbs</span>
+</div>
 </div>
 
 <style>
@@ -812,15 +824,18 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="tab" id="tab-progress">
 <h2>📈 Progress</h2>
 <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
-<button class="btn btn-s prog-range-btn" data-range="7d" onclick="setProgressRange('7d')">7d</button>
+<button class="btn btn-s prog-range-btn" data-range="14d" onclick="setProgressRange('14d')">14d</button>
 <button class="btn btn-s prog-range-btn active" data-range="30d" onclick="setProgressRange('30d')">30d</button>
 <button class="btn btn-s prog-range-btn" data-range="ytd" onclick="setProgressRange('ytd')">YTD</button>
 <button class="btn btn-s prog-range-btn" data-range="all" onclick="setProgressRange('all')">All</button>
 </div>
 <p id="progress-empty" style="display:none;color:var(--muted);font-size:13px">No data yet — start using the app and charts will appear here.</p>
-<div class="card"><h3>🃏 Anki Activity</h3><div style="position:relative;height:280px"><canvas id="chart-anki"></canvas></div></div>
-<div class="card"><h3>🇮🇹 Italian Scores</h3><div style="position:relative;height:280px"><canvas id="chart-italian"></canvas></div></div>
-<div class="card"><h3>🍽️ Calories &amp; Protein</h3><div style="position:relative;height:280px"><canvas id="chart-nutrition"></canvas></div></div>
+<div class="prog-grid">
+<div class="card prog-cell"><h3>🃏 Anki Activity</h3><div style="position:relative;height:320px"><canvas id="chart-anki"></canvas></div></div>
+<div class="card prog-cell"><h3>🇮🇹 Italian Scores</h3><div style="position:relative;height:320px"><canvas id="chart-italian"></canvas></div></div>
+<div class="card prog-cell"><h3>🍽️ Calories &amp; Protein</h3><div style="position:relative;height:320px"><canvas id="chart-nutrition"></canvas></div></div>
+<div class="card prog-cell"><h3>⚖️ Weight</h3><div style="position:relative;height:320px"><canvas id="chart-weight"></canvas></div></div>
+</div>
 </div>
 
 <div class="tab" id="tab-log">

@@ -2,6 +2,11 @@
 let _progressCharts = {};
 let _progressRange = '30d';
 
+const _CHART_FONT_SIZE = 20;
+const _CHART_TITLE_SIZE = 22;
+const _CHART_LEGEND_SIZE = 18;
+const _CHART_TICK_SIZE = 16;
+
 function renderProgress() {
   const range = _progressRange;
   const dates = _getAllDatesInRange(range);
@@ -19,6 +24,7 @@ function renderProgress() {
   _renderAnkiChart(dates);
   _renderItalianChart(dates);
   _renderNutritionChart(dates);
+  _renderWeightChart(dates);
 }
 
 function setProgressRange(r) {
@@ -29,19 +35,12 @@ function setProgressRange(r) {
 // ---- date helpers ----
 function _getAllDatesInRange(range) {
   const d = load();
-  // Collect every date that exists in days, corrections, readingHistory, or cards
   const dateSet = new Set();
 
-  // From days
   if (d.days) Object.keys(d.days).forEach(dt => dateSet.add(dt));
-
-  // From corrections
   (d.corrections || []).forEach(c => { if (c.date) dateSet.add(c.date); });
-
-  // From readingHistory
   (d.readingHistory || []).forEach(r => { if (r.date) dateSet.add(r.date); });
 
-  // From anki cards (created dates + reviewedToday)
   const cd = _getCardsData();
   (cd.cards || []).forEach(c => {
     if (c.created) dateSet.add(c.created);
@@ -50,26 +49,23 @@ function _getAllDatesInRange(range) {
 
   let all = Array.from(dateSet).sort();
 
-  // Apply range filter
   const now = new Date();
   let cutoff = null;
   if (range === '7d') {
-    cutoff = new Date(now);
-    cutoff.setDate(cutoff.getDate() - 6);
+    cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 6);
+  } else if (range === '14d') {
+    cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 13);
   } else if (range === '30d') {
-    cutoff = new Date(now);
-    cutoff.setDate(cutoff.getDate() - 29);
+    cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 29);
   } else if (range === 'ytd') {
     cutoff = new Date(now.getFullYear(), 0, 1);
   }
-  // 'all' → no cutoff
 
   if (cutoff) {
     const cutStr = cutoff.getFullYear() + '-' + String(cutoff.getMonth() + 1).padStart(2, '0') + '-' + String(cutoff.getDate()).padStart(2, '0');
     all = all.filter(dt => dt >= cutStr);
   }
 
-  // Fill gaps — generate continuous date range from first to today
   if (all.length === 0) return [];
   const todayStr = today();
   const start = all[0] < todayStr ? all[0] : todayStr;
@@ -91,7 +87,6 @@ function _getCardsData() {
 }
 
 function _shortDate(dt) {
-  // "2025-02-17" → "Feb 17"
   const parts = dt.split('-');
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return months[parseInt(parts[1]) - 1] + ' ' + parseInt(parts[2]);
@@ -118,7 +113,6 @@ function _renderAnkiChart(dates) {
   });
 
   const labels = dates.map(_shortDate);
-  const reviewData = dates.map(dt => reviewedPerDay[dt] || 0);
   const addedData = dates.map(dt => addedPerDay[dt] || 0);
 
   const ctx = document.getElementById('chart-anki').getContext('2d');
@@ -132,8 +126,8 @@ function _renderAnkiChart(dates) {
           data: dates.map((dt, i) => ({ x: i, y: reviewedPerDay[dt] || 0 })),
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
-          pointRadius: 4,
-          pointHoverRadius: 6,
+          pointRadius: 5,
+          pointHoverRadius: 8,
           yAxisID: 'y',
           order: 1
         },
@@ -154,31 +148,30 @@ function _renderAnkiChart(dates) {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#ccc', font: { size: 11 } } },
+        legend: { labels: { color: '#555', font: { size: _CHART_LEGEND_SIZE } } },
         tooltip: {
-          callbacks: {
-            title: function(items) { return dates[items[0].dataIndex] || ''; }
-          }
+          titleFont: { size: _CHART_TICK_SIZE },
+          bodyFont: { size: _CHART_TICK_SIZE },
+          callbacks: { title: function(items) { return dates[items[0].dataIndex] || ''; } }
         }
       },
       scales: {
         x: {
-          type: 'category',
-          labels: labels,
-          ticks: { color: '#999', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 15 },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+          type: 'category', labels: labels,
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
           position: 'left',
-          title: { display: true, text: 'Reviewed', color: '#3b82f6' },
-          ticks: { color: '#3b82f6', font: { size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.05)' },
+          title: { display: true, text: 'Reviewed', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
+          grid: { color: 'rgba(0,0,0,0.06)' },
           beginAtZero: true
         },
         y1: {
           position: 'right',
-          title: { display: true, text: 'Added', color: '#f97316' },
-          ticks: { color: '#f97316', font: { size: 10 } },
+          title: { display: true, text: 'Added', color: '#f97316', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#f97316', font: { size: _CHART_TICK_SIZE } },
           grid: { drawOnChartArea: false },
           beginAtZero: true
         }
@@ -194,7 +187,6 @@ function _renderItalianChart(dates) {
   const corrections = d.corrections || [];
   const readings = d.readingHistory || [];
 
-  // Build per-date score maps (may have multiple per day — take latest)
   const reflScores = {};
   corrections.forEach(c => {
     if (c.date && c.score && c.score.score != null) reflScores[c.date] = c.score.score;
@@ -205,8 +197,6 @@ function _renderItalianChart(dates) {
   });
 
   const labels = dates.map(_shortDate);
-
-  // Build scatter data points (only where scores exist)
   const reflPoints = [];
   const artPoints = [];
   dates.forEach((dt, i) => {
@@ -225,22 +215,16 @@ function _renderItalianChart(dates) {
           data: reflPoints,
           backgroundColor: 'rgba(239, 68, 68, 0.7)',
           borderColor: 'rgba(239, 68, 68, 1)',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          showLine: true,
-          tension: 0.3,
-          borderWidth: 1.5
+          pointRadius: 6, pointHoverRadius: 9,
+          showLine: true, tension: 0.3, borderWidth: 2
         },
         {
           label: 'Article Reflection',
           data: artPoints,
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          showLine: true,
-          tension: 0.3,
-          borderWidth: 1.5
+          pointRadius: 6, pointHoverRadius: 9,
+          showLine: true, tension: 0.3, borderWidth: 2
         }
       ]
     },
@@ -249,8 +233,10 @@ function _renderItalianChart(dates) {
       maintainAspectRatio: false,
       interaction: { mode: 'nearest', intersect: true },
       plugins: {
-        legend: { labels: { color: '#ccc', font: { size: 11 } } },
+        legend: { labels: { color: '#555', font: { size: _CHART_LEGEND_SIZE } } },
         tooltip: {
+          titleFont: { size: _CHART_TICK_SIZE },
+          bodyFont: { size: _CHART_TICK_SIZE },
           callbacks: {
             title: function(items) { return dates[items[0].raw.x] || ''; },
             label: function(item) { return item.dataset.label + ': ' + item.raw.y + '/100'; }
@@ -259,16 +245,15 @@ function _renderItalianChart(dates) {
       },
       scales: {
         x: {
-          type: 'category',
-          labels: labels,
-          ticks: { color: '#999', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 15 },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+          type: 'category', labels: labels,
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
           min: 0, max: 100,
-          title: { display: true, text: 'Score', color: '#ccc' },
-          ticks: { color: '#999', font: { size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.08)' }
+          title: { display: true, text: 'Score', color: '#555', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE } },
+          grid: { color: 'rgba(0,0,0,0.08)' }
         }
       }
     }
@@ -311,22 +296,18 @@ function _renderNutritionChart(dates) {
           data: calData,
           borderColor: 'rgba(59, 130, 246, 1)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          yAxisID: 'y'
+          tension: 0.3, fill: true,
+          pointRadius: 4, pointHoverRadius: 7,
+          borderWidth: 2, yAxisID: 'y'
         },
         {
           label: 'Protein (g)',
           data: protData,
           borderColor: 'rgba(34, 197, 94, 1)',
           backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          yAxisID: 'y1'
+          tension: 0.3, fill: true,
+          pointRadius: 4, pointHoverRadius: 7,
+          borderWidth: 2, yAxisID: 'y1'
         }
       ]
     },
@@ -335,26 +316,107 @@ function _renderNutritionChart(dates) {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#ccc', font: { size: 11 } } }
+        legend: { labels: { color: '#555', font: { size: _CHART_LEGEND_SIZE } } },
+        tooltip: { titleFont: { size: _CHART_TICK_SIZE }, bodyFont: { size: _CHART_TICK_SIZE } }
       },
       scales: {
         x: {
-          ticks: { color: '#999', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 15 },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          grid: { color: 'rgba(0,0,0,0.06)' }
         },
         y: {
           position: 'left',
-          title: { display: true, text: 'Calories', color: '#3b82f6' },
-          ticks: { color: '#3b82f6', font: { size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.05)' },
+          title: { display: true, text: 'Calories', color: '#3b82f6', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#3b82f6', font: { size: _CHART_TICK_SIZE } },
+          grid: { color: 'rgba(0,0,0,0.06)' },
           beginAtZero: true
         },
         y1: {
           position: 'right',
-          title: { display: true, text: 'Protein (g)', color: '#22c55e' },
-          ticks: { color: '#22c55e', font: { size: 10 } },
+          title: { display: true, text: 'Protein (g)', color: '#22c55e', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#22c55e', font: { size: _CHART_TICK_SIZE } },
           grid: { drawOnChartArea: false },
           beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// ---- Chart 4: Weight ----
+function _renderWeightChart(dates) {
+  _destroyChart('weight');
+  const d = load();
+  const days = d.days || {};
+
+  const weightData = [];
+  const weightLabels = [];
+  const weightDates = [];
+
+  dates.forEach(dt => {
+    const day = days[dt];
+    if (day && day.meals && day.meals.weight) {
+      weightData.push(day.meals.weight);
+      weightLabels.push(_shortDate(dt));
+      weightDates.push(dt);
+    }
+  });
+
+  const ctx = document.getElementById('chart-weight').getContext('2d');
+
+  if (weightData.length === 0) {
+    _progressCharts['weight'] = new Chart(ctx, {
+      type: 'line',
+      data: { labels: ['No data'], datasets: [{ label: 'Weight (lbs)', data: [], borderColor: '#8b5cf6' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#555', font: { size: _CHART_LEGEND_SIZE } } },
+          title: { display: true, text: 'Log weight on the Meals tab to see data here', color: '#999', font: { size: 14 } }
+        }
+      }
+    });
+    return;
+  }
+
+  _progressCharts['weight'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: weightLabels,
+      datasets: [{
+        label: 'Weight (lbs)',
+        data: weightData,
+        borderColor: 'rgba(139, 92, 246, 1)',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        tension: 0.3, fill: true,
+        pointRadius: 5, pointHoverRadius: 8,
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#555', font: { size: _CHART_LEGEND_SIZE } } },
+        tooltip: {
+          titleFont: { size: _CHART_TICK_SIZE },
+          bodyFont: { size: _CHART_TICK_SIZE },
+          callbacks: {
+            title: function(items) { return weightDates[items[0].dataIndex] || ''; },
+            label: function(item) { return item.raw + ' lbs'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#666', font: { size: _CHART_TICK_SIZE }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+          grid: { color: 'rgba(0,0,0,0.06)' }
+        },
+        y: {
+          title: { display: true, text: 'Weight (lbs)', color: '#8b5cf6', font: { size: _CHART_TITLE_SIZE } },
+          ticks: { color: '#8b5cf6', font: { size: _CHART_TICK_SIZE } },
+          grid: { color: 'rgba(0,0,0,0.08)' }
         }
       }
     }

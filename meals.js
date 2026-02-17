@@ -44,6 +44,9 @@ function renderMeals() {
   renderMacroRings(totals, targets);
   renderMealLog(m.entries || []);
   renderStoredMeals('');
+  // Weight field
+  const weightEl = document.getElementById('meal-weight-in');
+  if (weightEl) weightEl.value = m.weight || '';
   // Clear autocomplete
   document.getElementById('meal-autocomplete').innerHTML = '';
   document.getElementById('meal-autocomplete').style.display = 'none';
@@ -488,6 +491,14 @@ function _offerSaveMeal(name, cal, prot, carb, fat, desc) {
     });
     save(d);
   }
+}
+
+function saveWeight() {
+  const v = document.getElementById('meal-weight-in').value.trim();
+  const dd = dayData(today());
+  if (!dd.days[today()].meals) dd.days[today()].meals = { dayType: 'workout', entries: [] };
+  dd.days[today()].meals.weight = v ? parseFloat(v) : null;
+  save(dd);
 }
 
 function _clearMealForm() {
