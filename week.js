@@ -13,6 +13,7 @@ function shiftWeekGoals(dir) {
 }
 function renderWeek() {
   const wk = weekId(); document.getElementById('wk-date').textContent = wk;
+  renderStretchGoals();
   renderDailySummaries();
   loadWeekGoals();
   syncWeekGoalsDoneState();
@@ -461,6 +462,482 @@ function submitWR() {
   if (!well || !bad || !imp) { alert('Complete all review prompts.'); return; }
   const wk = weekId(), wd = weekData(wk); wd.weeks[wk].review = { well, bad, imp, push, ts: new Date().toISOString() }; save(wd);
   document.getElementById('wr-res').style.display = 'block'; document.getElementById('wr-res').innerHTML = '<p style="color:var(--green);font-weight:600">✅ Weekly review submitted!</p>'; addLog('action', 'Weekly review: ' + wk);
+}
+
+// ============ STRETCH GOALS SYSTEM ============
+const STRETCH_GOAL_EVALUATOR_PROMPT = `You are evaluating three weekly stretch goals for someone who wants to build a year of memorable experiences. Your role is to push back on comfort-zone goals and prioritize experiences that create lasting positive memories.
+
+CONTEXT: The user already has a rigorous daily tracking system covering:
+- Italian language learning (flashcards, reading, composition)
+- Academic/dissertation work
+- Gym and nutrition tracking  
+- Article reading with reflections
+- Productivity systems
+
+These are ALREADY optimized. Stretch goals must push AWAY from these quantified patterns.
+
+AUTOMATIC REJECTION:
+❌ More language learning tasks (already doing 300 cards/day + reading + composition)
+❌ More academic/dissertation work (already tracked weekly)
+❌ More gym sessions (already tracked)
+❌ More reading/articles (already doing 2/day with reflections)
+❌ Productivity meta-work (tracking systems, optimization)
+❌ Generic social ("get dinner with X")
+❌ More than ONE Italian media consumption goal
+
+EVALUATION CRITERIA (in priority order):
+1. **Untrackable Over Measurable**: Would this feel stupid to put in a spreadsheet?
+2. **Experiential Over Achievement**: Memory-making > accomplishment
+3. **In-Person Over Digital**: Real world > screen
+4. **Novel Over Optimized**: First time doing X > getting better at X
+5. **Social Beyond Default**: Meaningful connection > routine hangout
+6. **Physical World**: Leaving your usual environments
+
+AUTOMATIC APPROVAL (1 per week max):
+✅ ONE Italian film or book (but NOT study materials)
+
+SCORING SYSTEM:
+For each goal:
+- **VERDICT**: APPROVED / CONDITIONAL / REJECTED  
+- **Memory Score**: 1-10 (smile-worthy in December?)
+- **Anti-Optimization Score**: 1-10 (how resistant to tracking/metrics?)
+- **Specific Feedback**: Why it works/fails
+- **Improvement**: If rejected, propose stronger alternative
+
+GOALS TO EVALUATE:
+[Goal 1]: {goal1}
+[Goal 2]: {goal2}
+[Goal 3]: {goal3}
+
+PREVIOUS WEEKS' GOALS (check for repetition):
+{history}
+
+FINAL RECOMMENDATION:
+- Count of Italian media goals (flag if >1)
+- Overall "unquantifiable experience" potential  
+- Warning if goals drift into already-tracked domains
+- Flag any repetitive patterns from previous weeks
+
+Be ruthlessly honest. These goals should make you feel slightly uncomfortable because they're NOT your normal optimization patterns. The bar is: "Would this make a good story at a dinner party, or would it sound like homework?"
+
+Return your response in this exact format:
+GOAL 1: [APPROVED/CONDITIONAL/REJECTED]
+Memory Score: X/10
+Anti-Optimization Score: X/10
+Feedback: ...
+
+GOAL 2: ...
+
+GOAL 3: ...
+
+FINAL: [APPROVED/NEEDS_REVISION]
+Summary: ...`;
+
+const ITALIAN_MEDIA_KEYWORDS = ['watch', 'film', 'movie', 'read', 'libro', 'legger', 'cinema', 'vedere'];
+
+let _sgPendingImage = null;
+let _sgCompletingGoalId = null;
+
+function renderStretchGoals() {
+  const wk = weekId();
+  const sg = getStretchGoals(wk);
+  const container = document.getElementById('stretch-goals-container');
+  if (!container) return;
+  
+  if (!sg || !sg.submitted) {
+    // Show submission form
+    container.innerHTML = `
+      <div class="stretch-goals-submission">
+        <h3 style="color:var(--red);margin-bottom:12px">⚠️ Weekly Stretch Goals Required</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Set three memory-making goals for this week. These should push you out of your comfort zone.</p>
+        <div class="sg-input-group">
+          <label>Goal 1:</label>
+          <input type="text" id="sg-goal-1" placeholder="Try a pottery class..." maxlength="200">
+        </div>
+        <div class="sg-input-group">
+          <label>Goal 2:</label>
+          <input type="text" id="sg-goal-2" placeholder="Attend a local theater performance..." maxlength="200">
+        </div>
+        <div class="sg-input-group">
+          <label>Goal 3:</label>
+          <input type="text" id="sg-goal-3" placeholder="Watch Cinema Paradiso (Italian film)..." maxlength="200">
+        </div>
+        <button id="sg-submit-btn" class="btn btn-p" onclick="submitStretchGoals()">Submit for AI Approval</button>
+        <div id="sg-eval-result" style="margin-top:16px"></div>
+      </div>
+    `;
+  } else {
+    // Show approved goals
+    const goalsHtml = sg.goals.map(g => {
+      const badge = g.type === 'italian-media' ? '<span class="sg-badge sg-badge-media">📚 Italian Media</span>' : '<span class="sg-badge sg-badge-exp">🎯 Experience</span>';
+      const completedClass = g.completed ? 'sg-goal-completed' : '';
+      const completedBadge = g.completed ? '<span class="sg-completed-badge">✓ Completed</span>' : '';
+      const completeBtn = g.completed ? '' : `<button class="btn btn-sm" onclick="openCompleteGoalModal('${g.id}', '${g.type}')">Complete Goal</button>`;
+      return `
+        <div class="stretch-goal-card ${completedClass}">
+          <div class="sg-header">
+            ${badge}
+            ${completedBadge}
+          </div>
+          <div class="sg-text">${escHtml(g.text)}</div>
+          <div class="sg-scores">
+            <span title="Memory Score">💭 ${g.memoryScore}/10</span>
+            <span title="Anti-Optimization Score">🎨 ${g.comfortZoneScore}/10</span>
+          </div>
+          ${completeBtn}
+        </div>
+      `;
+    }).join('');
+    
+    container.innerHTML = `
+      <div class="stretch-goals-display">
+        <h3 style="margin-bottom:8px">🎯 Weekly Stretch Goals</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Memory-making experiences for week of ${wk}</p>
+        <div class="stretch-goals-grid">${goalsHtml}</div>
+      </div>
+    `;
+  }
+}
+
+async function submitStretchGoals() {
+  const goal1 = document.getElementById('sg-goal-1').value.trim();
+  const goal2 = document.getElementById('sg-goal-2').value.trim();
+  const goal3 = document.getElementById('sg-goal-3').value.trim();
+  
+  if (!goal1 || !goal2 || !goal3) {
+    alert('All three goals are required.');
+    return;
+  }
+  
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) {
+    alert('Set your Anthropic API key in the Claude tab first.');
+    switchTab('claude');
+    return;
+  }
+  
+  const btn = document.getElementById('sg-submit-btn');
+  const result = document.getElementById('sg-eval-result');
+  btn.textContent = '⏳ Evaluating with Claude...';
+  btn.disabled = true;
+  
+  try {
+    // Get history for repetition check
+    const history = getStretchGoalHistory().map(h => 
+      `Week ${h.week}: ${h.goals.map(g => `"${g.text}" (${g.type}, ${g.completed ? 'completed' : 'incomplete'})`).join(', ')}`
+    ).join('\n');
+    
+    const prompt = STRETCH_GOAL_EVALUATOR_PROMPT
+      .replace('{goal1}', goal1)
+      .replace('{goal2}', goal2)
+      .replace('{goal3}', goal3)
+      .replace('{history}', history || 'No previous stretch goals.');
+    
+    const response = await callClaude(key, prompt);
+    result.style.display = 'block';
+    result.innerHTML = `<div style="background:var(--bg);padding:12px;border-radius:6px;font-size:13px;white-space:pre-wrap;border:1px solid var(--border);max-height:400px;overflow-y:auto">${escHtml(response)}</div>`;
+    
+    // Parse response for approval
+    const finalMatch = response.match(/FINAL:\s*(APPROVED|NEEDS_REVISION)/i);
+    if (finalMatch && finalMatch[1].toUpperCase() === 'APPROVED') {
+      // Extract scores and save goals
+      const goals = [goal1, goal2, goal3].map((text, idx) => {
+        const goalNum = idx + 1;
+        const verdictMatch = response.match(new RegExp(`GOAL ${goalNum}:\\s*(APPROVED|CONDITIONAL|REJECTED)`, 'i'));
+        const memoryMatch = response.match(new RegExp(`Memory Score:\\s*(\\d+)/10`, 'i'));
+        const antiOptMatch = response.match(new RegExp(`Anti-Optimization Score:\\s*(\\d+)/10`, 'i'));
+        
+        const type = _detectGoalType(text);
+        
+        return {
+          id: 'sg_' + Date.now() + '_' + idx,
+          text: text,
+          type: type,
+          approved: verdictMatch ? verdictMatch[1].toUpperCase() === 'APPROVED' : true,
+          approvalResponse: response,
+          memoryScore: memoryMatch ? parseInt(memoryMatch[1]) : 7,
+          comfortZoneScore: antiOptMatch ? parseInt(antiOptMatch[1]) : 7,
+          completed: false,
+          completionDate: null,
+          completionEvidence: null
+        };
+      });
+      
+      // Save to weekData
+      const wk = weekId();
+      const wd = weekData(wk);
+      wd.weeks[wk].stretchGoals = {
+        goals: goals,
+        submitted: true,
+        submittedDate: new Date().toISOString()
+      };
+      save(wd);
+      
+      result.innerHTML += '<p style="color:var(--green);font-weight:600;margin-top:12px">✅ Goals approved! Site unlocked.</p>';
+      addLog('action', 'Stretch goals submitted for ' + wk);
+      
+      setTimeout(() => {
+        renderStretchGoals();
+        if (typeof checkSiteLock === 'function') checkSiteLock();
+      }, 2000);
+    } else {
+      result.innerHTML += '<p style="color:var(--orange);font-weight:600;margin-top:12px">⚠️ Goals need revision. Please adjust based on feedback above.</p>';
+    }
+  } catch (e) {
+    result.style.display = 'block';
+    result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
+  } finally {
+    btn.textContent = 'Submit for AI Approval';
+    btn.disabled = false;
+  }
+}
+
+function _detectGoalType(text) {
+  const lower = text.toLowerCase();
+  for (const keyword of ITALIAN_MEDIA_KEYWORDS) {
+    if (lower.includes(keyword)) return 'italian-media';
+  }
+  return 'experiential';
+}
+
+function openCompleteGoalModal(goalId, type) {
+  _sgCompletingGoalId = goalId;
+  const modal = document.getElementById('sg-complete-modal');
+  const content = document.getElementById('sg-complete-content');
+  
+  if (type === 'experiential') {
+    content.innerHTML = `
+      <h3>Complete Experiential Goal</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Upload photo evidence (tickets, programs, photos of you there)</p>
+      <input type="file" id="sg-photo-input" accept="image/*" onchange="sgPhotoSelected(this)" style="margin-bottom:12px">
+      <div id="sg-photo-preview" style="margin-bottom:12px"></div>
+      <button class="btn btn-p" onclick="submitExperientialCompletion()">Submit for Validation</button>
+      <button class="btn" onclick="closeSGModal()">Cancel</button>
+      <div id="sg-complete-result" style="margin-top:12px"></div>
+    `;
+  } else {
+    content.innerHTML = `
+      <h3>Complete Italian Media Goal</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Write a 400+ word composition about the film/book</p>
+      <textarea id="sg-composition" rows="12" style="width:100%;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:4px;font-family:inherit"></textarea>
+      <div id="sg-word-count" style="font-size:12px;color:var(--muted);margin:4px 0">0 / 400 words</div>
+      <button class="btn btn-p" onclick="submitMediaCompletion()">Submit for Validation</button>
+      <button class="btn" onclick="closeSGModal()">Cancel</button>
+      <div id="sg-complete-result" style="margin-top:12px"></div>
+    `;
+    
+    // Word counter
+    setTimeout(() => {
+      const textarea = document.getElementById('sg-composition');
+      if (textarea) {
+        textarea.addEventListener('input', function() {
+          const words = this.value.trim().split(/\s+/).filter(w => w).length;
+          const counter = document.getElementById('sg-word-count');
+          if (counter) {
+            counter.textContent = words + ' / 400 words';
+            counter.style.color = words >= 400 ? 'var(--green)' : 'var(--muted)';
+          }
+        });
+      }
+    }, 100);
+  }
+  
+  modal.style.display = 'flex';
+}
+
+function sgPhotoSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    _sgPendingImage = e.target.result;
+    document.getElementById('sg-photo-preview').innerHTML = 
+      '<img src="' + _sgPendingImage + '" style="max-width:300px;max-height:200px;border-radius:6px;border:1px solid var(--border)">';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitExperientialCompletion() {
+  if (!_sgPendingImage) {
+    alert('Please upload photo evidence.');
+    return;
+  }
+  
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) {
+    alert('Set your API key in the Claude tab first.');
+    return;
+  }
+  
+  const result = document.getElementById('sg-complete-result');
+  result.innerHTML = '<p style="font-size:13px">⏳ Validating with Claude...</p>';
+  
+  try {
+    const base64 = _sgPendingImage.split(',')[1];
+    const mediaType = _sgPendingImage.split(';')[0].split(':')[1] || 'image/jpeg';
+    
+    const prompt = 'Analyze this image as evidence of completing an experiential stretch goal. Look for: tickets, programs, photos showing the person at an event/location, or other proof of participation in a memorable experience. If this appears to be genuine evidence of an experience (not just a screenshot or random photo), respond with "APPROVED: [brief description of what you see]". If it does not appear to be valid evidence, respond with "REJECTED: [reason]". Be reasonable - tickets, wristbands, photos at venues, program booklets, etc. all count as valid evidence.';
+    
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+    
+    if (!resp.ok) throw new Error('API error: ' + resp.status);
+    const data = await resp.json();
+    const validation = data.content[0].text;
+    
+    if (validation.toUpperCase().includes('APPROVED')) {
+      // Mark goal complete
+      const wk = weekId();
+      const wd = weekData(wk);
+      const goal = wd.weeks[wk].stretchGoals.goals.find(g => g.id === _sgCompletingGoalId);
+      if (goal) {
+        goal.completed = true;
+        goal.completionDate = new Date().toISOString();
+        goal.completionEvidence = {
+          imageDataUrl: _sgPendingImage,
+          validationResponse: validation
+        };
+        save(wd);
+        
+        result.innerHTML = '<p style="color:var(--green);font-weight:600">✅ Goal completed! ' + escHtml(validation) + '</p>';
+        addLog('milestone', 'Stretch goal completed: ' + goal.text);
+        
+        setTimeout(() => {
+          closeSGModal();
+          celebrateGoalCompletion();
+          renderStretchGoals();
+        }, 2000);
+      }
+    } else {
+      result.innerHTML = '<p style="color:var(--red)">❌ ' + escHtml(validation) + '</p>';
+    }
+  } catch (e) {
+    result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
+  }
+}
+
+async function submitMediaCompletion() {
+  const text = document.getElementById('sg-composition').value.trim();
+  const words = text.split(/\s+/).filter(w => w).length;
+  
+  if (words < 400) {
+    alert('Minimum 400 words required. Currently: ' + words);
+    return;
+  }
+  
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) {
+    alert('Set your API key in the Claude tab first.');
+    return;
+  }
+  
+  const result = document.getElementById('sg-complete-result');
+  result.innerHTML = '<p style="font-size:13px">⏳ Validating with Claude...</p>';
+  
+  try {
+    const prompt = `Analyze this composition about Italian media (film or book). Determine if this is a genuine reflection showing the person actually engaged with and thought about the work, or if it's superficial/copied. Respond with "APPROVED: [brief feedback]" if genuine, or "REJECTED: [reason]" if not.
+
+Composition:
+${text}`;
+    
+    const validation = await callClaude(key, prompt);
+    
+    if (validation.toUpperCase().includes('APPROVED')) {
+      // Mark goal complete
+      const wk = weekId();
+      const wd = weekData(wk);
+      const goal = wd.weeks[wk].stretchGoals.goals.find(g => g.id === _sgCompletingGoalId);
+      if (goal) {
+        goal.completed = true;
+        goal.completionDate = new Date().toISOString();
+        goal.completionEvidence = {
+          composition: text,
+          validationResponse: validation
+        };
+        save(wd);
+        
+        result.innerHTML = '<p style="color:var(--green);font-weight:600">✅ Goal completed! ' + escHtml(validation) + '</p>';
+        addLog('milestone', 'Stretch goal completed: ' + goal.text);
+        
+        setTimeout(() => {
+          closeSGModal();
+          celebrateGoalCompletion();
+          renderStretchGoals();
+        }, 2000);
+      }
+    } else {
+      result.innerHTML = '<p style="color:var(--red)">❌ ' + escHtml(validation) + '</p>';
+    }
+  } catch (e) {
+    result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
+  }
+}
+
+function closeSGModal() {
+  document.getElementById('sg-complete-modal').style.display = 'none';
+  _sgPendingImage = null;
+  _sgCompletingGoalId = null;
+}
+
+function celebrateGoalCompletion() {
+  // Confetti celebration
+  if (typeof confetti !== 'undefined') {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 }
+      });
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 }
+      });
+    }, 250);
+  }
+  
+  // Encouraging message
+  const messages = [
+    '🎉 Another memory in the books!',
+    '✨ You\'re building a life worth remembering!',
+    '🌟 That\'s one for the highlight reel!',
+    '🎊 Living, not optimizing!',
+    '💫 December-you will thank you for this!'
+  ];
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+  
+  // Show temporary overlay message
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--green);color:#fff;padding:24px 48px;border-radius:12px;font-size:24px;font-weight:600;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:sgFadeOut 3s forwards';
+  overlay.textContent = msg;
+  document.body.appendChild(overlay);
+  
+  setTimeout(() => overlay.remove(), 3000);
 }
 
 

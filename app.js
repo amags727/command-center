@@ -44,7 +44,47 @@ function renderLog() {
   if (filter !== 'all') entries = entries.filter(e => e.type === filter);
   if (dateF) entries = entries.filter(e => e.ts.startsWith(dateF));
   document.getElementById('log-entries').innerHTML = entries.length === 0 ? '<p style="color:var(--muted);font-size:13px;padding:10px">No entries.</p>' : entries.slice(0, 100).map(e => '<div class="lentry ' + e.type + '"><span class="lt">' + new Date(e.ts).toLocaleString() + '</span> ' + escHtml(e.msg) + '</div>').join('');
+  renderMemoryList();
   renderWeekArchives();
+}
+
+function renderMemoryList() {
+  const container = document.getElementById('memory-list-container');
+  if (!container) return;
+  
+  const history = getStretchGoalHistory();
+  if (!history.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic">No stretch goals yet.</p>';
+    return;
+  }
+  
+  const html = history.map(weekData => {
+    const completed = weekData.goals.filter(g => g.completed).length;
+    const total = weekData.goals.length;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const statusBadge = completed === total ? '<span style="color:var(--green);font-weight:600">✓ Complete</span>' : '<span style="color:var(--orange)">' + completed + '/' + total + ' Complete</span>';
+    
+    const goalsHtml = weekData.goals.map(g => {
+      const typeIcon = g.type === 'italian-media' ? '📚' : '🎯';
+      const status = g.completed ? '✓' : '○';
+      const statusColor = g.completed ? 'var(--green)' : 'var(--muted)';
+      return `<li style="margin-bottom:6px;color:${statusColor}"><span style="font-size:16px">${status}</span> ${typeIcon} ${escHtml(g.text)}</li>`;
+    }).join('');
+    
+    return `
+      <details class="memory-week-item" style="margin-bottom:12px">
+        <summary style="cursor:pointer;font-weight:600;font-size:14px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+          <span>Week of ${weekData.week}</span>
+          <span style="float:right">${statusBadge}</span>
+        </summary>
+        <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px">
+          <ul style="list-style:none;padding:0;margin:0">${goalsHtml}</ul>
+        </div>
+      </details>
+    `;
+  }).join('');
+  
+  container.innerHTML = html;
 }
 
 function addConfession() {
@@ -272,6 +312,29 @@ function initSyncUI() {
   }
 }
 
+// ============ STRETCH GOALS SITE LOCK ============
+function checkSiteLock() {
+  const wk = weekId();
+  const hasGoals = hasStretchGoals(wk);
+  const modal = document.getElementById('site-lock-modal');
+  
+  if (!hasGoals) {
+    // Site is locked - show modal and disable interactions
+    if (modal) modal.style.display = 'flex';
+    document.body.classList.add('site-locked');
+  } else {
+    // Site is unlocked
+    if (modal) modal.style.display = 'none';
+    document.body.classList.remove('site-locked');
+  }
+}
+
+function goToWeekTab() {
+  const modal = document.getElementById('site-lock-modal');
+  if (modal) modal.style.display = 'none';
+  switchTab('week');
+}
+
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize Firebase Sync
@@ -295,4 +358,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', _handleAutoNumberedList);
   });
+  // Check if site should be locked
+  checkSiteLock();
+  // Add CSS animation for celebration
+  const style = document.createElement('style');
+  style.textContent = '@keyframes sgFadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } }';
+  document.head.appendChild(style);
 });

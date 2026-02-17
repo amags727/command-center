@@ -417,6 +417,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <!-- WEEK -->
 <div class="tab" id="tab-week">
 <h1>📊 Week of <span id="wk-date"></span></h1>
+<div class="card" style="border:2px solid var(--red)">
+  <div id="stretch-goals-container"></div>
+</div>
 <div class="card">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="wk-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
 <details style="margin-bottom:10px">
@@ -846,14 +849,172 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <h1>📋 Activity Log</h1>
 <div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
 <div class="card"><h3>📖 Confession / Note</h3><div class="flex"><textarea class="fin flex-1" id="confess-in" placeholder="Honest note to future self..." rows="2"></textarea><button class="btn btn-s" onclick="addConfession()">Log</button></div></div>
+<div class="card"><h3>🎯 Memory List</h3><p style="font-size:12px;color:var(--muted);margin-bottom:10px">Your weekly stretch goals — the experiences worth remembering.</p><div id="memory-list-container"></div></div>
 <div id="log-entries" style="max-height:500px;overflow-y:auto"></div>
 <div class="card" style="margin-top:12px"><h3>📦 Weekly Archives</h3><button class="btn btn-s" onclick="manualArchiveWeek()" style="margin-bottom:8px">📸 Archive Current Week + Email</button><div id="week-archives"></div></div>
 <div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
 </div>
 
+<!-- SITE LOCK MODAL -->
+<div id="site-lock-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:12px;padding:32px;max-width:500px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <h2 style="font-size:28px;margin-bottom:16px;color:var(--red)">🔒 Site Locked</h2>
+    <p style="font-size:16px;margin-bottom:24px;line-height:1.6">You must set your three weekly stretch goals before accessing the site. These goals should push you out of your comfort zone and create memorable experiences.</p>
+    <button class="btn btn-p" onclick="goToWeekTab()" style="font-size:18px;padding:12px 24px">Go to Week Tab →</button>
+  </div>
+</div>
+
+<!-- STRETCH GOAL COMPLETION MODAL -->
+<div id="sg-complete-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:12px;padding:24px;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div id="sg-complete-content"></div>
+  </div>
+</div>
+
+<style>
+/* Stretch Goals Styles */
+.stretch-goals-submission .sg-input-group {
+  margin-bottom:12px;
+}
+.stretch-goals-submission .sg-input-group label {
+  display:block;
+  font-weight:600;
+  font-size:13px;
+  margin-bottom:4px;
+  color:var(--muted);
+}
+.stretch-goals-submission .sg-input-group input {
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-size:14px;
+}
+
+.stretch-goals-grid {
+  display:grid;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.stretch-goal-card {
+  background:var(--bg);
+  border:2px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  transition:all 0.2s;
+}
+
+.stretch-goal-card:hover {
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stretch-goal-card.sg-goal-completed {
+  background:var(--gl);
+  border-color:var(--green);
+}
+
+.sg-header {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+  flex-wrap:wrap;
+}
+
+.sg-badge {
+  font-size:11px;
+  padding:2px 8px;
+  border-radius:12px;
+  font-weight:600;
+}
+
+.sg-badge-exp {
+  background:var(--bl);
+  color:var(--blue);
+}
+
+.sg-badge-media {
+  background:var(--ol);
+  color:var(--orange);
+}
+
+.sg-completed-badge {
+  background:var(--green);
+  color:#fff;
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.sg-text {
+  font-size:15px;
+  line-height:1.5;
+  margin-bottom:8px;
+  font-weight:500;
+}
+
+.sg-scores {
+  display:flex;
+  gap:12px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+
+.sg-scores span {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+
+body.site-locked {
+  overflow:hidden;
+}
+
+body.site-locked * {
+  pointer-events:none !important;
+}
+
+body.site-locked #site-lock-modal,
+body.site-locked #site-lock-modal *,
+body.site-locked .sync-bar,
+body.site-locked .sync-bar *,
+body.site-locked #tab-week,
+body.site-locked #tab-week * {
+  pointer-events:auto !important;
+}
+
+@media(min-width:1024px) {
+  .stretch-goals-submission .sg-input-group label {
+    font-size:18px;
+  }
+  .stretch-goals-submission .sg-input-group input {
+    font-size:18px;
+    padding:12px 16px;
+  }
+  .sg-text {
+    font-size:20px;
+  }
+  .sg-scores {
+    font-size:18px;
+  }
+  .sg-badge {
+    font-size:16px;
+    padding:4px 12px;
+  }
+  .sg-completed-badge {
+    font-size:16px;
+    padding:4px 12px;
+  }
+}
+</style>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script src="core.js"></script>
 <script src="calendar.js"></script>
 <script src="flashcard-review.js"></script>

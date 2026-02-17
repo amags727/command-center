@@ -25,3 +25,6 @@ function escHtml(s) { const d = document.createElement('div'); d.textContent = s
 function offsetWeekId(baseWeek, n) { const dt = new Date(baseWeek + 'T00:00:00'); dt.setDate(dt.getDate() + n * 7); return weekId(dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0') + 'T00:00:00'); }
 function weekMonday(wk) { return new Date(wk + 'T00:00:00'); }
 function weekDates(wk) { const mon = weekMonday(wk); return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }); }
+function hasStretchGoals(wk) { const d = load(); return !!(d.weeks && d.weeks[wk] && d.weeks[wk].stretchGoals && d.weeks[wk].stretchGoals.submitted); }
+function getStretchGoals(wk) { const d = load(); if (!d.weeks || !d.weeks[wk] || !d.weeks[wk].stretchGoals) return null; return d.weeks[wk].stretchGoals; }
+function getStretchGoalHistory() { const d = load(); if (!d.weeks) return []; return Object.keys(d.weeks).filter(wk => d.weeks[wk].stretchGoals?.goals).map(wk => ({ week: wk, goals: d.weeks[wk].stretchGoals.goals.map(g => ({ text: g.text, type: g.type, completed: g.completed })) })).sort((a,b) => b.week.localeCompare(a.week)); }
