@@ -16,7 +16,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(
 h1{font-size:1.4em;font-weight:600}h2{font-size:1.2em;margin-bottom:10px;font-weight:600}h3{font-size:1.05em;margin-bottom:8px;font-weight:600}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
 .top-bar{position:sticky;top:0;z-index:100;background:var(--card)}
-.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto;position:sticky;top:0;z-index:100}
+.nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto;position:sticky;top:0;z-index:100;max-width:880px;margin:0 auto}
 .nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;display:inline-flex;flex-direction:column;align-items:center;gap:2px}.nav-icon{display:block;text-align:center;width:100%;font-size:1.3em;line-height:1}.nav-label{display:block;text-align:center;width:100%}
 .sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12px}
 .sync-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;width:180px}
@@ -26,7 +26,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .nav button.active{color:var(--text);border-bottom-color:var(--blue);font-weight:600}
 .nav button:hover{background:var(--bl)}
 .tab{display:none;max-width:880px;margin:0 auto;padding:20px 16px}.tab.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh);font-size:1.3em}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh);font-size:1.0em}
 .label{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
 .l-work{background:var(--bl);color:var(--blue)}.l-gym{background:var(--gl);color:var(--green)}.l-ital{background:var(--ol);color:var(--orange)}.l-diss{background:var(--pl);color:var(--purple)}.l-social{background:var(--pkl);color:var(--pink)}.l-misc{background:var(--yl);color:var(--yellow)}
 .tblock{display:flex;border-left:3px solid var(--border);padding:7px 12px;margin:3px 0;border-radius:0 4px 4px 0;font-size:14px}
@@ -155,29 +155,30 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 }
 /* Desktop: bigger text, wider content, readable nav */
 @media(min-width:1024px){
-body{font-size:19px}
+body{font-size:25px}
 h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 .tab{max-width:1400px;padding:28px 40px}
+.nav{max-width:1400px;margin:0 auto}
 .nav{justify-content:center}
-.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:14px;min-width:60px}
-.nav-icon{font-size:22px;display:block;width:100%;text-align:center;line-height:1}
-.nav-label{font-size:13px;font-weight:500}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:18px;min-width:60px}
+.nav-icon{font-size:28px;display:block;width:100%;text-align:center;line-height:1}
+.nav-label{font-size:17px;font-weight:500}
 .sync-bar{font-size:14px;padding:8px 20px}
 .sync-bar input{font-size:14px;width:240px;padding:7px 12px}
 .sync-bar button{font-size:13px;padding:6px 14px}
 .card{padding:24px;margin-bottom:20px}
-.hname{font-size:16px}
-.hdet{font-size:14px}
-.hev input,.hev textarea{font-size:16px;padding:8px 12px}
-.label{font-size:13px;padding:3px 10px}
-.tblock{font-size:17px;padding:10px 16px}
-.tblock .tm{font-size:15px;min-width:100px}
-.iitem{font-size:16px;padding:12px}
-.iinput input{font-size:17px;padding:12px 14px}
-.iinput button{font-size:17px;padding:12px 18px}
-.lentry{font-size:14px;padding:10px 14px}
-.lentry .lt{font-size:12px}
-.rarea textarea{font-size:17px;min-height:180px;padding:14px}
+.hname{font-size:21px}
+.hdet{font-size:18px}
+.hev input,.hev textarea{font-size:21px;padding:10px 14px}
+.label{font-size:17px;padding:4px 12px}
+.tblock{font-size:22px;padding:12px 18px}
+.tblock .tm{font-size:20px;min-width:110px}
+.iitem{font-size:21px;padding:14px}
+.iinput input{font-size:22px;padding:14px 16px}
+.iinput button{font-size:22px;padding:14px 20px}
+.lentry{font-size:18px;padding:12px 16px}
+.lentry .lt{font-size:16px}
+.rarea textarea{font-size:22px;min-height:200px;padding:16px}
 .chatia input{font-size:16px;padding:10px 14px}
 .chatia button{font-size:16px;padding:10px 18px}
 .cmsg .bbl{font-size:16px;padding:10px 16px}
@@ -194,8 +195,8 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 .btn{font-size:15px;padding:8px 14px}
 .btn-s{font-size:13px;padding:6px 12px}
 .btn-p{font-size:15px;padding:10px 18px}
-.goal-chip{font-size:15px;padding:3px 10px}
-.chip-add{font-size:14px;padding:3px 12px}
+.goal-chip{font-size:20px;padding:4px 12px}
+.chip-add{font-size:18px;padding:4px 14px}
 .tr-table{font-size:16px}
 .tr-table td{padding:12px 14px}
 .rprompt label{font-size:15px}
@@ -279,15 +280,15 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 #wg-work [data-wg-done],#wg-school [data-wg-done],#wg-life [data-wg-done]{text-decoration:line-through!important;opacity:.45}
 /* --- Goal Chips --- */
 .chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
-.goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:13px; line-height:1.5; max-width:100%; }
+.goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:17px; line-height:1.5; max-width:100%; }
 .goal-chip.linked { border-left:3px solid #B3D9FF; }
 .goal-chip .chip-text { outline:none; min-width:20px; word-break:break-word; }
 .goal-chip .chip-text:empty::before { content:attr(data-placeholder); color:var(--muted); }
-.goal-chip .chip-x { cursor:pointer; color:var(--muted); font-size:11px; margin-left:2px; line-height:1; }
+.goal-chip .chip-x { cursor:pointer; color:var(--muted); font-size:14px; margin-left:2px; line-height:1; }
 .goal-chip .chip-x:hover { color:var(--red,#e74c3c); }
-.chip-add { cursor:pointer; font-size:12px; color:var(--muted); border:1px dashed var(--border); border-radius:14px; padding:2px 10px; background:none; }
+.chip-add { cursor:pointer; font-size:16px; color:var(--muted); border:1px dashed var(--border); border-radius:14px; padding:2px 10px; background:none; }
 .chip-add:hover { color:var(--accent); border-color:var(--accent); }
-.chip-check { width:14px; height:14px; border-radius:50%; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:9px; color:transparent; transition:all .15s; }
+.chip-check { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent; transition:all .15s; }
 .chip-check:hover { border-color:var(--green); }
 .goal-chip.done .chip-check { background:var(--green); border-color:var(--green); color:#fff; }
 .goal-chip.done .chip-text { text-decoration:line-through; opacity:.55; }
@@ -357,9 +358,9 @@ h1{font-size:1.6em}h2{font-size:1.35em}h3{font-size:1.15em}
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
 <div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"><button class="chip-add" onclick="_t3AddNewChip('t3-work','w')">＋ Add</button></div></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"><button class="chip-add" onclick="_t3AddNewChip('t3-school','s')">＋ Add</button></div></div>
-<div><h4 style="font-size:13px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"><button class="chip-add" onclick="_t3AddNewChip('t3-life','l')">＋ Add</button></div></div>
+<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"><button class="chip-add" onclick="_t3AddNewChip('t3-work','w')">＋ Add</button></div></div>
+<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"><button class="chip-add" onclick="_t3AddNewChip('t3-school','s')">＋ Add</button></div></div>
+<div><h4 style="font-size:17px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"><button class="chip-add" onclick="_t3AddNewChip('t3-life','l')">＋ Add</button></div></div>
 </div>
 </div>
 <div class="card">
