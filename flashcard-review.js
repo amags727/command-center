@@ -20,6 +20,7 @@ Cloze Card Rules:
 - Verbs must be conjugated in context. Never use infinitives as cloze answers.
 - Prefer present tense or passato prossimo. No passato remoto unless unavoidable.
 - Rich contextual cues are mandatory. The sentence must contain enough information that the word is inferable.
+- CRITICAL: Cloze sentences must be fully self-contained — answerable by someone who has NOT read the source text. Do NOT simply copy the student's original sentence with a blank. If the original sentence lacks enough semantic cues to uniquely determine the answer, REWRITE the cloze sentence to embed the necessary context. Example: "un problema quasi inevitabile della cultura ________" is unanswerable without external context. Rewrite to something like: "L'alpinismo in alta quota è pericoloso, e questo è un problema della cultura ________ stessa" where the topic makes the answer inferable.
 - Natural syntax and discourse flow take priority.
 
 Register, Usage, and Accuracy Rules:
@@ -62,6 +63,7 @@ D. Card Framing:
 - Default to Italian-language definition cards (consistent with the flash card rules). Use English only for long propositional phrases or discourse moves where Italian paraphrase would be disproportionately longer.
 - Definition prompts should describe the function, not literal wording.
 - Cloze cards must recreate the rhetorical move, not just the word.
+- CRITICAL: Cloze sentences derived from student compositions must NEVER be a copy-paste of the original sentence with a word blanked out. The cloze must be a new or substantially rewritten sentence that provides enough internal context to make the answer uniquely recoverable without having read the source text.
 
 E. Frequency Control:
 - Cap: 5-8 items per text. More dilutes salience and retention.
