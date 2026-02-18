@@ -57,6 +57,140 @@ const FirebaseSync = (() => {
     return Array.from(merged.values());
   }
 
+  // Field-level merge for a single day: never lose user content
+  function mergeDayFields(localDay, remoteDay) {
+    if (!localDay) return remoteDay;
+    if (!remoteDay) return localDay;
+
+    // Start with both sides, then override with smart merges
+    const merged = Object.assign({}, localDay, remoteDay);
+
+    // String fields: keep the LONGER one (never lose content)
+    for (const field of ['reflection', 'notes']) {
+      const l = (localDay[field] || '').toString();
+      const r = (remoteDay[field] || '').toString();
+      merged[field] = l.length >= r.length ? l : r;
+    }
+
+    // sealed: logical OR — once sealed, stays sealed
+    merged.sealed = !!(localDay.sealed || remoteDay.sealed);
+
+    // habits: per-habit OR — once checked, stays checked
+    const lh = localDay.habits || {};
+    const rh = remoteDay.habits || {};
+    merged.habits = Object.assign({}, lh, rh);
+    for (const key of Object.keys(merged.habits)) {
+      merged.habits[key] = !!(lh[key] || rh[key]);
+    }
+
+    // calBlocks: merge by ID, keep higher lastMod per block
+    if (localDay.calBlocks || remoteDay.calBlocks) {
+      const lBlocks = new Map((localDay.calBlocks || []).map(b => [b.id, b]));
+      const rBlocks = new Map((remoteDay.calBlocks || []).map(b => [b.id, b]));
+      const allIds = new Set([...lBlocks.keys(), ...rBlocks.keys()]);
+      merged.calBlocks = [];
+      for (const id of allIds) {
+        const lb = lBlocks.get(id);
+        const rb = rBlocks.get(id);
+        if (!lb) merged.calBlocks.push(rb);
+        else if (!rb) merged.calBlocks.push(lb);
+        else merged.calBlocks.push((rb.lastMod || 0) > (lb.lastMod || 0) ? rb : lb);
+      }
+    }
+
+    // t3intentions: keep the version with more total items
+    if (localDay.t3intentions || remoteDay.t3intentions) {
+      const countItems = (t) => {
+        if (!t) return 0;
+        return (t.work || []).length + (t.school || []).length + (t.life || []).length;
+      };
+      merged.t3intentions = countItems(localDay.t3intentions) >= countItems(remoteDay.t3intentions)
+        ? localDay.t3intentions : remoteDay.t3intentions;
+    }
+
+    // meals: keep whichever has more filled entries
+    if (localDay.meals || remoteDay.meals) {
+      const lm = localDay.meals || {};
+      const rm = remoteDay.meals || {};
+      const countFilled = (m) => Object.values(m).filter(v => v && (typeof v === 'string' ? v.length > 0 : true)).length;
+      merged.meals = countFilled(lm) >= countFilled(rm) ? lm : rm;
+    }
+
+    // italian: per-field OR for boolean checkboxes, keep longer for strings
+    if (localDay.italian || remoteDay.italian) {
+      const li = localDay.italian || {};
+      const ri = remoteDay.italian || {};
+      merged.italian = Object.assign({}, li, ri);
+      for (const key of Object.keys(merged.italian)) {
+        if (typeof li[key] === 'boolean' || typeof ri[key] === 'boolean') {
+          merged.italian[key] = !!(li[key] || ri[key]);
+        }
+      }
+    }
+
+    // lastMod: keep the higher value
+    merged.lastMod = Math.max(localDay.lastMod || 0, remoteDay.lastMod || 0);
+
+    return merged;
+  }
+
+  // Field-level merge for a single week: never lose user content
+  function mergeWeekFields(localWeek, remoteWeek) {
+    if (!localWeek) return remoteWeek;
+    if (!remoteWeek) return localWeek;
+
+    const merged = Object.assign({}, localWeek, remoteWeek);
+
+    // goals: merge by ID, keep higher lastMod per goal
+    if (localWeek.goals || remoteWeek.goals) {
+      const lGoals = new Map((localWeek.goals || []).map(g => [g.id || g.text, g]));
+      const rGoals = new Map((remoteWeek.goals || []).map(g => [g.id || g.text, g]));
+      const allIds = new Set([...lGoals.keys(), ...rGoals.keys()]);
+      merged.goals = [];
+      for (const id of allIds) {
+        const lg = lGoals.get(id);
+        const rg = rGoals.get(id);
+        if (!lg) merged.goals.push(rg);
+        else if (!rg) merged.goals.push(lg);
+        else merged.goals.push((rg.lastMod || 0) > (lg.lastMod || 0) ? rg : lg);
+      }
+    }
+
+    // review: keep the non-null / more complete one
+    if (localWeek.review || remoteWeek.review) {
+      if (!localWeek.review) merged.review = remoteWeek.review;
+      else if (!remoteWeek.review) merged.review = localWeek.review;
+      else {
+        const lLen = JSON.stringify(localWeek.review).length;
+        const rLen = JSON.stringify(remoteWeek.review).length;
+        merged.review = lLen >= rLen ? localWeek.review : remoteWeek.review;
+      }
+    }
+
+    // String fields: keep the longer one
+    for (const field of ['notes', 'pushGoal']) {
+      const l = (localWeek[field] || '').toString();
+      const r = (remoteWeek[field] || '').toString();
+      merged[field] = l.length >= r.length ? l : r;
+    }
+
+    // stretchGoals: keep the submitted one, or the one with more content
+    if (localWeek.stretchGoals || remoteWeek.stretchGoals) {
+      const ls = localWeek.stretchGoals;
+      const rs = remoteWeek.stretchGoals;
+      if (!ls) merged.stretchGoals = rs;
+      else if (!rs) merged.stretchGoals = ls;
+      else if (rs.submitted && !ls.submitted) merged.stretchGoals = rs;
+      else if (ls.submitted && !rs.submitted) merged.stretchGoals = ls;
+      else merged.stretchGoals = (JSON.stringify(ls).length >= JSON.stringify(rs).length) ? ls : rs;
+    }
+
+    // lastMod: keep the higher value
+    merged.lastMod = Math.max(localWeek.lastMod || 0, remoteWeek.lastMod || 0);
+
+    return merged;
+  }
+
   // Merge the cmdcenter key specifically, card-by-card
   function mergeCmdCenter(localRaw, remoteRaw) {
     let local, remote;
@@ -70,41 +204,24 @@ const FirebaseSync = (() => {
     const result = Object.assign({}, local, remote);
     result.cards = mergedCards;
 
-    // Merge days per-date: keep whichever has higher lastMod
+    // Merge days per-date: FIELD-LEVEL merge (never lose content)
     if (local.days || remote.days) {
       const localDays = local.days || {};
       const remoteDays = remote.days || {};
       const mergedDays = Object.assign({}, localDays);
       for (const date of Object.keys(remoteDays)) {
-        const ld = mergedDays[date];
-        const rd = remoteDays[date];
-        if (!ld) {
-          mergedDays[date] = rd;
-        } else {
-          const lm = ld.lastMod || 0;
-          const rm = rd.lastMod || 0;
-          if (rm > lm) mergedDays[date] = rd;
-          // else keep local (already in mergedDays)
-        }
+        mergedDays[date] = mergeDayFields(mergedDays[date], remoteDays[date]);
       }
       result.days = mergedDays;
     }
 
-    // Merge weeks per-weekId: keep whichever has higher lastMod
+    // Merge weeks per-weekId: FIELD-LEVEL merge (never lose content)
     if (local.weeks || remote.weeks) {
       const localWeeks = local.weeks || {};
       const remoteWeeks = remote.weeks || {};
       const mergedWeeks = Object.assign({}, localWeeks);
       for (const wk of Object.keys(remoteWeeks)) {
-        const lw = mergedWeeks[wk];
-        const rw = remoteWeeks[wk];
-        if (!lw) {
-          mergedWeeks[wk] = rw;
-        } else {
-          const lm = lw.lastMod || 0;
-          const rm = rw.lastMod || 0;
-          if (rm > lm) mergedWeeks[wk] = rw;
-        }
+        mergedWeeks[wk] = mergeWeekFields(mergedWeeks[wk], remoteWeeks[wk]);
       }
       result.weeks = mergedWeeks;
     }

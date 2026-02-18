@@ -1,4 +1,4 @@
-const CACHE = 'cc-v17';
+const CACHE = 'cc-v18';
 const ASSETS = ['./index.html', './core.js', './calendar.js', './flashcard-review.js', './today.js', './week.js', './dissertation.js', './chat.js', './anki.js', './translate.js', './aotd.js', './meals.js', './progress.js', './week-archive.js', './app.js', './firebase-sync.js', './manifest.json'];
 
 self.addEventListener('install', e => {

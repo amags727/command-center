@@ -150,19 +150,26 @@ setInterval(() => {
 
 // ============ LOAD ALL (called by FirebaseSync on remote update) ============
 function loadAll() {
-  initToday();
-  trUpdateSubmitBtn();
-  const key = localStorage.getItem('cc_apikey');
-  if (key) document.getElementById('api-key').value = key;
-  // Re-render whichever tab is active
-  const active = document.querySelector('.tab.active');
-  if (active) {
-    const id = active.id.replace('tab-', '');
-    if (id === 'week') renderWeek();
-    if (id === 'log') renderLog();
-    if (id === 'dissertation') renderDiss();
-    if (id === 'cards') renderCards();
-    if (id === 'claude') initClaude();
+  // Suppress lastMod stamping during re-render so stale data doesn't
+  // get a fresh timestamp and win future merges
+  suppressLastMod(true);
+  try {
+    initToday();
+    trUpdateSubmitBtn();
+    const key = localStorage.getItem('cc_apikey');
+    if (key) document.getElementById('api-key').value = key;
+    // Re-render whichever tab is active
+    const active = document.querySelector('.tab.active');
+    if (active) {
+      const id = active.id.replace('tab-', '');
+      if (id === 'week') renderWeek();
+      if (id === 'log') renderLog();
+      if (id === 'dissertation') renderDiss();
+      if (id === 'cards') renderCards();
+      if (id === 'claude') initClaude();
+    }
+  } finally {
+    suppressLastMod(false);
   }
 }
 
