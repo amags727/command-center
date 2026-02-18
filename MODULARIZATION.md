@@ -32,9 +32,9 @@ Data layer used by everything:
 Day calendar rendering + goal management:
 `renderCalendar()`, `toggleGoal()`, `addGoal()`, `removeGoal()`, `moveGoal()`, `editGoal()`, `toggleDayGoalCategory()`, `renderItalianWork()`, `submitReflection()`, `renderReflection()`
 
-### flashcard-review.js (~228 lines)
-Shared flashcard review modal used by Cards, Translate, and Claude tabs:
-`startReview()`, `showCard()`, `flipCard()`, `rateCard()`, `endReview()`
+### flashcard-review.js (~365 lines)
+Shared flashcard review modal, card rules constants, correction prompts:
+`FLASH_CARD_RULES`, `COMPOSITION_EXTRACTION_RULES`, `CORRECTION_PROMPT_DAILY()`, `CORRECTION_PROMPT_ARTICLE()`, `CORRECTION_PROMPT_REPRODUCTION()`, `renderFlashcardReview()`, `fcSubmitAll()`, `fcChat()`, `_parseCardsJSON()`, `_parseReflectionScore()`, `submitRefl()`
 
 ### today.js (~170 lines)
 Today tab orchestration:
@@ -56,9 +56,13 @@ Claude chat integration:
 SM-2 flashcard engine (Cards tab):
 `renderAnki()`, `studyNow()`, `addManualCard()`, `addVocabList()`, `addPreMade()`, `browseDeck()`, `editCard()`, `deleteCard()`, `seedAnkiCards()`
 
-### translate.js (~294 lines)
-Italian reading & translation (Read tab):
-`renderTranslate()`, `fetchAndTranslate()`, `pasteText()`, `collectWord()`, `renderReadingHistory()`
+### translate.js (~481 lines)
+Italian reading, translation, reflection & prose reproduction (Read tab — article mode):
+`renderTranslate()`, `trFetchURL()`, `trTranslateText()`, `trBindSelection()`, `trHandleSelection()`, `trCollectedWords`, `trSubmitWords()`, `trSubmitReflection()`, `trSwitchMode()`, `trStartRepro()`, `trLockPara()`, `trSubmitRepro()`, `trUpdateReproProgress()`
+
+### book-translate.js (~259 lines)
+Book mode translation (Read tab — book mode):
+`bkSetDir()`, `bkImagesSelected()`, `bkRenderThumbs()`, `bkProcessNext()`, `bkClearAll()`, `bkBindSelection()`, `bkHandleSelection()`, `bkSubmitWords()`, `_callClaudeVision()`
 
 ### aotd.js (~412 lines)
 Article of the Day:
@@ -72,9 +76,9 @@ Article of the Day:
 - `renderWeekArchives()` — collapsible Year→Month→Week tree on Log tab
 - `checkWeekTransition()` — auto-archive on week rollover
 
-### progress.js (~290 lines)
-Progress tab with Chart.js graphs:
-`renderProgress()`, `setProgressRange()`, `_getAllDatesInRange()`, `_getCardsData()`, `_renderAnkiChart()`, `_renderItalianChart()`, `_renderNutritionChart()`
+### progress.js (~440 lines)
+Progress tab with Chart.js graphs (Anki, Italian scores incl. green reproduction line, nutrition, weight):
+`renderProgress()`, `setProgressRange()`, `_getAllDatesInRange()`, `_getCardsData()`, `_renderAnkiChart()`, `_renderItalianChart()`, `_renderNutritionChart()`, `_renderWeightChart()`
 
 ### meals.js (~407 lines)
 Meal Planning tab — day type toggle, food submission (photo/text/stored), Claude macro analysis, circular progress rings, stored meal library:
@@ -101,7 +105,7 @@ Firebase sync layer (loaded last):
 | Week | week.js | tab-week |
 | Dissertation | dissertation.js | tab-dissertation |
 | Cards | anki.js + flashcard-review.js | tab-cards |
-| Read | translate.js + flashcard-review.js | tab-translate |
+| Read | translate.js + book-translate.js + flashcard-review.js | tab-translate |
 | Claude | chat.js + flashcard-review.js | tab-claude |
 | Meals | meals.js | tab-meals |
 | Progress | progress.js | tab-progress |
