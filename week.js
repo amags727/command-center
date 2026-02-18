@@ -696,30 +696,51 @@ function _detectGoalType(text) {
   return 'experiential';
 }
 
+let _sgPendingImages = [];
+
 function openCompleteGoalModal(goalId, type) {
   _sgCompletingGoalId = goalId;
-  const modal = document.getElementById('sg-complete-modal');
-  const content = document.getElementById('sg-complete-content');
+  _sgPendingImages = [];
+  
+  // Find chip and insert form below it
+  const container = document.getElementById('stretch-goals-container');
+  if (!container) return;
+  
+  // Remove any existing completion form
+  const existing = document.getElementById('sg-complete-form');
+  if (existing) existing.remove();
+  
+  const form = document.createElement('div');
+  form.id = 'sg-complete-form';
+  form.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;margin-top:8px';
   
   if (type === 'experiential') {
-    content.innerHTML = `
-      <h3>Complete Experiential Goal</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Upload photo evidence (tickets, programs, photos of you there)</p>
-      <input type="file" id="sg-photo-input" accept="image/*" onchange="sgPhotoSelected(this)" style="margin-bottom:12px">
-      <div id="sg-photo-preview" style="margin-bottom:12px"></div>
-      <button class="btn btn-p" onclick="submitExperientialCompletion()">Submit for Validation</button>
-      <button class="btn" onclick="closeSGModal()">Cancel</button>
-      <div id="sg-complete-result" style="margin-top:12px"></div>
+    form.innerHTML = `
+      <h4 style="font-size:13px;font-weight:600;margin-bottom:8px">Complete Goal - Upload Evidence</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload photos: tickets, programs, venue photos, etc.</p>
+      <input type="file" id="sg-photo-input" accept="image/*" multiple onchange="sgPhotosSelected(this)" style="margin-bottom:8px;font-size:12px">
+      <div id="sg-photo-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <div style="margin-bottom:10px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--muted)">Reflection (optional):</label>
+        <textarea id="sg-reflection" rows="4" placeholder="Any thoughts about this experience..." style="width:100%;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-family:inherit;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-s" onclick="submitExperientialCompletion()">Submit for Validation</button>
+        <button class="btn btn-s" onclick="cancelSGCompletion()">Cancel</button>
+      </div>
+      <div id="sg-complete-result" style="margin-top:10px"></div>
     `;
   } else {
-    content.innerHTML = `
-      <h3>Complete Italian Media Goal</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Write a 400+ word composition about the film/book</p>
-      <textarea id="sg-composition" rows="12" style="width:100%;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:4px;font-family:inherit"></textarea>
+    form.innerHTML = `
+      <h4 style="font-size:13px;font-weight:600;margin-bottom:8px">Complete Goal - Write Reflection</h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Write a 400+ word composition about the film/book</p>
+      <textarea id="sg-composition" rows="10" style="width:100%;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:4px;font-family:inherit;resize:vertical"></textarea>
       <div id="sg-word-count" style="font-size:12px;color:var(--muted);margin:4px 0">0 / 400 words</div>
-      <button class="btn btn-p" onclick="submitMediaCompletion()">Submit for Validation</button>
-      <button class="btn" onclick="closeSGModal()">Cancel</button>
-      <div id="sg-complete-result" style="margin-top:12px"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn btn-s" onclick="submitMediaCompletion()">Submit for Validation</button>
+        <button class="btn btn-s" onclick="cancelSGCompletion()">Cancel</button>
+      </div>
+      <div id="sg-complete-result" style="margin-top:10px"></div>
     `;
     
     // Word counter
@@ -738,24 +759,75 @@ function openCompleteGoalModal(goalId, type) {
     }, 100);
   }
   
-  modal.style.display = 'flex';
+  // Insert form after the chip container
+  const chipContainer = container.querySelector('.chip-container');
+  if (chipContainer) {
+    chipContainer.after(form);
+  } else {
+    container.appendChild(form);
+  }
 }
 
-function sgPhotoSelected(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    _sgPendingImage = e.target.result;
-    document.getElementById('sg-photo-preview').innerHTML = 
-      '<img src="' + _sgPendingImage + '" style="max-width:300px;max-height:200px;border-radius:6px;border:1px solid var(--border)">';
-  };
-  reader.readAsDataURL(file);
+function sgPhotosSelected(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  
+  const preview = document.getElementById('sg-photo-preview');
+  _sgPendingImages = [];
+  preview.innerHTML = '';
+  
+  let processed = 0;
+  files.forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      _sgPendingImages.push(e.target.result);
+      const thumb = document.createElement('div');
+      thumb.style.cssText = 'position:relative;display:inline-block';
+      thumb.innerHTML = `
+        <img src="${e.target.result}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+        <button onclick="removeSGPhoto(${idx})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
+      `;
+      preview.appendChild(thumb);
+      
+      processed++;
+      if (processed === files.length) {
+        preview.innerHTML += `<p style="font-size:11px;color:var(--muted);margin-top:4px">${files.length} photo(s) selected</p>`;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeSGPhoto(idx) {
+  _sgPendingImages.splice(idx, 1);
+  // Re-trigger preview update
+  const input = document.getElementById('sg-photo-input');
+  if (input) {
+    const dt = new DataTransfer();
+    _sgPendingImages.forEach(() => dt.items.add(new File([''], 'keep')));
+    input.files = dt.files;
+  }
+  const preview = document.getElementById('sg-photo-preview');
+  if (preview) {
+    preview.innerHTML = _sgPendingImages.map((img, i) => `
+      <div style="position:relative;display:inline-block">
+        <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+        <button onclick="removeSGPhoto(${i})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
+      </div>
+    `).join('') + `<p style="font-size:11px;color:var(--muted);margin-top:4px">${_sgPendingImages.length} photo(s) selected</p>`;
+  }
+}
+
+function cancelSGCompletion() {
+  const form = document.getElementById('sg-complete-form');
+  if (form) form.remove();
+  _sgCompletingGoalId = null;
+  _sgPendingImages = [];
 }
 
 async function submitExperientialCompletion() {
-  if (!_sgPendingImage) {
-    alert('Please upload photo evidence.');
+  if (!_sgPendingImages.length) {
+    alert('Please upload at least one photo.');
     return;
   }
   
@@ -765,14 +837,25 @@ async function submitExperientialCompletion() {
     return;
   }
   
+  const reflection = document.getElementById('sg-reflection')?.value.trim() || '';
   const result = document.getElementById('sg-complete-result');
   result.innerHTML = '<p style="font-size:13px">⏳ Validating with Claude...</p>';
   
   try {
-    const base64 = _sgPendingImage.split(',')[1];
-    const mediaType = _sgPendingImage.split(';')[0].split(':')[1] || 'image/jpeg';
+    // Build content array with all images
+    const content = [];
+    _sgPendingImages.forEach(imgData => {
+      const base64 = imgData.split(',')[1];
+      const mediaType = imgData.split(';')[0].split(':')[1] || 'image/jpeg';
+      content.push({
+        type: 'image',
+        source: { type: 'base64', media_type: mediaType, data: base64 }
+      });
+    });
     
-    const prompt = 'Analyze this image as evidence of completing an experiential stretch goal. Look for: tickets, programs, photos showing the person at an event/location, or other proof of participation in a memorable experience. If this appears to be genuine evidence of an experience (not just a screenshot or random photo), respond with "APPROVED: [brief description of what you see]". If it does not appear to be valid evidence, respond with "REJECTED: [reason]". Be reasonable - tickets, wristbands, photos at venues, program booklets, etc. all count as valid evidence.';
+    const promptText = `Analyze these ${_sgPendingImages.length} image(s) as evidence of completing an experiential stretch goal. Look for: tickets, programs, photos showing the person at an event/location, or other proof of participation in a memorable experience. If these appear to be genuine evidence of an experience (not just screenshots or random photos), respond with "APPROVED: [brief description of what you see]". If they do not appear to be valid evidence, respond with "REJECTED: [reason]". Be reasonable - tickets, wristbands, photos at venues, program booklets, etc. all count as valid evidence.`;
+    
+    content.push({ type: 'text', text: promptText });
     
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -785,13 +868,7 @@ async function submitExperientialCompletion() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 300,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
+        messages: [{ role: 'user', content: content }]
       })
     });
     
@@ -808,7 +885,8 @@ async function submitExperientialCompletion() {
         goal.completed = true;
         goal.completionDate = new Date().toISOString();
         goal.completionEvidence = {
-          imageDataUrl: _sgPendingImage,
+          images: _sgPendingImages,
+          reflection: reflection,
           validationResponse: validation
         };
         save(wd);
@@ -817,7 +895,7 @@ async function submitExperientialCompletion() {
         addLog('milestone', 'Stretch goal completed: ' + goal.text);
         
         setTimeout(() => {
-          closeSGModal();
+          cancelSGCompletion();
           celebrateGoalCompletion();
           renderStretchGoals();
         }, 2000);
@@ -874,7 +952,7 @@ ${text}`;
         addLog('milestone', 'Stretch goal completed: ' + goal.text);
         
         setTimeout(() => {
-          closeSGModal();
+          cancelSGCompletion();
           celebrateGoalCompletion();
           renderStretchGoals();
         }, 2000);
@@ -885,12 +963,6 @@ ${text}`;
   } catch (e) {
     result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
   }
-}
-
-function closeSGModal() {
-  document.getElementById('sg-complete-modal').style.display = 'none';
-  _sgPendingImage = null;
-  _sgCompletingGoalId = null;
 }
 
 function celebrateGoalCompletion() {

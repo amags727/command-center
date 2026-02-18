@@ -52,29 +52,62 @@ function renderMemoryList() {
   const container = document.getElementById('memory-list-container');
   if (!container) return;
   
-  const history = getStretchGoalHistory();
-  if (!history.length) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic">No stretch goals yet.</p>';
+  const d = load();
+  if (!d.weeks) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic">No memory goals yet.</p>';
     return;
   }
   
-  const html = history.map(weekData => {
-    const completed = weekData.goals.filter(g => g.completed).length;
-    const total = weekData.goals.length;
-    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const weeksWithGoals = Object.keys(d.weeks)
+    .filter(wk => d.weeks[wk].stretchGoals?.goals)
+    .sort((a, b) => b.localeCompare(a));
+  
+  if (!weeksWithGoals.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic">No memory goals yet.</p>';
+    return;
+  }
+  
+  const html = weeksWithGoals.map(wk => {
+    const sg = d.weeks[wk].stretchGoals;
+    const completed = sg.goals.filter(g => g.completed).length;
+    const total = sg.goals.length;
     const statusBadge = completed === total ? '<span style="color:var(--green);font-weight:600">✓ Complete</span>' : '<span style="color:var(--orange)">' + completed + '/' + total + ' Complete</span>';
     
-    const goalsHtml = weekData.goals.map(g => {
+    const goalsHtml = sg.goals.map(g => {
       const typeIcon = g.type === 'italian-media' ? '📚' : '🎯';
       const status = g.completed ? '✓' : '○';
       const statusColor = g.completed ? 'var(--green)' : 'var(--muted)';
-      return `<li style="margin-bottom:6px;color:${statusColor}"><span style="font-size:16px">${status}</span> ${typeIcon} ${escHtml(g.text)}</li>`;
+      
+      let evidenceHtml = '';
+      if (g.completed && g.completionEvidence) {
+        const ev = g.completionEvidence;
+        
+        // Photos
+        if (ev.images && ev.images.length) {
+          const photosHtml = ev.images.map(img => 
+            `<img src="${img}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--border);margin-right:4px;margin-top:4px">`
+          ).join('');
+          evidenceHtml += `<div style="margin-top:6px">${photosHtml}</div>`;
+        }
+        
+        // Reflection
+        if (ev.reflection) {
+          evidenceHtml += `<div style="margin-top:6px;font-size:12px;font-style:italic;color:var(--muted);border-left:2px solid var(--border);padding-left:8px">"${escHtml(ev.reflection.substring(0, 150))}${ev.reflection.length > 150 ? '...' : ''}"</div>`;
+        }
+        
+        // Composition (Italian media)
+        if (ev.composition) {
+          evidenceHtml += `<div style="margin-top:6px;font-size:12px;font-style:italic;color:var(--muted);border-left:2px solid var(--purple);padding-left:8px">"${escHtml(ev.composition.substring(0, 150))}${ev.composition.length > 150 ? '...' : ''}"</div>`;
+        }
+      }
+      
+      return `<li style="margin-bottom:10px;color:${statusColor}"><span style="font-size:16px">${status}</span> ${typeIcon} ${escHtml(g.text)}${evidenceHtml}</li>`;
     }).join('');
     
     return `
       <details class="memory-week-item" style="margin-bottom:12px">
         <summary style="cursor:pointer;font-weight:600;font-size:14px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-          <span>Week of ${weekData.week}</span>
+          <span>Week of ${wk}</span>
           <span style="float:right">${statusBadge}</span>
         </summary>
         <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px">
