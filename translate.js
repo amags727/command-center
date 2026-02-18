@@ -98,7 +98,7 @@ CRITICAL RULES:
 - Each paragraph object has "it" (the original Italian), "en" (English translation), and "repro" (boolean).
 - Do NOT merge, split, skip, or reorder paragraphs. Paragraph [1] → index 0, [2] → index 1, etc.
 - Preserve the original text in the "it" field (without the [N] number prefix).
-- Set "repro": true on EXACTLY 4 paragraphs that are most valuable for a prose reproduction exercise. Choose paragraphs with: complex subordination, interesting register choices, idiomatic density, or native Italian syntax patterns that an English speaker would struggle to reproduce. Skip trivial/short paragraphs. If fewer than 4 substantive paragraphs exist, mark all substantive ones.
+- Set "repro": true on 2-5 paragraphs that are most valuable for a prose reproduction exercise, targeting 350-600 total words of reproduction material. Choose paragraphs with: complex subordination, interesting register choices, idiomatic density, or native Italian syntax patterns that an English speaker would struggle to reproduce. Skip trivial/short paragraphs. Fewer paragraphs if they are long, more if they are short.
 
 Also include a "title" field if you can infer the article title, and a "difficulty" field (A2/B1/B2/C1/C2).
 
@@ -308,8 +308,10 @@ async function trSubmitReflection(num) {
   try {
     const feedbackPrompt = CORRECTION_PROMPT_ARTICLE(title, txt);
     const feedbackResp = await callClaude(key, feedbackPrompt);
-    // Parse and save score
+    // Parse and save score + update interference profile
     const scoreData = _parseReflectionScore(feedbackResp);
+    const intPatterns = _parseInterferencePatterns(feedbackResp);
+    _updateInterferenceProfile(intPatterns);
     document.getElementById('tr-refl-result').style.display = 'block';
     document.getElementById('tr-refl-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');
     // Log as article on Today tab
@@ -429,6 +431,11 @@ async function trSubmitRepro() {
     const feedbackPrompt = CORRECTION_PROMPT_REPRODUCTION(paragraphs);
     const feedbackResp = await callClaude(key, feedbackPrompt, 8192);
     const scoreData = _parseReflectionScore(feedbackResp);
+    const dimData = _parseReproDimensions(feedbackResp);
+    if (dimData) scoreData.dimensions = dimData;
+    // Update interference profile from reproduction patterns section
+    const reproIntPatterns = _parseInterferencePatterns(feedbackResp);
+    _updateInterferenceProfile(reproIntPatterns);
     // Show feedback
     document.getElementById('tr-repro-result').style.display = 'block';
     document.getElementById('tr-repro-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');

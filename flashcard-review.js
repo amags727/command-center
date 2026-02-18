@@ -9,7 +9,7 @@ Definition / Translation Card Rules:
 - The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
 - Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
 - CRITICAL: Italian definitions must be DECLARATIVE, never interrogative. Use direct paraphrases or explanations. NEVER use question format like "Cosa significa quando..." or "Che cosa vuol dire...". Example: For "rivolgersi contro" → "produrre l'effetto opposto a quello desiderato" NOT "Cosa significa quando una situazione produce l'effetto opposto?"
-- The only exception for English on the prompt side is long extended phrases or introductory/discourse expressions (e.g. "per inciso", "As someone who...", "To decide what truly matters to me") where an Italian paraphrase would be disproportionately longer than just providing the English equivalent. If in doubt, use Italian.
+- Exception for English on the prompt side: discourse operators, rhetorical frames, and stance-setting expressions (e.g. "per inciso", "non tanto X quanto Y", "da persona che + verbo", "As someone who...", "To decide what truly matters to me") should default to English-led prompts describing the FUNCTION of the move, because these are intention→form mappings where English better captures the rhetorical intent. Single concrete words and short expressions always get Italian definitions.
 - When the target word is a conjugated verb, the definition card should present the word in its infinitive form. (Cloze cards can use whatever conjugation fits the sentence.)
 - Answer side always includes: the Italian target word/expression + a brief English gloss.
 - The gloss should flag register (colloquial, informal, legal, literary, vulgar, etc.) and if the term is archaic or has a more common modern alternative.
@@ -30,7 +30,8 @@ Register, Usage, and Accuracy Rules:
 
 Exceptions to the Two-Card Rule:
 - For tense/mood errors (wrong tense, missed congiuntivo, indicativo vs congiuntivo, etc.) where the learner knows the word but produced the wrong form: generate ONLY a cloze card testing the correct tense/mood in context. No definition card needed.
-- Do NOT generate any cards for: gender/number agreement errors, article choice errors, or typographic/punctuation fixes. These are mechanical and not worth flashcard space.
+- Do NOT generate any cards for: gender/number agreement slips, one-off article choice slips, or typographic/punctuation fixes. These are mechanical and not worth flashcard space.
+- EXCEPTION: If an article choice error reflects a SEMANTIC pattern (generic vs definite vs partitive where meaning changes, or systematic omission of articles on abstract nouns due to English interference), it IS worth a card. Only skip true one-off slips.
 
 Scope Rules:
 - One lexical target per pair. No combining unrelated words.
@@ -47,7 +48,8 @@ A. Extraction Priority (What to Pull First):
 5. Idiomatic compression: longer phrase replaced by shorter idiomatic unit.
 
 B. What NOT to Extract (no flashcards for these):
-- Gender/number agreement errors, article choice errors — these are mechanical, not vocabulary gaps.
+- Gender/number agreement slips, one-off article choice slips — these are mechanical, not vocabulary gaps.
+- EXCEPTION: Systematic article patterns that encode meaning (generic vs definite vs partitive contrasts, repeated omission of articles on abstract nouns from English interference) SHOULD be extracted.
 - Typographic/punctuation errors (missed commas, capitalization) — not learning items.
 - Transparent, obvious, predictable, stylistically neutral synonyms.
 - Hyper-local phrasing that only works in that precise context and doesn't generalize.
@@ -187,7 +189,7 @@ async function fcChat(containerId) {
   log.scrollTop = log.scrollHeight;
   try {
     const currentCards = rev.cards.map(c => 'Front: ' + c.front + ' | Back: ' + c.back).join('\n');
-    const prompt = `Context: ${rev.context}\n\nCurrent flashcards:\n${currentCards}\n\nUser question: ${q}\n\nTone instructions: Be direct and factual. No motivational language, no emojis in your response, no encouragement or cheerleading. Assume the user is competent. Precision over politeness. Be concise but not shallow. If something is complex, explain why rather than summarizing it away.\n\nIf the user asks to add/modify/generate cards, return any new cards as a JSON array with "front" and "back" fields, wrapped in <cards>[...]</cards> tags, IN ADDITION to your normal response. Otherwise answer the question analytically.`;
+    const prompt = `Context: ${rev.context}\n\nCurrent flashcards:\n${currentCards}\n\nUser question: ${q}\n\n${FLASH_CARD_RULES}\n\nTone instructions: Be direct and factual. No motivational language, no emojis in your response, no encouragement or cheerleading. Assume the user is competent. Precision over politeness. Be concise but not shallow. If something is complex, explain why rather than summarizing it away.\n\nIf the user asks to add/modify/generate cards, you MUST follow the flashcard construction rules above. Return any new cards as a JSON array with "front" and "back" fields, wrapped in <cards>[...]</cards> tags, IN ADDITION to your normal response. Otherwise answer the question analytically.`;
     const resp = await callClaude(key, prompt);
     // Remove the "Thinking..." message
     const msgs = log.querySelectorAll('div');
@@ -244,7 +246,7 @@ function _parseCardsJSON(resp) {
 // ============ SHARED FEEDBACK PROMPT ============
 const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:
 
-"${txt}"
+"${txt}"${_getTopInterferenceContext()}
 
 Istruzioni — segui questo formato ESATTAMENTE:
 
@@ -263,12 +265,26 @@ Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
 Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+
+Fasce di calibrazione (usale come riferimento stabile):
+- 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
+- 80-89 (C1+): Pochi errori, tutti minori. Buon controllo del registro. Qualche calco residuo.
+- 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
+- 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
+- Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
+
+REGOLA IMPORTANTE: Nelle correzioni, preferisci interventi minimi. NON riscrivere per gusto stilistico. Correggi solo ciò che è effettivamente errato o inadeguato.
+
+5. PATTERN DI INTERFERENZA
+Scrivi su una riga separata nel formato esatto:
+INTERFERENCE: pattern1 | pattern2 | pattern3
+Elenca i pattern di interferenza L1 rilevati in questo testo (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
 
 Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
 
 const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:
 
-"${txt}"
+"${txt}"${_getTopInterferenceContext()}
 
 Istruzioni — segui questo formato ESATTAMENTE:
 
@@ -287,6 +303,20 @@ Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
 Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+
+Fasce di calibrazione (usale come riferimento stabile):
+- 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
+- 80-89 (C1+): Pochi errori, tutti minori. Buon controllo del registro. Qualche calco residuo.
+- 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
+- 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
+- Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
+
+REGOLA IMPORTANTE: Nelle correzioni, preferisci interventi minimi. NON riscrivere per gusto stilistico. Correggi solo ciò che è effettivamente errato o inadeguato.
+
+5. PATTERN DI INTERFERENZA
+Scrivi su una riga separata nel formato esatto:
+INTERFERENCE: pattern1 | pattern2 | pattern3
+Elenca i pattern di interferenza L1 rilevati in questo testo (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
 
 Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
 
@@ -317,9 +347,17 @@ RIEPILOGO ERRORI SOSTANZIALI:
 Per ogni errore significativo trovato in tutti i paragrafi: originale → riproduzione dello studente → forma corretta + spiegazione breve IN ITALIANO.
 
 PUNTEGGIO FINALE:
-Calcola la media delle 4 dimensioni (0-5) su tutti i paragrafi, poi scala a 100: (media / 5) × 100.
+Calcola il punteggio pesato delle 4 dimensioni su tutti i paragrafi:
+- Fedeltà semantica: peso 35%
+- Naturalezza collocazionale: peso 30%
+- Struttura informativa / ritmo: peso 25%
+- Allineamento di registro: peso 10%
+Formula: per ogni paragrafo, (sem×0.35 + coll×0.30 + strutt×0.25 + reg×0.10) / 5 × 100. Poi media tra paragrafi.
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
+
+Scrivi anche le medie per dimensione nel formato:
+DIMENSIONS: sem=X.X coll=X.X struct=X.X reg=X.X
 
 Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
 };
@@ -331,6 +369,51 @@ function _parseReflectionScore(resp) {
   const m2 = resp.match(/\b(A2|B1|B2\+?|C1\+?|C2)\b/);
   if (m2) return { score: null, level: m2[1] };
   return { score: null, level: null };
+}
+
+function _parseReproDimensions(resp) {
+  // Parse DIMENSIONS: sem=X.X coll=X.X struct=X.X reg=X.X
+  const m = resp.match(/DIMENSIONS:\s*sem=([\d.]+)\s+coll=([\d.]+)\s+struct=([\d.]+)\s+reg=([\d.]+)/i);
+  if (m) return { sem: parseFloat(m[1]), coll: parseFloat(m[2]), struct: parseFloat(m[3]), reg: parseFloat(m[4]) };
+  return null;
+}
+
+// ============ INTERFERENCE PATTERN TRACKER ============
+function _parseInterferencePatterns(resp) {
+  // Parse INTERFERENCE: pattern1 | pattern2 | pattern3
+  const m = resp.match(/INTERFERENCE:\s*(.+)/i);
+  if (!m) return [];
+  return m[1].split('|').map(p => p.trim()).filter(p => p.length > 3);
+}
+
+function _updateInterferenceProfile(patterns) {
+  if (!patterns || !patterns.length) return;
+  const d = load();
+  if (!d.interferenceProfile) d.interferenceProfile = [];
+  const profile = d.interferenceProfile;
+  const dt = today();
+  patterns.forEach(pat => {
+    const normalized = pat.toLowerCase();
+    const existing = profile.find(p => p.pattern.toLowerCase() === normalized);
+    if (existing) {
+      existing.count = (existing.count || 1) + 1;
+      existing.lastSeen = dt;
+    } else {
+      profile.push({ pattern: pat, count: 1, firstSeen: dt, lastSeen: dt });
+    }
+  });
+  // Sort by count descending, keep top 20
+  profile.sort((a, b) => b.count - a.count);
+  d.interferenceProfile = profile.slice(0, 20);
+  save(d);
+}
+
+function _getTopInterferenceContext() {
+  const d = load();
+  const profile = d.interferenceProfile || [];
+  if (!profile.length) return '';
+  const top3 = profile.slice(0, 3).map(p => '- ' + p.pattern + ' (rilevato ' + p.count + ' volte)');
+  return '\n\nPATTERN DI INTERFERENZA RICORRENTI DELLO STUDENTE (presta particolare attenzione a questi):\n' + top3.join('\n');
 }
 
 // ============ REFLECTION SUBMIT (Daily Composition) ============
@@ -346,8 +429,10 @@ async function submitRefl() {
     const feedbackPrompt = CORRECTION_PROMPT_DAILY(txt);
     const feedbackResp = await callClaude(key, feedbackPrompt);
     res.innerHTML = '<div style="background:var(--bg);padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap;border:1px solid var(--border)">' + escHtml(feedbackResp) + '</div>';
-    // Parse and save score
+    // Parse and save score + update interference profile
     const scoreData = _parseReflectionScore(feedbackResp);
+    const intPatterns = _parseInterferencePatterns(feedbackResp);
+    _updateInterferenceProfile(intPatterns);
     // Save correction with score
     const d = getGlobal();
     d.corrections.push({ date: today(), text: txt, response: feedbackResp, score: scoreData });
