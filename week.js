@@ -552,55 +552,37 @@ function renderStretchGoals() {
   if (!container) return;
   
   if (!sg || !sg.submitted) {
-    // Show submission form
+    // Show compact submission form
     container.innerHTML = `
-      <div class="stretch-goals-submission">
-        <h3 style="color:var(--red);margin-bottom:12px">⚠️ Weekly Stretch Goals Required</h3>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Set three memory-making goals for this week. These should push you out of your comfort zone.</p>
-        <div class="sg-input-group">
-          <label>Goal 1:</label>
-          <input type="text" id="sg-goal-1" placeholder="Try a pottery class..." maxlength="200">
+      <div style="padding:10px 0;border-bottom:1px dashed var(--border);margin-bottom:12px">
+        <h4 style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px">💫 Memory <span style="color:var(--muted);font-weight:400;font-size:12px">(Required to unlock site)</span></h4>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Set three memory-making experiences for this week.</p>
+        <div style="margin-bottom:8px">
+          <input type="text" id="sg-goal-1" placeholder="Goal 1: Try a pottery class..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:4px">
+          <input type="text" id="sg-goal-2" placeholder="Goal 2: Attend a local theater show..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:4px">
+          <input type="text" id="sg-goal-3" placeholder="Goal 3: Watch Cinema Paradiso..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
         </div>
-        <div class="sg-input-group">
-          <label>Goal 2:</label>
-          <input type="text" id="sg-goal-2" placeholder="Attend a local theater performance..." maxlength="200">
-        </div>
-        <div class="sg-input-group">
-          <label>Goal 3:</label>
-          <input type="text" id="sg-goal-3" placeholder="Watch Cinema Paradiso (Italian film)..." maxlength="200">
-        </div>
-        <button id="sg-submit-btn" class="btn btn-p" onclick="submitStretchGoals()">Submit for AI Approval</button>
-        <div id="sg-eval-result" style="margin-top:16px"></div>
+        <button id="sg-submit-btn" class="btn btn-s" onclick="submitStretchGoals()" style="font-size:12px">Submit for AI Approval</button>
+        <div id="sg-eval-result" style="margin-top:10px"></div>
       </div>
     `;
   } else {
-    // Show approved goals
-    const goalsHtml = sg.goals.map(g => {
-      const badge = g.type === 'italian-media' ? '<span class="sg-badge sg-badge-media">📚 Italian Media</span>' : '<span class="sg-badge sg-badge-exp">🎯 Experience</span>';
-      const completedClass = g.completed ? 'sg-goal-completed' : '';
-      const completedBadge = g.completed ? '<span class="sg-completed-badge">✓ Completed</span>' : '';
-      const completeBtn = g.completed ? '' : `<button class="btn btn-sm" onclick="openCompleteGoalModal('${g.id}', '${g.type}')">Complete Goal</button>`;
-      return `
-        <div class="stretch-goal-card ${completedClass}">
-          <div class="sg-header">
-            ${badge}
-            ${completedBadge}
-          </div>
-          <div class="sg-text">${escHtml(g.text)}</div>
-          <div class="sg-scores">
-            <span title="Memory Score">💭 ${g.memoryScore}/10</span>
-            <span title="Anti-Optimization Score">🎨 ${g.comfortZoneScore}/10</span>
-          </div>
-          ${completeBtn}
-        </div>
-      `;
-    }).join('');
+    // Show approved goals as chips
+    const chipsHtml = sg.goals.map(g => {
+      const typeIcon = g.type === 'italian-media' ? '📚' : '🎯';
+      const completedClass = g.completed ? ' memory-chip-done' : ' memory-chip-active';
+      const checkmark = g.completed ? ' ✓' : '';
+      const clickHandler = g.completed ? '' : ` onclick="openCompleteGoalModal('${g.id}', '${g.type}')"`;
+      const tooltip = `💭 ${g.memoryScore}/10 memory · 🎨 ${g.comfortZoneScore}/10 comfort`;
+      const cursorStyle = g.completed ? 'cursor:default' : 'cursor:pointer';
+      
+      return `<span class="goal-chip${completedClass}" ${clickHandler} title="${tooltip}" style="${cursorStyle}">${typeIcon} ${escHtml(g.text)}${checkmark}</span>`;
+    }).join(' ');
     
     container.innerHTML = `
-      <div class="stretch-goals-display">
-        <h3 style="margin-bottom:8px">🎯 Weekly Stretch Goals</h3>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Memory-making experiences for week of ${wk}</p>
-        <div class="stretch-goals-grid">${goalsHtml}</div>
+      <div style="padding:10px 0;border-bottom:1px dashed var(--border);margin-bottom:12px">
+        <h4 style="font-size:13px;font-weight:600;margin-bottom:8px">💫 Memory</h4>
+        <div class="chip-container">${chipsHtml}</div>
       </div>
     `;
   }

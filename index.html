@@ -302,6 +302,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .goal-chip.done .chip-text { text-decoration:line-through; opacity:.55; }
 .goal-chip.overdue { border-left:3px solid var(--red,#e74c3c); background:rgba(231,76,60,.06); }
 .goal-chip.overdue .chip-overdue-badge { font-size:9px; color:var(--red,#e74c3c); margin-right:2px; }
+.memory-chip-active { transition:all .15s; }
+.memory-chip-active:hover { background:var(--bl); box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.memory-chip-done { background:var(--gl); border-color:var(--green); opacity:0.85; }
 @media(min-width:1024px){
   .goal-chip { font-size:20px !important; }
   .chip-add { font-size:20px !important; }
@@ -417,11 +420,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <!-- WEEK -->
 <div class="tab" id="tab-week">
 <h1>📊 Week of <span id="wk-date"></span></h1>
-<div class="card" style="border:2px solid var(--red)">
-  <div id="stretch-goals-container"></div>
-</div>
 <div class="card">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="wk-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
+<div id="stretch-goals-container"></div>
 <details style="margin-bottom:10px">
   <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:4px">💼 Work</summary>
   <div id="wg-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
