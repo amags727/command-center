@@ -536,7 +536,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div><b id="cards-reviewed-today" style="color:#8b5cf6">0</b> <span class="cards-stat-label" style="color:var(--muted)">reviewed today</span></div>
 <div style="margin-top:8px;font-size:12px;color:var(--muted)">
   <label>New/day: <input type="number" id="cards-new-limit" class="fin" style="width:55px;font-size:12px" value="20" min="1" max="200" onchange="saveCardSettings()"></label>
-  <span style="margin-left:8px">Review cap: <b id="cards-review-cap">200</b></span>
+  <label style="margin-left:8px">Review cap: <input type="number" id="cards-review-cap" class="fin" style="width:65px;font-size:12px" value="200" min="1" max="9999" onchange="saveCardSettings()"></label>
 </div>
 <div id="cards-limit-status" style="margin-top:4px;font-size:12px"></div>
 <button class="btn btn-p" onclick="startStudy()">▶ Study Now</button>
@@ -546,7 +546,6 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <div id="study-area" style="display:none">
 <div class="card" style="min-height:400px;text-align:center;position:relative" onclick="flipCard()">
-<div style="font-size:11px;color:var(--muted);margin-bottom:12px"><span id="study-progress"></span></div>
 <div id="study-front" style="font-size:20px;padding:20px 10px;cursor:pointer"></div>
 <div id="study-back" style="display:none;padding:16px 10px;border-top:1px dashed var(--border);margin-top:12px">
 <div id="study-back-content" style="font-size:20px;margin-bottom:16px"></div>

@@ -3,9 +3,14 @@ function getCards() { const d = load(); if (!d.cards) d.cards = []; if (!d.cardS
 function todayDayNum() { return Math.floor(Date.now() / 86400000); }
 function saveCardSettings() {
   const v = parseInt(document.getElementById('cards-new-limit').value) || 20;
-  const d = getCards(); d.cardSettings = { newPerDay: Math.max(1, Math.min(200, v)) }; save(d);
-  document.getElementById('cards-review-cap').textContent = v * 10;
+  const rc = parseInt(document.getElementById('cards-review-cap').value) || 200;
+  const d = getCards();
+  d.cardSettings = Object.assign(d.cardSettings || {}, { newPerDay: Math.max(1, Math.min(200, v)), reviewCap: Math.max(1, Math.min(9999, rc)) });
+  save(d);
   renderCards();
+}
+function getReviewCap(settings) {
+  return settings.reviewCap || (settings.newPerDay || 20) * 10;
 }
 function getAnkiDailyTarget() {
   // Compute once at site open, cache for the day
@@ -16,7 +21,7 @@ function getAnkiDailyTarget() {
   const settings = d.cardSettings || { newPerDay: 20 };
   const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
   const newLimit = settings.newPerDay + dailyBonus;
-  const reviewCap = newLimit * 10;
+  const reviewCap = getReviewCap(settings);
   const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0).length;
   const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
   // Cap to review cap — you can't study more than this in one day
@@ -125,38 +130,43 @@ function renderCards() {
   const settings = d.cardSettings || { newPerDay: 20 };
   const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
   const newLimit = settings.newPerDay + dailyBonus;
-  const reviewCap = newLimit * 10;
+  const reviewCap = getReviewCap(settings);
 
-  // Load setting into UI
+  // Load settings into UI
   document.getElementById('cards-new-limit').value = settings.newPerDay;
-  document.getElementById('cards-review-cap').textContent = reviewCap;
+  document.getElementById('cards-review-cap').value = reviewCap;
 
-  const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
-  const allNew = d.cards.filter(c => c.queue === 0);
   const newIntroducedToday = getNewIntroducedToday();
   const totalReviewedToday = getTotalReviewedToday();
-  const newRemaining = Math.max(0, newLimit - newIntroducedToday);
   const reviewRemaining = Math.max(0, reviewCap - totalReviewedToday);
+  const newRemaining = Math.max(0, newLimit - newIntroducedToday);
 
-  // What's actually available this session
-  const availableReviews = dueReviews.slice(0, reviewRemaining);
-  const availableNew = allNew.slice(0, Math.min(newRemaining, Math.max(0, reviewRemaining - availableReviews.length)));
-  const totalAvailable = availableReviews.length + availableNew.length;
+  // Build virtual queue exactly like startStudy — single source of truth
+  // Due reviews: learning (queue===1) + review (queue===2), both due now
+  const dueCards = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0);
+  const newCards = d.cards.filter(c => c.queue === 0).slice(0, newRemaining);
+  let virtualQueue = [...dueCards, ...newCards];
+  if (virtualQueue.length > reviewRemaining) virtualQueue = virtualQueue.slice(0, reviewRemaining);
 
-  const learningCards = d.cards.filter(c => c.queue === 1 && (c.due || 0) <= now);
-  document.getElementById('cards-new-remaining').textContent = Math.min(newRemaining, allNew.length);
-  document.getElementById('cards-learning-ct').textContent = learningCards.length;
-  document.getElementById('cards-review-remaining').textContent = availableReviews.length;
+  // Count by type — mutually exclusive buckets
+  const qNew = virtualQueue.filter(c => c.queue === 0).length;
+  const qLearn = virtualQueue.filter(c => c.queue === 1).length;
+  const qReview = virtualQueue.length - qNew - qLearn;
 
-  // Count cards reviewed today
+  document.getElementById('cards-new-remaining').textContent = qNew;
+  document.getElementById('cards-learning-ct').textContent = qLearn;
+  document.getElementById('cards-review-remaining').textContent = qReview;
   document.getElementById('cards-reviewed-today').textContent = totalReviewedToday;
+
+  const totalAvailable = virtualQueue.length;
+  const allNew = d.cards.filter(c => c.queue === 0);
 
   // Limit status message
   const statusEl = document.getElementById('cards-limit-status');
-  if (totalAvailable === 0 && (allNew.length > 0 || dueReviews.length > 0)) {
+  if (totalAvailable === 0 && (allNew.length > 0 || dueCards.length > 0)) {
     if (totalReviewedToday >= reviewCap) {
       statusEl.innerHTML = '🎉 <b>Review cap reached!</b> Done for today.';
-    } else if (newIntroducedToday >= newLimit && dueReviews.length === 0) {
+    } else if (newIntroducedToday >= newLimit && dueCards.length === 0) {
       statusEl.innerHTML = '✅ All reviews done. New card limit reached (' + newLimit + '/' + newLimit + ').';
     }
     statusEl.style.color = 'var(--green)';
@@ -206,7 +216,7 @@ function startStudy() {
   const settings = d.cardSettings || { newPerDay: 20 };
   const dailyBonus = (settings.dailyBonusNew && settings.dailyBonusNew[today()]) || 0;
   const newLimit = settings.newPerDay + dailyBonus;
-  const reviewCap = newLimit * 10;
+  const reviewCap = getReviewCap(settings);
   const newIntroducedToday = getNewIntroducedToday();
   const totalReviewedToday = getTotalReviewedToday();
   const reviewRemaining = Math.max(0, reviewCap - totalReviewedToday);
@@ -252,11 +262,14 @@ function showStudyCard() {
   document.getElementById('study-back-content').innerHTML = escHtml(card.back);
   document.getElementById('study-back').style.display = 'none';
   document.getElementById('study-hint').style.display = '';
+  // Update summary bar with remaining queue counts
   const remaining = studyQueue.slice(studyIdx);
   const newLeft = remaining.filter(c => c.queue === 0).length;
   const learnLeft = remaining.filter(c => c.queue === 1).length;
   const revLeft = remaining.length - newLeft - learnLeft;
-  document.getElementById('study-progress').innerHTML = '<span style="color:#3b82f6;font-weight:700">' + newLeft + '</span> + <span style="color:#ef4444;font-weight:700">' + learnLeft + '</span> + <span style="color:#22c55e;font-weight:700">' + revLeft + '</span>';
+  document.getElementById('cards-new-remaining').textContent = newLeft;
+  document.getElementById('cards-learning-ct').textContent = learnLeft;
+  document.getElementById('cards-review-remaining').textContent = revLeft;
   document.getElementById('hard-ivl').textContent = previewIvl(card, 2);
   document.getElementById('good-ivl').textContent = previewIvl(card, 3);
   document.getElementById('easy-ivl').textContent = previewIvl(card, 4);
