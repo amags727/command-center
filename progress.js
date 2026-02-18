@@ -192,16 +192,25 @@ function _renderItalianChart(dates) {
     if (c.date && c.score && c.score.score != null) reflScores[c.date] = c.score.score;
   });
   const articleScores = {};
+  const reproScores = {};
   readings.forEach(r => {
-    if (r.date && r.score && r.score.score != null) articleScores[r.date] = r.score.score;
+    if (r.date && r.score && r.score.score != null) {
+      if (r.type === 'reproduction') {
+        reproScores[r.date] = r.score.score;
+      } else {
+        articleScores[r.date] = r.score.score;
+      }
+    }
   });
 
   const labels = dates.map(_shortDate);
   const reflPoints = [];
   const artPoints = [];
+  const reproPoints = [];
   dates.forEach((dt, i) => {
     if (reflScores[dt] !== undefined) reflPoints.push({ x: i, y: reflScores[dt] });
     if (articleScores[dt] !== undefined) artPoints.push({ x: i, y: articleScores[dt] });
+    if (reproScores[dt] !== undefined) reproPoints.push({ x: i, y: reproScores[dt] });
   });
 
   const ctx = document.getElementById('chart-italian').getContext('2d');
@@ -223,6 +232,14 @@ function _renderItalianChart(dates) {
           data: artPoints,
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: 'rgba(59, 130, 246, 1)',
+          pointRadius: 9, pointHoverRadius: 13,
+          showLine: true, tension: 0.3, borderWidth: 2
+        },
+        {
+          label: 'Prose Reproduction',
+          data: reproPoints,
+          backgroundColor: 'rgba(34, 197, 94, 0.7)',
+          borderColor: 'rgba(34, 197, 94, 1)',
           pointRadius: 9, pointHoverRadius: 13,
           showLine: true, tension: 0.3, borderWidth: 2
         }

@@ -290,6 +290,40 @@ Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON 
 
 Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
 
+const CORRECTION_PROMPT_REPRODUCTION = (paragraphs) => {
+  // paragraphs is an array of {original, reproduction} objects
+  const aligned = paragraphs.map((p, i) => `--- Paragrafo ${i + 1} ---\nORIGINALE:\n${p.original}\n\nRIPRODUZIONE DELLO STUDENTE:\n${p.reproduction}`).join('\n\n');
+  return `Sei un valutatore esperto di italiano a livello C1-C2. Lo studente ha letto un articolo italiano e poi ha tentato di riprodurre a memoria alcuni paragrafi chiave senza guardare il testo originale.
+
+L'obiettivo NON è la riproduzione parola per parola, ma dimostrare di aver interiorizzato la sintassi, il registro, le collocazioni e il ritmo del testo originale.
+
+Ecco i paragrafi originali e le riproduzioni dello studente:
+
+${aligned}
+
+Istruzioni — segui questo formato ESATTAMENTE:
+
+Per OGNI paragrafo, valuta su scala 0-5:
+
+1. FEDELTÀ SEMANTICA (0-5): Il contenuto e le idee sono gli stessi? Informazioni mancanti o aggiunte?
+2. NATURALEZZA COLLOCAZIONALE (0-5): Le combinazioni di parole sono native italiane o calchi dall'inglese?
+3. STRUTTURA INFORMATIVA / RITMO (0-5): L'architettura della frase rispecchia il flusso naturale della prosa italiana? Ordine delle informazioni, subordinazione, posizione del verbo?
+4. ALLINEAMENTO DI REGISTRO (0-5): Il livello di formalità corrisponde all'originale? (giornalistico, accademico, colloquiale, ecc.) Tempi verbali appropriati al genere?
+5. PATTERN DI INTERFERENZA DALL'INGLESE: Elenca ogni costrutto che tradisce interferenza L1 (calchi sintattici, ordine SVO forzato, articoli mancanti su nomi generici, preposizioni calcolate dall'inglese, ecc.)
+
+Dopo tutti i paragrafi, scrivi:
+
+RIEPILOGO ERRORI SOSTANZIALI:
+Per ogni errore significativo trovato in tutti i paragrafi: originale → riproduzione dello studente → forma corretta + spiegazione breve IN ITALIANO.
+
+PUNTEGGIO FINALE:
+Calcola la media delle 4 dimensioni (0-5) su tutti i paragrafi, poi scala a 100: (media / 5) × 100.
+Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
+dove LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
+
+Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
+};
+
 function _parseReflectionScore(resp) {
   const m = resp.match(/SCORE:\s*(\d+)\s*\/\s*100\s*\(([^)]+)\)/i);
   if (m) return { score: parseInt(m[1]), level: m[2].trim() };

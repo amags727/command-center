@@ -95,14 +95,15 @@ async function trTranslateText(raw, fetchedTitle) {
 CRITICAL RULES:
 - The text has ${srcParas.length} numbered paragraphs [1] through [${srcParas.length}].
 - You MUST return EXACTLY ${srcParas.length} paragraph objects in your response — one per numbered paragraph.
-- Each paragraph object has "it" (the original Italian) and "en" (English translation).
+- Each paragraph object has "it" (the original Italian), "en" (English translation), and "repro" (boolean).
 - Do NOT merge, split, skip, or reorder paragraphs. Paragraph [1] → index 0, [2] → index 1, etc.
 - Preserve the original text in the "it" field (without the [N] number prefix).
+- Set "repro": true on EXACTLY 4 paragraphs that are most valuable for a prose reproduction exercise. Choose paragraphs with: complex subordination, interesting register choices, idiomatic density, or native Italian syntax patterns that an English speaker would struggle to reproduce. Skip trivial/short paragraphs. If fewer than 4 substantive paragraphs exist, mark all substantive ones.
 
 Also include a "title" field if you can infer the article title, and a "difficulty" field (A2/B1/B2/C1/C2).
 
 Return ONLY valid JSON:
-{"title": "...", "difficulty": "...", "paragraphs": [{"it": "...", "en": "..."}, ...]}
+{"title": "...", "difficulty": "...", "paragraphs": [{"it": "...", "en": "...", "repro": false}, ...]}
 
 Numbered Italian text:
 ${numbered}`;
@@ -137,15 +138,29 @@ ${numbered}`;
 
     // Render the result
     document.getElementById('tr-title').textContent = data.title || 'Article';
-    document.getElementById('tr-meta').textContent = 'Difficulty: ' + (data.difficulty || '?') + ' | ' + data.paragraphs.length + ' paragraphs';
+    const reproCount = data.paragraphs.filter(p => p.repro).length;
+    document.getElementById('tr-meta').textContent = 'Difficulty: ' + (data.difficulty || '?') + ' | ' + data.paragraphs.length + ' paragraphs' + (reproCount ? ' | ' + reproCount + ' marked for reproduction' : '');
     const tbody = document.getElementById('tr-tbody');
-    tbody.innerHTML = data.paragraphs.map(p =>
-      '<tr><td class="it-col">' + escHtml(p.it) + '</td><td>' + escHtml(p.en) + '</td></tr>'
+    tbody.innerHTML = data.paragraphs.map((p, i) =>
+      '<tr data-idx="' + i + '"' + (p.repro ? ' data-repro="1"' : '') + '><td class="it-col">' + escHtml(p.it) + '</td><td class="en-col">' + escHtml(p.en) + '</td></tr>'
     ).join('');
     document.getElementById('tr-result-card').style.display = 'block';
     document.getElementById('tr-reflection-card').style.display = 'block';
+    // Show reproduction card if repro paragraphs exist
+    const reproCard = document.getElementById('tr-repro-card');
+    if (reproCard) reproCard.style.display = reproCount > 0 ? 'block' : 'none';
     trArticleCards = [];
     trCollectedWords = [];
+    // Store paragraph data for reproduction
+    _trParagraphs = data.paragraphs;
+    _trReproState = 'idle'; // idle | active | submitted
+    _trReproductions = {};
+    const reproStatus = document.getElementById('tr-repro-status');
+    if (reproStatus) reproStatus.textContent = '';
+    const reproResultEl = document.getElementById('tr-repro-result');
+    if (reproResultEl) reproResultEl.style.display = 'none';
+    const reproReviewEl = document.getElementById('tr-repro-card-review');
+    if (reproReviewEl) reproReviewEl.style.display = 'none';
     const collCard = document.getElementById('tr-collected-card');
     if (collCard) collCard.style.display = 'none';
     status.textContent = '✅ Translation complete! Highlight Italian words to collect them for flashcards.';
@@ -586,6 +601,137 @@ async function trSubmitReflection(num) {
     }
     status.textContent = '✅ Feedback + ' + cards.length + ' cards generated. Logged as Article ' + num + '.';
     addLog('action', 'Article ' + num + ' reflection: ' + title + ' + ' + cards.length + ' cards');
+    trUpdateSubmitBtn();
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// ============ PROSE REPRODUCTION EXERCISE ============
+let _trParagraphs = []; // [{it, en, repro}, ...]
+let _trReproState = 'idle'; // idle | active | submitted
+let _trReproductions = {}; // {idx: 'text typed by user'}
+
+function trStartRepro() {
+  if (!_trParagraphs.length) { alert('Translate an article first.'); return; }
+  _trReproState = 'active';
+  _trReproductions = {};
+  const tbody = document.getElementById('tr-tbody');
+  // Wipe ALL English columns immediately
+  tbody.querySelectorAll('.en-col').forEach(td => { td.textContent = ''; td.style.color = 'var(--muted)'; });
+  // For repro paragraphs: add lock button, for non-repro: leave Italian visible
+  const rows = tbody.querySelectorAll('tr');
+  rows.forEach(tr => {
+    const idx = parseInt(tr.dataset.idx);
+    const isRepro = tr.dataset.repro === '1';
+    const itCol = tr.querySelector('.it-col');
+    if (isRepro) {
+      // Add lock button overlay
+      const origText = itCol.textContent;
+      itCol.innerHTML = '<div style="position:relative">' +
+        '<div class="repro-orig" style="font-size:13px;line-height:1.5">' + escHtml(origText) + '</div>' +
+        '<button class="btn btn-s repro-lock-btn" onclick="trLockPara(' + idx + ')" style="margin-top:6px;font-size:11px">🔒 Lock & Reproduce</button>' +
+        '</div>';
+    }
+  });
+  // Update UI
+  document.getElementById('tr-repro-start-btn').style.display = 'none';
+  document.getElementById('tr-repro-progress').style.display = 'block';
+  trUpdateReproProgress();
+}
+
+function trLockPara(idx) {
+  const tbody = document.getElementById('tr-tbody');
+  const row = tbody.querySelector('tr[data-idx="' + idx + '"]');
+  if (!row) return;
+  const itCol = row.querySelector('.it-col');
+  // Replace with textarea
+  itCol.innerHTML = '<textarea class="fin repro-textarea" id="repro-ta-' + idx + '" ' +
+    'style="width:100%;min-height:80px;font-size:13px;resize:vertical" ' +
+    'placeholder="Reproduce this paragraph from memory..." ' +
+    'oninput="trReproInput(' + idx + ')"></textarea>';
+  // Focus the textarea
+  document.getElementById('repro-ta-' + idx).focus();
+  trUpdateReproProgress();
+}
+
+function trReproInput(idx) {
+  const ta = document.getElementById('repro-ta-' + idx);
+  if (ta) _trReproductions[idx] = ta.value;
+  trUpdateReproProgress();
+}
+
+function trUpdateReproProgress() {
+  const reproIdxs = _trParagraphs.map((p, i) => p.repro ? i : -1).filter(i => i >= 0);
+  const total = reproIdxs.length;
+  const done = reproIdxs.filter(i => (_trReproductions[i] || '').trim().length > 10).length;
+  const el = document.getElementById('tr-repro-progress');
+  if (el) el.innerHTML = '<span style="font-size:13px">' + done + ' / ' + total + ' paragraphs completed</span>' +
+    (done === total ? ' <button class="btn btn-p" onclick="trSubmitRepro()" style="margin-left:10px">✅ Submit Reproduction</button>' : '');
+}
+
+async function trSubmitRepro() {
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const reproIdxs = _trParagraphs.map((p, i) => p.repro ? i : -1).filter(i => i >= 0);
+  const paragraphs = reproIdxs.map(i => ({
+    original: _trParagraphs[i].it,
+    reproduction: (_trReproductions[i] || '').trim()
+  }));
+  if (paragraphs.some(p => !p.reproduction)) { alert('Complete all reproduction paragraphs first.'); return; }
+  const article = CAL._currentArticle || {};
+  const title = article.title || document.getElementById('tr-title').textContent || 'Untitled';
+  const status = document.getElementById('tr-repro-status');
+  status.textContent = '⏳ Sending reproductions to Claude for evaluation...';
+  _trReproState = 'submitted';
+  try {
+    const feedbackPrompt = CORRECTION_PROMPT_REPRODUCTION(paragraphs);
+    const feedbackResp = await callClaude(key, feedbackPrompt, 8192);
+    const scoreData = _parseReflectionScore(feedbackResp);
+    // Show feedback
+    document.getElementById('tr-repro-result').style.display = 'block';
+    document.getElementById('tr-repro-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');
+    // Show side-by-side comparison (unhide originals)
+    const tbody = document.getElementById('tr-tbody');
+    reproIdxs.forEach(i => {
+      const row = tbody.querySelector('tr[data-idx="' + i + '"]');
+      if (!row) return;
+      const itCol = row.querySelector('.it-col');
+      const userText = (_trReproductions[i] || '').trim();
+      itCol.innerHTML = '<div style="margin-bottom:6px"><b style="font-size:11px;color:var(--green)">Original:</b><div style="font-size:13px;background:#f0fdf4;padding:6px;border-radius:4px;border:1px solid #bbf7d0">' + escHtml(_trParagraphs[i].it) + '</div></div>' +
+        '<div><b style="font-size:11px;color:var(--blue)">Your reproduction:</b><div style="font-size:13px;background:#eff6ff;padding:6px;border-radius:4px;border:1px solid #bfdbfe">' + escHtml(userText) + '</div></div>';
+    });
+    // Log as Article 2
+    const num = 2;
+    const titleEl = document.getElementById('art' + num + '-t');
+    const thoughtsEl = document.getElementById('art' + num + '-th');
+    if (titleEl) titleEl.value = title + ' [Reproduction]' + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+    if (thoughtsEl) thoughtsEl.value = paragraphs.map(p => p.reproduction).join('\n\n');
+    const chk = document.getElementById('h-art' + num);
+    if (chk) chk.checked = true;
+    const st = document.getElementById('art' + num + '-status');
+    if (st) st.textContent = '✅ ' + title + ' [Reproduction]';
+    // Save to readingHistory with type: reproduction
+    const d = load();
+    if (!d.readingHistory) d.readingHistory = [];
+    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, type: 'reproduction', score: scoreData });
+    save(d);
+    // Persist habit
+    const dd2 = dayData(today());
+    const dayObj = dd2.days[today()];
+    dayObj.habits['art' + num] = true;
+    dayObj.habits['art' + num + 'Title'] = title + ' [Reproduction]';
+    dayObj.habits['art' + num + 'Thoughts'] = paragraphs.map(p => p.reproduction).join('\n\n');
+    save(dd2);
+    // Generate flashcards from reproduction errors
+    const cardPrompt = `You are generating flashcards from a prose reproduction exercise.\n\nThe student read an Italian article and attempted to reproduce key paragraphs from memory.\n\nClaude's evaluation:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the errors and interference patterns identified above, generate 5-8 flashcard items following the extraction and card construction rules. Focus on constructions where the student's reproduction diverged from native Italian patterns.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardResp = await callClaude(key, cardPrompt);
+    const cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      renderFlashcardReview('tr-repro-card-review', cards, 'Reproduction exercise: ' + title + '\n\nEvaluation:\n' + feedbackResp, 'reproduction');
+    }
+    status.textContent = '✅ Evaluation + ' + cards.length + ' cards generated. Logged as Article 2 [Reproduction].';
+    addLog('action', 'Prose reproduction: ' + title + ' — Score: ' + (scoreData.score || '?') + '/100 + ' + cards.length + ' cards');
     trUpdateSubmitBtn();
   } catch (e) {
     status.textContent = '❌ Error: ' + e.message;
