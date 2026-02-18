@@ -409,7 +409,7 @@ function populateFromWeeklyGoals() {
 function updRC() {
   const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
   el.textContent = wc + ' / 200 words'; el.className = 'wc' + (wc > 0 && wc < 200 ? ' bad' : '');
-  const dd = dayData(today()); dd.days[today()].reflection = txt; save(dd);
+  const dd = dayData(today()); dd.days[today()].reflection = txt; dd.days[today()].reflectionMod = Date.now(); save(dd);
 }
 
 

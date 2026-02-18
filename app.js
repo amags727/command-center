@@ -179,6 +179,7 @@ function saveTodayNotes() {
   if (!el) return;
   const dd = dayData(today());
   dd.days[today()].notes = el.innerHTML;
+  dd.days[today()].notesMod = Date.now();
   save(dd);
 }
 function loadTodayNotes() {

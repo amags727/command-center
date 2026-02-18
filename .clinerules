@@ -4,20 +4,20 @@
 Fully modularized as of Feb 2026. `app.js` is a 241-line orchestration shell. All feature code lives in dedicated module files. See `MODULARIZATION.md` for the complete module→function map and script load order.
 
 ## Module Map (quick reference)
-| File | Lines | Owns |
-|------|-------|------|
-| core.js | ~10 | Data layer: load/save/today/weekId/dayData/weekData/getGlobal/addLog/escHtml |
-| calendar.js | ~520 | Day calendar rendering, goal CRUD, Italian work, reflection |
-| flashcard-review.js | ~228 | Shared card review modal (used by Cards, Translate, Claude) |
-| today.js | ~120 | Today tab orchestration |
-| week.js | ~53 | Week tab |
-| dissertation.js | ~200 | Dissertation tab |
-| chat.js | ~66 | Claude tab |
-| anki.js | ~607 | SM-2 flashcard engine (Cards tab) |
-| translate.js | ~294 | Read/Translate tab |
-| aotd.js | ~412 | Article of the Day |
-| app.js | ~241 | Nav, notes, keyboard, auto-seal, sync UI, init |
-| firebase-sync.js | ~150 | Firebase sync (loaded last) |
+- `core.js` (~10 lines) — Data layer: load/save/today/weekId/dayData/weekData/getGlobal/addLog/escHtml
+- `calendar.js` (~520 lines) — Day calendar rendering, goal CRUD, Italian work, reflection
+- `flashcard-review.js` (~228 lines) — Shared card review modal (used by Cards, Translate, Claude)
+- `today.js` (~120 lines) — Today tab orchestration
+- `week.js` (~53 lines) — Week tab
+- `dissertation.js` (~200 lines) — Dissertation tab
+- `chat.js` (~66 lines) — Claude tab
+- `anki.js` (~607 lines) — SM-2 flashcard engine (Cards tab)
+- `translate.js` (~294 lines) — Read/Translate tab
+- `aotd.js` (~412 lines) — Article of the Day
+- `meals.js` (~350 lines) — Meals tab (food diary, meal library, macro tracking)
+- `progress.js` (~300 lines) — Progress tab (charts, weekly summaries)
+- `app.js` (~241 lines) — Nav, notes, keyboard, auto-seal, sync UI, init
+- `firebase-sync.js` (~350 lines) — Firebase sync (loaded last)
 
 ## Critical Rules
 
@@ -58,7 +58,10 @@ When modifying any module file:
 ### 9. Data layer is read-only knowledge
 `core.js` exports: `load()`, `save()`, `today()`, `weekId()`, `dayData()`, `weekData()`, `getGlobal()`, `addLog()`, `escHtml()`. You never need to read their implementations — just know they exist and are globally available.
 
-### 10. Script load order matters
+### 10. Formatting: no markdown tables
+Use lists instead of tables in all responses. Tables render poorly in the Cline browser window.
+
+### 11. Script load order matters
 ```
 core.js → calendar.js → flashcard-review.js → today.js → week.js → dissertation.js → chat.js → anki.js → translate.js → aotd.js → app.js → firebase-sync.js
 ```

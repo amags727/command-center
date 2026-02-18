@@ -26,9 +26,7 @@ const FirebaseSync = (() => {
   let _initialPullDone = false;
   let _cachedAuthToken = null; // cached for beforeunload
 
-  // ---- Per-card merge for the cmdcenter blob ----
-  // Merges remote cards into local cards by ID, keeping whichever has higher lastMod.
-  // New cards from either side are always kept.
+  // Per-card merge: keep whichever card has higher lastMod, new cards from either side kept
   function mergeCards(localCards, remoteCards) {
     const localMap = new Map();
     (localCards || []).forEach(c => localMap.set(c.id, c));
@@ -65,22 +63,36 @@ const FirebaseSync = (() => {
     // Start with both sides, then override with smart merges
     const merged = Object.assign({}, localDay, remoteDay);
 
-    // String fields: keep the LONGER one (never lose content)
+    // String fields with per-field timestamps: use *Mod as authority,
+    // fall back to keep-longer for pre-migration data
     for (const field of ['reflection', 'notes']) {
+      const modKey = field === 'reflection' ? 'reflectionMod' : 'notesMod';
+      const lMod = localDay[modKey] || 0;
+      const rMod = remoteDay[modKey] || 0;
       const l = (localDay[field] || '').toString();
       const r = (remoteDay[field] || '').toString();
-      merged[field] = l.length >= r.length ? l : r;
+      if (lMod || rMod) {
+        // At least one side has a per-field timestamp — use it
+        merged[field] = lMod >= rMod ? l : r;
+        merged[modKey] = Math.max(lMod, rMod);
+      } else {
+        // Pre-migration fallback: keep the longer one
+        merged[field] = l.length >= r.length ? l : r;
+      }
     }
 
     // sealed: logical OR — once sealed, stays sealed
     merged.sealed = !!(localDay.sealed || remoteDay.sealed);
 
     // habits: per-habit OR — once checked, stays checked
+    // BUT preserve non-boolean habit values (ankiCount, art1Title, etc.) from the checked side
     const lh = localDay.habits || {};
     const rh = remoteDay.habits || {};
     merged.habits = Object.assign({}, lh, rh);
     for (const key of Object.keys(merged.habits)) {
-      merged.habits[key] = !!(lh[key] || rh[key]);
+      if (typeof lh[key] === 'boolean' || typeof rh[key] === 'boolean') {
+        merged.habits[key] = !!(lh[key] || rh[key]);
+      }
     }
 
     // calBlocks: merge by ID, keep higher lastMod per block
@@ -98,22 +110,50 @@ const FirebaseSync = (() => {
       }
     }
 
-    // t3intentions: keep the version with more total items
+    // t3intentions: per-chip merge by ID, OR for done state
     if (localDay.t3intentions || remoteDay.t3intentions) {
-      const countItems = (t) => {
-        if (!t) return 0;
-        return (t.work || []).length + (t.school || []).length + (t.life || []).length;
-      };
-      merged.t3intentions = countItems(localDay.t3intentions) >= countItems(remoteDay.t3intentions)
-        ? localDay.t3intentions : remoteDay.t3intentions;
+      const lt = localDay.t3intentions || {};
+      const rt = remoteDay.t3intentions || {};
+      merged.t3intentions = {};
+      for (const cat of ['work', 'school', 'life']) {
+        const lArr = lt[cat] || [];
+        const rArr = rt[cat] || [];
+        const lMap = new Map(lArr.map(c => [c.id || c.text, c]));
+        const rMap = new Map(rArr.map(c => [c.id || c.text, c]));
+        const allIds = new Set([...lMap.keys(), ...rMap.keys()]);
+        merged.t3intentions[cat] = [];
+        for (const cid of allIds) {
+          const lc = lMap.get(cid);
+          const rc = rMap.get(cid);
+          if (!lc) merged.t3intentions[cat].push(rc);
+          else if (!rc) merged.t3intentions[cat].push(lc);
+          else {
+            // Both sides have this chip — merge: OR for done, keep longer text
+            const m = Object.assign({}, lc, rc);
+            m.done = !!(lc.done || rc.done);
+            if ((lc.text || '').length > (rc.text || '').length) m.text = lc.text;
+            merged.t3intentions[cat].push(m);
+          }
+        }
+      }
     }
 
-    // meals: keep whichever has more filled entries
+    // meals: union entries by timestamp, keep dayType/weight from higher lastMod side
     if (localDay.meals || remoteDay.meals) {
       const lm = localDay.meals || {};
       const rm = remoteDay.meals || {};
-      const countFilled = (m) => Object.values(m).filter(v => v && (typeof v === 'string' ? v.length > 0 : true)).length;
-      merged.meals = countFilled(lm) >= countFilled(rm) ? lm : rm;
+      // Merge entries by timestamp (dedup)
+      const seen = new Set();
+      const mergedEntries = [];
+      for (const entry of [...(lm.entries || []), ...(rm.entries || [])]) {
+        const key = (entry.timestamp || '') + '|' + (entry.name || '');
+        if (!seen.has(key)) { seen.add(key); mergedEntries.push(entry); }
+      }
+      mergedEntries.sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
+      // Keep dayType and weight from whichever side has more data
+      const base = (lm.entries || []).length >= (rm.entries || []).length ? lm : rm;
+      merged.meals = Object.assign({}, base);
+      merged.meals.entries = mergedEntries;
     }
 
     // italian: per-field OR for boolean checkboxes, keep longer for strings
@@ -258,6 +298,91 @@ const FirebaseSync = (() => {
       result.chatHistory = merged;
     }
 
+    // Merge weekGoals: per-week, per-category, keep longer HTML
+    if (local.weekGoals || remote.weekGoals) {
+      const lw = local.weekGoals || {};
+      const rw = remote.weekGoals || {};
+      const mergedWG = Object.assign({}, lw);
+      for (const wk of Object.keys(rw)) {
+        if (!mergedWG[wk]) { mergedWG[wk] = rw[wk]; continue; }
+        const lWeek = mergedWG[wk];
+        const rWeek = rw[wk];
+        for (const cat of ['work', 'school', 'life']) {
+          const l = (lWeek[cat] || '').toString();
+          const r = (rWeek[cat] || '').toString();
+          lWeek[cat] = l.length >= r.length ? l : r;
+        }
+      }
+      result.weekGoals = mergedWG;
+    }
+
+    // Merge dissWeeklyGoals: per-week, keep longer HTML
+    if (local.dissWeeklyGoals || remote.dissWeeklyGoals) {
+      const ld = local.dissWeeklyGoals || {};
+      const rd = remote.dissWeeklyGoals || {};
+      const mergedDWG = Object.assign({}, ld);
+      for (const wk of Object.keys(rd)) {
+        const l = (mergedDWG[wk] || '').toString();
+        const r = (rd[wk] || '').toString();
+        mergedDWG[wk] = l.length >= r.length ? l : r;
+      }
+      result.dissWeeklyGoals = mergedDWG;
+    }
+
+    // Merge mealLibrary: per-ID, keep higher usageCount, new meals from either side kept
+    if (local.mealLibrary || remote.mealLibrary) {
+      const lMap = new Map((local.mealLibrary || []).map(m => [m.id, m]));
+      const rMap = new Map((remote.mealLibrary || []).map(m => [m.id, m]));
+      const allIds = new Set([...lMap.keys(), ...rMap.keys()]);
+      result.mealLibrary = [];
+      for (const id of allIds) {
+        const lm = lMap.get(id);
+        const rm = rMap.get(id);
+        if (!lm) result.mealLibrary.push(rm);
+        else if (!rm) result.mealLibrary.push(lm);
+        else result.mealLibrary.push((rm.usageCount || 0) > (lm.usageCount || 0) ? rm : lm);
+      }
+    }
+
+    // Merge readingHistory: union by date+title
+    if (local.readingHistory || remote.readingHistory) {
+      const seen = new Set();
+      const merged = [];
+      for (const entry of [...(local.readingHistory || []), ...(remote.readingHistory || [])]) {
+        const key = (entry.date || '') + '|' + (entry.title || '').slice(0, 60);
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      merged.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      result.readingHistory = merged;
+    }
+
+    // Merge corrections: union by date, keep longer response
+    if (local.corrections || remote.corrections) {
+      const byDate = new Map();
+      for (const entry of [...(local.corrections || []), ...(remote.corrections || [])]) {
+        const existing = byDate.get(entry.date);
+        if (!existing) { byDate.set(entry.date, entry); }
+        else {
+          const eLen = (existing.response || '').length + (existing.text || '').length;
+          const nLen = (entry.response || '').length + (entry.text || '').length;
+          if (nLen > eLen) byDate.set(entry.date, entry);
+        }
+      }
+      result.corrections = Array.from(byDate.values());
+    }
+
+    // Merge dissSessions: union by date+minutes dedup
+    if (local.dissSessions || remote.dissSessions) {
+      const seen = new Set();
+      const merged = [];
+      for (const entry of [...(local.dissSessions || []), ...(remote.dissSessions || [])]) {
+        const key = (entry.date || '') + '|' + (entry.minutes || 0) + '|' + (entry.ts || '');
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      merged.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      result.dissSessions = merged;
+    }
+
     return result;
   }
 
@@ -377,23 +502,17 @@ const FirebaseSync = (() => {
       const snap = await db.ref(userPath + '/data').once('value');
       const remote = snap.val();
       if (remote) {
+        // Always merge — field-level merge is idempotent and safe in both directions
+        _importing = true;
+        importRemoteData(remote);
         const remoteTs = remote._lastSync || 0;
-        const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
-        if (remoteTs > localTs) {
-          // Remote is newer — merge (per-card for cmdcenter)
-          _importing = true;
-          importRemoteData(remote);
-          localStorage.setItem('_lastSync', String(remoteTs));
-          if (typeof loadAll === 'function') loadAll();
-          _importing = false;
-          clearTimeout(debounceTimer);
-          _importCooldown = Date.now() + 2000;
-          // Push merged result back so both sides converge
-          setTimeout(() => pushAll(), 2500);
-        } else {
-          // Local is newer — push to remote
-          pushAll();
-        }
+        localStorage.setItem('_lastSync', String(Math.max(remoteTs, parseInt(localStorage.getItem('_lastSync') || '0'))));
+        if (typeof loadAll === 'function') loadAll();
+        _importing = false;
+        clearTimeout(debounceTimer);
+        _importCooldown = Date.now() + 2000;
+        // Push merged result back so both sides converge
+        setTimeout(() => pushAll(), 2500);
       } else {
         pushAll();
       }
@@ -409,16 +528,15 @@ const FirebaseSync = (() => {
             setStatus(navigator.onLine ? 'synced' : 'offline');
             return;
           }
+          // Always merge — field-level merge is idempotent
+          _importing = true;
+          importRemoteData(remote);
           const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
-          if (remoteTs > localTs) {
-            _importing = true;
-            importRemoteData(remote);
-            localStorage.setItem('_lastSync', String(remoteTs));
-            if (typeof loadAll === 'function') loadAll();
-            _importing = false;
-            clearTimeout(debounceTimer);
-            _importCooldown = Date.now() + 2000;
-          }
+          localStorage.setItem('_lastSync', String(Math.max(remoteTs, localTs)));
+          if (typeof loadAll === 'function') loadAll();
+          _importing = false;
+          clearTimeout(debounceTimer);
+          _importCooldown = Date.now() + 2000;
           setStatus(navigator.onLine ? 'synced' : 'offline');
         });
       }
@@ -512,19 +630,19 @@ const FirebaseSync = (() => {
       const remote = snap.val();
       if (!remote) return;
       const remoteTs = remote._lastSync || 0;
+      if (remoteTs === _lastPushTs) return; // our own echo
+      // Always merge — field-level merge is idempotent
+      _importing = true;
+      importRemoteData(remote);
       const localTs = parseInt(localStorage.getItem('_lastSync') || '0');
-      if (remoteTs > localTs) {
-        _importing = true;
-        importRemoteData(remote);
-        localStorage.setItem('_lastSync', String(remoteTs));
-        if (typeof loadAll === 'function') loadAll();
-        _importing = false;
-        clearTimeout(debounceTimer);
-        _importCooldown = Date.now() + 2000;
-        setStatus(navigator.onLine ? 'synced' : 'offline');
-        // Push merged result back
-        setTimeout(() => pushAll(), 2500);
-      }
+      localStorage.setItem('_lastSync', String(Math.max(remoteTs, localTs)));
+      if (typeof loadAll === 'function') loadAll();
+      _importing = false;
+      clearTimeout(debounceTimer);
+      _importCooldown = Date.now() + 2000;
+      setStatus(navigator.onLine ? 'synced' : 'offline');
+      // Push merged result back so both sides converge
+      setTimeout(() => pushAll(), 2500);
     } catch (e) {
       console.error('Pull latest error:', e);
     }
