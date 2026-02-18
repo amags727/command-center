@@ -251,11 +251,13 @@ Istruzioni — segui questo formato ESATTAMENTE:
 1. TESTO CORRETTO
 Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
 
-2. ERRORI MECCANICI (concordanza genere/numero/articoli)
-Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio.
+2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
+Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
+
+ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
 3. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
 
 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
@@ -273,11 +275,13 @@ Istruzioni — segui questo formato ESATTAMENTE:
 1. TESTO CORRETTO
 Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
 
-2. ERRORI MECCANICI (concordanza genere/numero/articoli)
-Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio.
+2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
+Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
+
+ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
 3. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
 
 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
