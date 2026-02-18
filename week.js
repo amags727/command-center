@@ -477,13 +477,17 @@ CONTEXT: The user already has a rigorous daily tracking system covering:
 These are ALREADY optimized. Stretch goals must push AWAY from these quantified patterns.
 
 AUTOMATIC REJECTION:
-❌ More language learning tasks (already doing 300 cards/day + reading + composition)
+❌ More language learning tasks (already doing 300 cards/day + daily language practice + composition)
 ❌ More academic/dissertation work (already tracked weekly)
 ❌ More gym sessions (already tracked)
-❌ More reading/articles (already doing 2/day with reflections)
+❌ Short-form reading for language learning (already doing 2 articles/day with reflections)
 ❌ Productivity meta-work (tracking systems, optimization)
 ❌ Generic social ("get dinner with X")
 ❌ More than ONE Italian media consumption goal
+
+IMPORTANT DISTINCTION - Reading Types:
+- ❌ REJECT: Short Italian articles for vocabulary building (user already does this daily)
+- ✅ APPROVE: Italian narrative books/novels read for enjoyment and sustained engagement (this is the ONE Italian media exception)
 
 EVALUATION CRITERIA (in priority order):
 1. **Untrackable Over Measurable**: Would this feel stupid to put in a spreadsheet?
@@ -494,7 +498,10 @@ EVALUATION CRITERIA (in priority order):
 6. **Physical World**: Leaving your usual environments
 
 AUTOMATIC APPROVAL (1 per week max):
-✅ ONE Italian film or book (but NOT study materials)
+✅ ONE Italian media goal: watching an Italian film OR reading an Italian book (novels, fiction, etc.)
+   - This includes chapter-based goals (e.g., "read 3 chapters of Il cimitero di Praga")
+   - This is an EXCEPTION to the reading rule because it supports sustained engagement with narrative media
+   - NOT study materials, textbooks, or language learning articles
 
 SCORING SYSTEM:
 For each goal:
@@ -676,17 +683,24 @@ async function submitStretchGoals() {
       result.innerHTML += '<p style="color:var(--green);font-weight:600;margin-top:12px">✅ Goals approved! Site unlocked.</p>';
       addLog('action', 'Stretch goals submitted for ' + wk);
       
+      // Re-enable button so it stays available
+      btn.textContent = 'Submit for AI Approval';
+      btn.disabled = false;
+      
       setTimeout(() => {
         renderStretchGoals();
         if (typeof checkSiteLock === 'function') checkSiteLock();
       }, 2000);
     } else {
-      result.innerHTML += '<p style="color:var(--orange);font-weight:600;margin-top:12px">⚠️ Goals need revision. Please adjust based on feedback above.</p>';
+      // Goals need revision - keep feedback visible and form editable
+      result.innerHTML += '<p style="color:var(--orange);font-weight:600;margin-top:12px">⚠️ Goals need revision. Adjust the goals above based on Claude\'s feedback, then resubmit.</p>';
+      // Re-enable button immediately for resubmission
+      btn.textContent = 'Resubmit for AI Approval';
+      btn.disabled = false;
     }
   } catch (e) {
     result.style.display = 'block';
     result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
-  } finally {
     btn.textContent = 'Submit for AI Approval';
     btn.disabled = false;
   }
