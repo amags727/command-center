@@ -69,6 +69,9 @@ function renderMacroRings(totals, targets) {
     { label: 'Fat',     key: 'fat',     unit: 'g', color: '#8b5cf6' }
   ];
   const r = 44, circ = 2 * Math.PI * r;
+  // Responsive size: larger on desktop
+  const isDesktop = window.innerWidth >= 1024;
+  const svgSize = isDesktop ? 180 : 100;
   container.innerHTML = metrics.map(m => {
     const val = totals[m.key], target = targets[m.key];
     const pct = target > 0 ? Math.min(val / target, 1.15) : 0;
@@ -78,7 +81,7 @@ function renderMacroRings(totals, targets) {
     else if (displayPct >= 80) ringColor = m.color;
     const offset = circ * (1 - Math.min(pct, 1));
     return '<div class="meal-ring-item">' +
-      '<svg width="100" height="100" viewBox="0 0 100 100">' +
+      '<svg width="' + svgSize + '" height="' + svgSize + '" viewBox="0 0 100 100">' +
       '<circle cx="50" cy="50" r="' + r + '" fill="none" stroke="#e5e5e3" stroke-width="8"/>' +
       '<circle cx="50" cy="50" r="' + r + '" fill="none" stroke="' + ringColor + '" stroke-width="8" ' +
       'stroke-dasharray="' + circ + '" stroke-dashoffset="' + offset + '" ' +
@@ -187,17 +190,20 @@ function filterMealLibrary() {
 }
 
 function quickAddStoredMeal(id) {
-  const d = getGlobal();
+  // Use single data snapshot to avoid save-overwrite race
+  const d = load();
   if (!d.mealLibrary) d.mealLibrary = [];
   const meal = d.mealLibrary.find(m => m.id === id);
   if (!meal) return;
-  const dd = dayData(today());
-  dd.days[today()].meals.entries.push({
-    name: meal.name, calories: meal.calories, protein: meal.protein,
-    carbs: meal.carbs, fat: meal.fat, timestamp: new Date().toISOString()
+  if (!d.days) d.days = {};
+  if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
+  if (!d.days[today()].meals) d.days[today()].meals = { dayType: 'workout', entries: [] };
+  d.days[today()].meals.entries.push({
+    name: meal.name, unitCal: meal.calories, unitProt: meal.protein, unitCarb: meal.carbs, unitFat: meal.fat,
+    calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat,
+    qty: 1, timestamp: new Date().toISOString()
   });
   meal.usageCount = (meal.usageCount || 0) + 1;
-  save(dd);
   save(d);
   renderMeals();
 }

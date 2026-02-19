@@ -146,7 +146,10 @@ ${numbered}`;
     ).join('');
     document.getElementById('tr-result-card').style.display = 'block';
     document.getElementById('tr-reflection-card').style.display = 'block';
-    // Show reproduction card if repro paragraphs exist
+    // Show summary card
+    const summaryCard = document.getElementById('tr-summary-card');
+    if (summaryCard) summaryCard.style.display = 'block';
+    // Show reproduction card if repro paragraphs exist (legacy, hidden in new HTML but kept for compat)
     const reproCard = document.getElementById('tr-repro-card');
     if (reproCard) reproCard.style.display = reproCount > 0 ? 'block' : 'none';
     trArticleCards = [];
@@ -253,27 +256,23 @@ async function trSubmitWords() {
 }
 
 function trUpdReflWC() {
-  const txt = document.getElementById('tr-refl-txt').value.trim();
-  const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
+  const txt = document.getElementById('tr-refl-txt').value;
+  const wc = txt.trim().split(/\s+/).filter(w => w).length;
   const el = document.getElementById('tr-refl-wc');
-  el.textContent = wc + ' / 50 words';
-  el.className = 'wc' + (wc < 50 ? ' bad' : '');
+  el.textContent = wc + ' / 100 words';
+  el.className = 'wc' + (wc < 100 ? ' bad' : '');
 }
 
-function trGetNextArticleSlot() {
-  const dd = dayData(today());
-  const day = dd.days[today()];
-  if (!day.habits || !day.habits.art1) return 1;
-  return 2;
+function trUpdSummaryWC() {
+  const txt = document.getElementById('tr-summary-txt').value;
+  const wc = txt.trim().split(/\s+/).filter(w => w).length;
+  const el = document.getElementById('tr-summary-wc');
+  el.textContent = wc + ' / 100 words';
+  el.className = 'wc' + (wc < 100 ? ' bad' : '');
 }
 
 function trUpdateSubmitBtn() {
-  const btn = document.getElementById('tr-refl-submit-btn');
-  if (btn) btn.textContent = '✅ Submit as Article ' + trGetNextArticleSlot();
-}
-
-function trSubmitReflectionAuto() {
-  trSubmitReflection(trGetNextArticleSlot());
+  // No-op — buttons are now fixed to Article 1 and Article 2
 }
 
 // ============ MODE TOGGLE ============
@@ -298,7 +297,7 @@ function trSwitchMode(mode) {
 async function trSubmitReflection(num) {
   const txt = document.getElementById('tr-refl-txt').value.trim();
   const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
-  if (wc < 50) { alert('Write at least 50 words in Italian.'); return; }
+  if (wc < 100) { alert('Write at least 100 words in Italian.'); return; }
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const article = CAL._currentArticle || {};
@@ -345,6 +344,92 @@ async function trSubmitReflection(num) {
     status.textContent = '✅ Feedback + ' + cards.length + ' cards generated. Logged as Article ' + num + '.';
     addLog('action', 'Article ' + num + ' reflection: ' + title + ' + ' + cards.length + ' cards');
     trUpdateSubmitBtn();
+  } catch (e) {
+    status.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// ============ ARTICLE SUMMARY (Article 2) ============
+async function trSubmitSummary() {
+  const txt = document.getElementById('tr-summary-txt').value.trim();
+  const wc = txt ? txt.split(/\s+/).filter(w => w).length : 0;
+  if (wc < 100) { alert('Write at least 100 words in Italian.'); return; }
+  const key = localStorage.getItem('cc_apikey');
+  if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
+  const article = CAL._currentArticle || {};
+  const title = article.title || document.getElementById('tr-title').textContent || 'Untitled';
+  const status = document.getElementById('tr-summary-status');
+  status.textContent = '⏳ Sending summary to Claude for feedback + flashcard generation...';
+  try {
+    // Build a summary-specific correction prompt
+    const feedbackPrompt = `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha letto un articolo intitolato "${title}" e ne ha scritto un riassunto in italiano, cercando di mantenere lo stesso registro, stile e livello di prosa dell'originale.
+
+Riassunto dello studente:
+"${txt}"${_getTopInterferenceContext()}
+
+Istruzioni — segui questo formato ESATTAMENTE:
+
+1. TESTO CORRETTO
+Riscrivi COMPLETAMENTE il riassunto corretto. Correggi TUTTI gli errori. Presta particolare attenzione alla COERENZA DI REGISTRO: se l'articolo originale usa un linguaggio giornalistico formale, il riassunto deve mantenerlo. Se usa gergo parlamentare, tecnico, accademico ecc., il riassunto deve riflettere lo stesso livello.
+
+2. ERRORI MECCANICI
+Sviste di genere/numero/concordanza. Una riga per errore: originale → corretto.
+
+3. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, registro inadeguato, scelta stilistica che tradisce il registro dell'originale: originale → corretto + spiegazione IN ITALIANO. Segnala in particolare dove lo studente ha abbassato il registro rispetto all'originale o ha usato costruzioni troppo semplici/anglofone dove l'originale avrebbe usato una struttura più elaborata.
+
+4. VALUTAZIONE DEL REGISTRO
+Valuta specificamente se lo studente ha mantenuto:
+- Il livello di formalità dell'originale
+- Il gergo/lessico specialistico appropriato
+- I tempi verbali coerenti con il genere (passato remoto per narrativa giornalistica, ecc.)
+- La complessità sintattica adeguata
+
+5. PUNTEGGIO
+SCORE: XX/100 (LIVELLO)
+
+Fasce: 90-100 (C2), 80-89 (C1+), 70-79 (C1/B2+), 60-69 (B2), sotto 60 (B1 o meno).
+
+6. PATTERN DI INTERFERENZA
+INTERFERENCE: pattern1 | pattern2 | pattern3
+
+Sii diretto e fattuale. Niente incoraggiamenti.`;
+
+    const feedbackResp = await callClaude(key, feedbackPrompt);
+    const scoreData = _parseReflectionScore(feedbackResp);
+    const intPatterns = _parseInterferencePatterns(feedbackResp);
+    _updateInterferenceProfile(intPatterns);
+    document.getElementById('tr-summary-result').style.display = 'block';
+    document.getElementById('tr-summary-feedback').innerHTML = feedbackResp.replace(/\n/g, '<br>');
+    // Log as Article 2
+    const num = 2;
+    const titleEl = document.getElementById('art' + num + '-t');
+    const thoughtsEl = document.getElementById('art' + num + '-th');
+    if (titleEl) titleEl.value = title + ' [Summary]' + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+    if (thoughtsEl) thoughtsEl.value = txt;
+    const chk = document.getElementById('h-art' + num);
+    if (chk) chk.checked = true;
+    const st = document.getElementById('art' + num + '-status');
+    if (st) st.textContent = '✅ ' + title + ' [Summary]';
+    const d = load();
+    if (!d.readingHistory) d.readingHistory = [];
+    d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, type: 'summary', summaryWords: wc, score: scoreData });
+    save(d);
+    const dd2 = dayData(today());
+    const dayObj = dd2.days[today()];
+    dayObj.habits['art' + num] = true;
+    dayObj.habits['art' + num + 'Title'] = title + ' [Summary]';
+    dayObj.habits['art' + num + 'Thoughts'] = txt;
+    save(dd2);
+    // Generate flashcards
+    const cardPrompt = `You are generating flashcards from a corrected Italian article summary.\n\nArticle: "${title}"\nStudent summary:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardResp = await callClaude(key, cardPrompt);
+    const cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      renderFlashcardReview('tr-summary-card-review', cards, 'Article: ' + title + '\nSummary:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'summary');
+    }
+    status.textContent = '✅ Feedback + ' + cards.length + ' cards generated. Logged as Article 2 [Summary].';
+    addLog('action', 'Article 2 summary: ' + title + ' + ' + cards.length + ' cards');
   } catch (e) {
     status.textContent = '❌ Error: ' + e.message;
   }

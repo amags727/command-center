@@ -403,6 +403,15 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <h3>📝 Notes</h3>
 <div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
 </div>
+<div class="card">
+<div onclick="toggleAppUpdates()" style="cursor:pointer;display:flex;align-items:center;gap:8px">
+<span id="app-updates-chevron" style="font-size:var(--font-sm)">▶</span>
+<h3 style="margin:0">📋 App Updates</h3>
+</div>
+<div id="app-updates-body" style="display:none;margin-top:10px">
+<div id="app-updates-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveAppUpdates()"></div>
+</div>
+</div>
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
@@ -568,7 +577,12 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 <p style="font-size:var(--font-xs);color:var(--muted);margin-top:10px;cursor:pointer" onclick="flipCard()" id="study-hint">tap to flip</p>
 </div>
-<div style="text-align:center"><button id="undo-card-btn" class="btn btn-s" style="margin-right:8px;opacity:.35;pointer-events:none" onclick="undoCardResponse()">⟲ Undo <span style="font-size:var(--font-xs);opacity:.6">⌘Z</span></button><button class="btn btn-s" onclick="endStudy()">✕ End Session</button></div>
+<div style="text-align:center">
+<button id="undo-card-btn" class="btn btn-s" style="margin-right:8px;opacity:.35;pointer-events:none" onclick="undoCardResponse()">⟲ Undo <span style="font-size:var(--font-xs);opacity:.6">⌘Z</span></button>
+<button class="btn btn-s" onclick="editStudyCard()" style="margin-right:4px">✏️ Edit</button>
+<button class="btn btn-s" onclick="deleteStudyCard()" style="margin-right:4px;color:var(--red);border-color:var(--red)">🗑 Delete</button>
+<button class="btn btn-s" onclick="endStudy()">✕ End Session</button>
+</div>
 </div>
 
 <div class="card"><h3>➕ Add Cards</h3>
@@ -663,13 +677,12 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 
 <div class="card" id="tr-reflection-card" style="display:none">
-<h3>✍️ Reflection (in Italian)</h3>
-<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Write a short reflection about this article in Italian. Minimum 50 words.</p>
-<div class="rarea"><textarea id="tr-refl-txt" placeholder="Scrivi una riflessione su questo articolo..." oninput="trUpdReflWC()"></textarea></div>
-<div class="wc" id="tr-refl-wc">0 / 50 words</div>
+<h3>✍️ Article 1: Reflection (in Italian)</h3>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Write what you thought while reading — your reactions, disagreements, connections to other things you know. In Italian. Minimum 100 words.</p>
+<div class="rarea"><textarea id="tr-refl-txt" placeholder="Cosa hai pensato leggendo questo articolo? Le tue reazioni, osservazioni, connessioni..." oninput="trUpdReflWC()"></textarea></div>
+<div class="wc" id="tr-refl-wc">0 / 100 words</div>
 <div class="flex mt8" style="gap:8px;flex-wrap:wrap;align-items:center">
-<span style="font-size:var(--font-sm);color:var(--muted)">Log as:</span>
-<button class="btn btn-p" id="tr-refl-submit-btn" onclick="trSubmitReflectionAuto()">✅ Submit as Article 1</button>
+<button class="btn btn-p" id="tr-refl-submit-btn" onclick="trSubmitReflection(1)">✅ Submit Reflection (Article 1)</button>
 </div>
 <div id="tr-refl-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 <div id="tr-refl-result" style="display:none;margin-top:10px" class="card" >
@@ -679,18 +692,21 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div id="tr-refl-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
 
-<!-- Prose Reproduction Exercise -->
-<div class="card" id="tr-repro-card" style="display:none">
-<h3>✍️ Prose Reproduction Exercise</h3>
-<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Read the article carefully, then click "Start Reproduction" to hide the English and reproduce the marked paragraphs from memory. Tests your ability to internalize native Italian syntax, register, and rhythm.</p>
-<button class="btn btn-p" id="tr-repro-start-btn" onclick="trStartRepro()" style="margin-bottom:8px">🔒 Start Reproduction (logs as Article 2)</button>
-<div id="tr-repro-progress" style="display:none;margin-bottom:8px"></div>
-<div id="tr-repro-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
-<div id="tr-repro-result" style="display:none;margin-top:10px" class="card">
-<h4 style="font-size:var(--font-xl);margin-bottom:6px">📝 Reproduction Evaluation</h4>
-<div id="tr-repro-feedback" style="font-size:var(--font-lg);line-height:1.6"></div>
+<!-- Article Summary -->
+<div class="card" id="tr-summary-card" style="display:none">
+<h3>✍️ Article 2: Summary (in Italian)</h3>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Write a summary of the article maintaining the same level of prose, register, and styling as the original (e.g. if it's a parliamentary article, use the proper jargon, passato remoto, etc.). Minimum 100 words.</p>
+<div class="rarea"><textarea id="tr-summary-txt" placeholder="Riassumi l'articolo mantenendo lo stesso registro e stile dell'originale..." oninput="trUpdSummaryWC()"></textarea></div>
+<div class="wc" id="tr-summary-wc">0 / 100 words</div>
+<div class="flex mt8" style="gap:8px;flex-wrap:wrap;align-items:center">
+<button class="btn btn-p" onclick="trSubmitSummary()">✅ Submit Summary (Article 2)</button>
 </div>
-<div id="tr-repro-card-review" style="display:none;margin-top:10px" class="card"></div>
+<div id="tr-summary-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
+<div id="tr-summary-result" style="display:none;margin-top:10px" class="card">
+<h4 style="font-size:var(--font-xl);margin-bottom:6px">📝 Claude's Feedback</h4>
+<div id="tr-summary-feedback" style="font-size:var(--font-lg);line-height:1.6"></div>
+</div>
+<div id="tr-summary-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
 
 <div class="card" id="tr-collected-card" style="display:none">
@@ -809,7 +825,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 #meal-autocomplete{position:absolute;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:4px;max-height:200px;overflow-y:auto;width:100%;box-shadow:var(--sh)}
 </style>
 
+<div class="card">
 <div id="meal-rings" class="meal-rings"></div>
+</div>
 
 <div class="card">
 <h3>Add Food</h3>

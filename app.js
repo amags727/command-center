@@ -188,6 +188,31 @@ function loadTodayNotes() {
   if (el && dd.days[today()].notes) el.innerHTML = dd.days[today()].notes;
 }
 
+// ============ APP UPDATES ============
+function toggleAppUpdates() {
+  const body = document.getElementById('app-updates-body');
+  const chevron = document.getElementById('app-updates-chevron');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    chevron.textContent = '▼';
+  } else {
+    body.style.display = 'none';
+    chevron.textContent = '▶';
+  }
+}
+function saveAppUpdates() {
+  const el = document.getElementById('app-updates-notes');
+  if (!el) return;
+  const d = getGlobal();
+  d.appUpdates = el.innerHTML;
+  save(d);
+}
+function loadAppUpdates() {
+  const d = getGlobal();
+  const el = document.getElementById('app-updates-notes');
+  if (el && d.appUpdates) el.innerHTML = d.appUpdates;
+}
+
 // ============ KEYBOARD SHORTCUTS ============
 
 // Helper: get the closest list item ancestor of the current selection
@@ -303,20 +328,38 @@ document.addEventListener('keydown', function(e) {
   // Notes rich-text shortcuts (only when inside contenteditable)
   const el = document.activeElement;
   if (el && el.getAttribute('contenteditable') === 'true') {
+    // Cmd+K / Ctrl+K: insert hyperlink on selection
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      const sel = window.getSelection();
+      const selectedText = sel.toString();
+      const url = prompt('Enter URL:', 'https://');
+      if (url && url !== 'https://') {
+        document.execCommand('createLink', false, url);
+        // Make links open in new tab
+        if (sel.anchorNode) {
+          let link = sel.anchorNode.parentElement;
+          if (link && link.tagName === 'A') {
+            link.target = '_blank';
+            link.rel = 'noopener';
+          }
+        }
+        _saveActiveEditor(el);
+      }
+      return;
+    }
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === 'Digit8' || e.code === 'Digit7')) {
       e.preventDefault();
       document.execCommand(e.code === 'Digit7' ? 'insertOrderedList' : 'insertUnorderedList');
       // Save the appropriate editor
-      if (el.id === 'today-notes') saveTodayNotes();
-      else if (el.classList.contains('wg-editor') && typeof saveWeekGoals === 'function') {
-        saveWeekGoals(el.id.replace('week-goals-',''));
-      }
+      _saveActiveEditor(el);
     }
     return; // don't process card shortcuts while editing
   }
-  // Card study shortcuts (only when study area visible)
+  // Card study shortcuts (only when study area visible and not typing in an input)
   const studyArea = document.getElementById('study-area');
-  if (studyArea && studyArea.style.display !== 'none') {
+  const activeTag = document.activeElement ? document.activeElement.tagName : '';
+  if (studyArea && studyArea.style.display !== 'none' && activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
     if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); flipCard(); }
     else if (studyFlipped && e.key === '1') { e.preventDefault(); rateCard(1); }
     else if (studyFlipped && e.key === '2') { e.preventDefault(); rateCard(2); }
@@ -353,12 +396,27 @@ function initSyncUI() {
   }
 }
 
+// Helper: save whichever contenteditable editor is active
+function _saveActiveEditor(el) {
+  if (el.id === 'today-notes') saveTodayNotes();
+  else if (el.id === 'app-updates-notes') saveAppUpdates();
+  else if (el.id === 'diss-weekly-goals' && typeof saveDissWeeklyGoals === 'function') saveDissWeeklyGoals();
+  else if (el.classList.contains('wg-editor') && typeof saveWeekGoals === 'function') {
+    saveWeekGoals(el.id.replace('week-goals-',''));
+  }
+}
+
 // ============ STRETCH GOALS SITE LOCK ============
 function checkSiteLock() {
   const wk = weekId();
   const hasGoals = hasStretchGoals(wk);
   const modal = document.getElementById('site-lock-modal');
-  
+  // Dev bypass: localStorage flag
+  if (localStorage.getItem('cc_devbypass') === '1') {
+    if (modal) modal.style.display = 'none';
+    document.body.classList.remove('site-locked');
+    return;
+  }
   if (!hasGoals) {
     // Site is locked - show modal and disable interactions
     if (modal) modal.style.display = 'flex';
@@ -392,10 +450,11 @@ document.addEventListener('DOMContentLoaded', function() {
   checkWeekTransition();
   loadAll();
   loadTodayNotes();
+  loadAppUpdates();
   // Article of the Day — runs once daily on launch
   fetchArticleOfTheDay(false);
   // Auto-numbered list detection on notes and weekly goal editors
-  ['today-notes','week-goals-work','week-goals-school','week-goals-life'].forEach(function(id) {
+  ['today-notes','week-goals-work','week-goals-school','week-goals-life','app-updates-notes'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', _handleAutoNumberedList);
   });

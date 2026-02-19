@@ -258,8 +258,8 @@ function addMoreCards() {
 function showStudyCard() {
   if (studyIdx >= studyQueue.length) { endStudy(); alert('Session complete! 🎉 Reviewed ' + studyQueue.length + ' cards.'); return; }
   const card = studyQueue[studyIdx];
-  document.getElementById('study-front').innerHTML = escHtml(card.front);
-  document.getElementById('study-back-content').innerHTML = escHtml(card.back);
+  document.getElementById('study-front').innerHTML = escHtml(card.front).replace(/\n/g, '<br>');
+  document.getElementById('study-back-content').innerHTML = escHtml(card.back).replace(/\n/g, '<br>');
   document.getElementById('study-back').style.display = 'none';
   document.getElementById('study-hint').style.display = '';
   // Update summary bar with remaining queue counts
@@ -346,6 +346,41 @@ function endStudy() {
   studyQueue = []; studyIdx = 0; lastCardAction = null;
   renderCards();
   addLog('action', 'Flashcard study session');
+}
+
+function editStudyCard() {
+  if (studyIdx >= studyQueue.length) return;
+  const card = studyQueue[studyIdx];
+  const newFront = prompt('Edit front:', card.front);
+  if (newFront === null) return;
+  const newBack = prompt('Edit back:', card.back);
+  if (newBack === null) return;
+  // Update in deck
+  const d = getCards();
+  const idx = d.cards.findIndex(c => c.id === card.id);
+  if (idx !== -1) {
+    d.cards[idx].front = newFront;
+    d.cards[idx].back = newBack;
+    d.cards[idx].lastMod = Date.now();
+    save(d);
+  }
+  // Update in queue
+  card.front = newFront;
+  card.back = newBack;
+  showStudyCard();
+}
+
+function deleteStudyCard() {
+  if (studyIdx >= studyQueue.length) return;
+  if (!confirm('Delete this card permanently?')) return;
+  const card = studyQueue[studyIdx];
+  // Remove from deck
+  const d = getCards();
+  d.cards = d.cards.filter(c => c.id !== card.id);
+  save(d);
+  // Remove from queue and show next
+  studyQueue.splice(studyIdx, 1);
+  showStudyCard();
 }
 
 function addCard(front, back, tags) {

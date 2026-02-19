@@ -10,8 +10,8 @@ Definition / Translation Card Rules:
 - Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
 - CRITICAL: Italian definitions must be DECLARATIVE, never interrogative. Use direct paraphrases or explanations. NEVER use question format like "Cosa significa quando..." or "Che cosa vuol dire...". Example: For "rivolgersi contro" → "produrre l'effetto opposto a quello desiderato" NOT "Cosa significa quando una situazione produce l'effetto opposto?"
 - Exception for English on the prompt side: discourse operators, rhetorical frames, and stance-setting expressions (e.g. "per inciso", "non tanto X quanto Y", "da persona che + verbo", "As someone who...", "To decide what truly matters to me") should default to English-led prompts describing the FUNCTION of the move, because these are intention→form mappings where English better captures the rhetorical intent. Single concrete words and short expressions always get Italian definitions.
-- When the target word is a conjugated verb, the definition card should present the word in its infinitive form. (Cloze cards can use whatever conjugation fits the sentence.)
-- Answer side always includes: the Italian target word/expression + a brief English gloss.
+- When the target word is a conjugated verb, the definition card should present the word in its INFINITIVE form on the answer side. Do NOT put the conjugated form as the answer — put the infinitive. Do NOT label the conjugation (e.g. never write "3rd person singular" or "presente indicativo"). The student highlighted the word because they don't know the meaning, not because they need conjugation practice.
+- Answer side always includes: the Italian target word/expression (infinitive for verbs) + a brief English gloss.
 - The gloss should flag register (colloquial, informal, legal, literary, vulgar, etc.) and if the term is archaic or has a more common modern alternative.
 - Prefer natural Italian over calques.
 
@@ -93,7 +93,7 @@ function renderFlashcardReview(containerId, cards, context, tags) {
     <div class="fc-review">
       <h4 style="font-size:18px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
       <p style="font-size:18px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
-      <div id="${containerId}-list" class="fc-review-list" style="max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:8px"></div>
+      <div id="${containerId}-list" class="fc-review-list" style="border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:8px"></div>
       <div class="flex mt8" style="gap:8px">
         <button class="btn btn-p" onclick="fcSubmitAll('${containerId}')">✅ Submit All to Deck</button>
         <span id="${containerId}-submit-status" style="font-size:18px;color:var(--muted)"></span>
