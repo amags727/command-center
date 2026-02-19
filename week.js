@@ -768,31 +768,67 @@ function openCompleteGoalModal(goalId, type) {
   }
 }
 
+function _resizeImage(dataUrl, maxDim, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
+let _sgProofIndexes = new Set([0]); // first photo is proof by default
+
+function _renderSGPhotoPreview() {
+  const preview = document.getElementById('sg-photo-preview');
+  if (!preview) return;
+  const proofCount = Array.from(_sgProofIndexes).filter(i => i < _sgPendingImages.length).length;
+  preview.innerHTML = _sgPendingImages.map((img, i) => {
+    const isProof = _sgProofIndexes.has(i);
+    const border = isProof ? '3px solid var(--blue)' : '1px solid var(--border)';
+    const badge = isProof ? '<span style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;white-space:nowrap">📎 Proof</span>' : '';
+    return `
+      <div style="position:relative;display:inline-block;margin-bottom:14px" onclick="toggleSGProof(${i})">
+        <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:${border};cursor:pointer" title="${isProof ? 'Proof photo (sent to AI)' : 'Vibes photo (saved only)'}">
+        <button onclick="event.stopPropagation();removeSGPhoto(${i})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
+        ${badge}
+      </div>
+    `;
+  }).join('') + `<p style="font-size:11px;color:var(--muted);margin-top:4px">${_sgPendingImages.length} photo(s) · ${proofCount} marked as proof (tap to toggle)</p>`;
+}
+
+function toggleSGProof(idx) {
+  if (_sgProofIndexes.has(idx)) _sgProofIndexes.delete(idx);
+  else _sgProofIndexes.add(idx);
+  _renderSGPhotoPreview();
+}
+
 function sgPhotosSelected(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
-  
+
   const preview = document.getElementById('sg-photo-preview');
   _sgPendingImages = [];
-  preview.innerHTML = '';
-  
+  _sgProofIndexes = new Set([0]); // auto-mark first as proof
+  preview.innerHTML = '<p style="font-size:11px;color:var(--muted)">⏳ Compressing...</p>';
+
   let processed = 0;
   files.forEach((file, idx) => {
     const reader = new FileReader();
-    reader.onload = function(e) {
-      _sgPendingImages.push(e.target.result);
-      const thumb = document.createElement('div');
-      thumb.style.cssText = 'position:relative;display:inline-block';
-      thumb.innerHTML = `
-        <img src="${e.target.result}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
-        <button onclick="removeSGPhoto(${idx})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
-      `;
-      preview.appendChild(thumb);
-      
+    reader.onload = async function(e) {
+      const compressed = await _resizeImage(e.target.result, 1024, 0.7);
+      _sgPendingImages.push(compressed);
       processed++;
-      if (processed === files.length) {
-        preview.innerHTML += `<p style="font-size:11px;color:var(--muted);margin-top:4px">${files.length} photo(s) selected</p>`;
-      }
+      if (processed === files.length) _renderSGPhotoPreview();
     };
     reader.readAsDataURL(file);
   });
@@ -800,22 +836,11 @@ function sgPhotosSelected(input) {
 
 function removeSGPhoto(idx) {
   _sgPendingImages.splice(idx, 1);
-  // Re-trigger preview update
-  const input = document.getElementById('sg-photo-input');
-  if (input) {
-    const dt = new DataTransfer();
-    _sgPendingImages.forEach(() => dt.items.add(new File([''], 'keep')));
-    input.files = dt.files;
-  }
-  const preview = document.getElementById('sg-photo-preview');
-  if (preview) {
-    preview.innerHTML = _sgPendingImages.map((img, i) => `
-      <div style="position:relative;display:inline-block">
-        <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
-        <button onclick="removeSGPhoto(${i})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
-      </div>
-    `).join('') + `<p style="font-size:11px;color:var(--muted);margin-top:4px">${_sgPendingImages.length} photo(s) selected</p>`;
-  }
+  // Rebuild proof indexes: remove this index, shift higher ones down
+  const newProof = new Set();
+  _sgProofIndexes.forEach(i => { if (i < idx) newProof.add(i); else if (i > idx) newProof.add(i - 1); });
+  _sgProofIndexes = newProof;
+  _renderSGPhotoPreview();
 }
 
 function cancelSGCompletion() {
@@ -831,6 +856,13 @@ async function submitExperientialCompletion() {
     return;
   }
   
+  // Require at least one proof photo
+  const proofImages = _sgPendingImages.filter((_, i) => _sgProofIndexes.has(i));
+  if (!proofImages.length) {
+    alert('Mark at least one photo as proof (tap a photo to toggle).');
+    return;
+  }
+  
   const key = localStorage.getItem('cc_apikey');
   if (!key) {
     alert('Set your API key in the Claude tab first.');
@@ -839,12 +871,12 @@ async function submitExperientialCompletion() {
   
   const reflection = document.getElementById('sg-reflection')?.value.trim() || '';
   const result = document.getElementById('sg-complete-result');
-  result.innerHTML = '<p style="font-size:13px">⏳ Validating with Claude...</p>';
+  result.innerHTML = '<p style="font-size:13px">⏳ Validating ' + proofImages.length + ' proof photo(s) with Claude...</p>';
   
   try {
-    // Build content array with all images
+    // Only send proof-marked photos to the API
     const content = [];
-    _sgPendingImages.forEach(imgData => {
+    proofImages.forEach(imgData => {
       const base64 = imgData.split(',')[1];
       const mediaType = imgData.split(';')[0].split(':')[1] || 'image/jpeg';
       content.push({
@@ -853,7 +885,7 @@ async function submitExperientialCompletion() {
       });
     });
     
-    const promptText = `Analyze these ${_sgPendingImages.length} image(s) as evidence of completing an experiential stretch goal. Look for: tickets, programs, photos showing the person at an event/location, or other proof of participation in a memorable experience. If these appear to be genuine evidence of an experience (not just screenshots or random photos), respond with "APPROVED: [brief description of what you see]". If they do not appear to be valid evidence, respond with "REJECTED: [reason]". Be reasonable - tickets, wristbands, photos at venues, program booklets, etc. all count as valid evidence.`;
+    const promptText = `Analyze these ${proofImages.length} image(s) as evidence of completing an experiential stretch goal. Look for: tickets, programs, photos showing the person at an event/location, or other proof of participation in a memorable experience. If these appear to be genuine evidence of an experience (not just screenshots or random photos), respond with "APPROVED: [brief description of what you see]". If they do not appear to be valid evidence, respond with "REJECTED: [reason]". Be reasonable - tickets, wristbands, photos at venues, program booklets, etc. all count as valid evidence.`;
     
     content.push({ type: 'text', text: promptText });
     
@@ -877,7 +909,7 @@ async function submitExperientialCompletion() {
     const validation = data.content[0].text;
     
     if (validation.toUpperCase().includes('APPROVED')) {
-      // Mark goal complete
+      // Mark goal complete — save ALL photos (proof + vibes)
       const wk = weekId();
       const wd = weekData(wk);
       const goal = wd.weeks[wk].stretchGoals.goals.find(g => g.id === _sgCompletingGoalId);
@@ -886,6 +918,7 @@ async function submitExperientialCompletion() {
         goal.completionDate = new Date().toISOString();
         goal.completionEvidence = {
           images: _sgPendingImages,
+          proofIndexes: Array.from(_sgProofIndexes),
           reflection: reflection,
           validationResponse: validation
         };

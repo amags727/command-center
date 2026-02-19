@@ -12,10 +12,11 @@ function initClaude() {
   }
 }
 function saveKey() { localStorage.setItem('cc_apikey', document.getElementById('api-key').value.trim()); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
+const SONNET = 'claude-sonnet-4-20250514';
 async function callClaude(key, prompt, maxTokens) {
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 4096, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: SONNET, max_tokens: maxTokens || 4096, messages: [{ role: 'user', content: prompt }] })
   });
   if (!resp.ok) throw new Error('API error: ' + resp.status + ' ' + (await resp.text()));
   const data = await resp.json(); return data.content[0].text;

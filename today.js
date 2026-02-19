@@ -60,7 +60,9 @@ function initToday() {
     if (st) st.textContent = '✅ ' + (day.habits.art2Title || 'Completed');
   }
   if (day.reflection) document.getElementById('reflection-text').value = day.reflection;
-  updRC();
+  // Display-only word count — do NOT call updRC() here, it would re-stamp reflectionMod
+  { const _t = document.getElementById('reflection-text').value, _wc = _t.trim().split(/\s+/).filter(w=>w).length, _el = document.getElementById('reflection-wordcount');
+    if (_el) { _el.textContent = _wc + ' / 200 words'; _el.className = 'wc' + (_wc > 0 && _wc < 200 ? ' bad' : ''); } }
   renderBlocks(); loadT3Intentions();
   const wk = weekId();
   const wd = weekData(wk);
