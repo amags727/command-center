@@ -261,7 +261,7 @@ function _handleNotesTab(e) {
   // Fire correct save
   if (isToday) { saveTodayNotes(); }
   else if (isWgEditor) {
-    const cat = el.id.replace('wg-','');
+    const cat = el.id.replace('week-goals-','');
     if (typeof saveWeekGoals === 'function') saveWeekGoals(cat);
   }
 }
@@ -288,7 +288,7 @@ function _handleAutoNumberedList(e) {
     document.execCommand('insertOrderedList');
     // Fire save
     if (isToday) saveTodayNotes();
-    else if (isWg && typeof saveWeekGoals === 'function') saveWeekGoals(el.id.replace('wg-',''));
+    else if (isWg && typeof saveWeekGoals === 'function') saveWeekGoals(el.id.replace('week-goals-',''));
   }
 }
 
@@ -309,7 +309,7 @@ document.addEventListener('keydown', function(e) {
       // Save the appropriate editor
       if (el.id === 'today-notes') saveTodayNotes();
       else if (el.classList.contains('wg-editor') && typeof saveWeekGoals === 'function') {
-        saveWeekGoals(el.id.replace('wg-',''));
+        saveWeekGoals(el.id.replace('week-goals-',''));
       }
     }
     return; // don't process card shortcuts while editing
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Article of the Day — runs once daily on launch
   fetchArticleOfTheDay(false);
   // Auto-numbered list detection on notes and weekly goal editors
-  ['today-notes','wg-work','wg-school','wg-life'].forEach(function(id) {
+  ['today-notes','week-goals-work','week-goals-school','week-goals-life'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', _handleAutoNumberedList);
   });

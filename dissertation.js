@@ -331,7 +331,7 @@ function saveDissWeeklyGoals() {
   save(d);
   // If editing current week, also update the visible Week tab element
   if (_dissWeekOffset === 0) {
-    const wgEl = document.getElementById('wg-school');
+    const wgEl = document.getElementById('week-goals-school');
     if (wgEl) wgEl.innerHTML = el.innerHTML;
   }
 }

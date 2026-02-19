@@ -6,13 +6,13 @@ function shiftWeekGoals(dir) {
   if (newOff < 0 || newOff > 1) return;
   _weekGoalOffset = newOff;
   loadWeekGoals();
-  const label = document.getElementById('wk-goal-label');
+  const label = document.getElementById('week-goal-label');
   if (label) label.textContent = _weekGoalOffset === 0 ? 'This Week' : 'Next Week (' + _activeWeekId() + ')';
-  const indicator = document.getElementById('wk-goal-indicator');
+  const indicator = document.getElementById('week-goal-indicator');
   if (indicator) indicator.style.display = _weekGoalOffset === 0 ? 'none' : 'inline';
 }
 function renderWeek() {
-  const wk = weekId(); document.getElementById('wk-date').textContent = wk;
+  const wk = weekId(); document.getElementById('week-date').textContent = wk;
   renderStretchGoals();
   renderDailySummaries();
   loadWeekGoals();
@@ -47,13 +47,13 @@ function _saveActiveEditor(el) {
   if (!el) return;
   if (el.id === 'today-notes' && typeof saveTodayNotes === 'function') { saveTodayNotes(); return; }
   if (el.id === 'diss-weekly-goals' && typeof saveDissWeeklyGoals === 'function') { saveDissWeeklyGoals(); return; }
-  const cat = el.id.replace('wg-', '');
+  const cat = el.id.replace('week-goals-', '');
   saveWeekGoals(cat);
 }
 
 
 function saveWeekGoals(cat) {
-  const el = document.getElementById('wg-'+cat);
+  const el = document.getElementById('week-goals-'+cat);
   if (!el) return;
   // Clone and strip visual-only done markers before saving
   const clone = el.cloneNode(true);
@@ -81,7 +81,7 @@ function loadWeekGoals() {
   const targetWk = _activeWeekId();
   const wk = d.weekGoals && d.weekGoals[targetWk] || {};
   ['work','school','life'].forEach(cat => {
-    const el = document.getElementById('wg-'+cat);
+    const el = document.getElementById('week-goals-'+cat);
     if (!el) return;
     let html = wk[cat] || '';
     // Fallback: if school is empty, check dissWeeklyGoals
@@ -110,7 +110,7 @@ function _stripHighlightsInRange(container, range) {
 }
 
 function weekGoalAssignDay(cat, day) {
-  const el = document.getElementById('wg-'+cat);
+  const el = document.getElementById('week-goals-'+cat);
   if (!el) return;
   const sel = window.getSelection();
   if (!sel.rangeCount || sel.isCollapsed) return;
@@ -138,7 +138,7 @@ function weekGoalAssignDay(cat, day) {
 }
 
 function weekGoalClearHighlights(cat) {
-  const el = document.getElementById('wg-'+cat);
+  const el = document.getElementById('week-goals-'+cat);
   if (!el) return;
   const sel = window.getSelection();
   if (sel.rangeCount && !sel.isCollapsed && el.contains(sel.getRangeAt(0).commonAncestorContainer)) {
@@ -162,7 +162,7 @@ function _wgDetectCat() {
   if (!sel.rangeCount) return null;
   const node = sel.getRangeAt(0).commonAncestorContainer;
   for (const cat of ['work','school','life']) {
-    const el = document.getElementById('wg-'+cat);
+    const el = document.getElementById('week-goals-'+cat);
     if (el && el.contains(node)) return cat;
   }
   return null;
@@ -173,7 +173,7 @@ function weekGoalAssignDayAuto(day) {
   // fallback: if no selection, try last focused editor
   const focused = document.activeElement;
   if (focused && focused.classList.contains('wg-editor')) {
-    const id = focused.id.replace('wg-','');
+    const id = focused.id.replace('week-goals-','');
     weekGoalAssignDay(id, day);
   }
 }
@@ -423,7 +423,7 @@ function syncWeekGoalsDoneState() {
   }
   // Apply/remove data-wg-done on [data-day] spans in each editor
   ['work','school','life'].forEach(cat => {
-    const el = document.getElementById('wg-'+cat);
+    const el = document.getElementById('week-goals-'+cat);
     if (!el) return;
     el.querySelectorAll('[data-day]').forEach(span => {
       const text = span.textContent.trim();
@@ -439,7 +439,7 @@ function syncWeekGoalsDoneState() {
 function populateSchoolWeeklyGoals() {
   const d = getGlobal();
   const html = d.dissWeeklyGoals && d.dissWeeklyGoals[weekId()] || '';
-  const el = document.getElementById('wg-school');
+  const el = document.getElementById('week-goals-school');
   if (el) el.innerHTML = html;
   if (!d.weekGoals) d.weekGoals = {};
   if (!d.weekGoals[weekId()]) d.weekGoals[weekId()] = {};
@@ -458,10 +458,10 @@ function populateDissWeeklyGoals() {
 }
 
 function submitWR() {
-  const well = document.getElementById('wr-well').value.trim(), bad = document.getElementById('wr-bad').value.trim(), imp = document.getElementById('wr-imp').value.trim(), push = document.getElementById('wr-push').value.trim();
+  const well = document.getElementById('weekly-review-well').value.trim(), bad = document.getElementById('weekly-review-bad').value.trim(), imp = document.getElementById('weekly-review-improve').value.trim(), push = document.getElementById('weekly-review-push').value.trim();
   if (!well || !bad || !imp) { alert('Complete all review prompts.'); return; }
   const wk = weekId(), wd = weekData(wk); wd.weeks[wk].review = { well, bad, imp, push, ts: new Date().toISOString() }; save(wd);
-  document.getElementById('wr-res').style.display = 'block'; document.getElementById('wr-res').innerHTML = '<p style="color:var(--green);font-weight:600">✅ Weekly review submitted!</p>'; addLog('action', 'Weekly review: ' + wk);
+  document.getElementById('weekly-review-result').style.display = 'block'; document.getElementById('weekly-review-result').innerHTML = '<p style="color:var(--green);font-weight:600">✅ Weekly review submitted!</p>'; addLog('action', 'Weekly review: ' + wk);
 }
 
 // ============ STRETCH GOALS SYSTEM ============

@@ -522,7 +522,7 @@ function addBlock() {} function renderBlocks() { renderCal(); } function rmBlock
 
 // saveT3Intentions and loadT3Intentions moved to today.js (chip-based)
 function updRC() {
-  const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
+  const txt = document.getElementById('reflection-text').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('reflection-wordcount');
   el.textContent = wc + ' / 200 words'; el.className = 'wc' + (wc > 0 && wc < 200 ? ' bad' : '');
   const dd = dayData(today()); dd.days[today()].reflection = txt; save(dd);
 }

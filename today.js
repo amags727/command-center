@@ -33,10 +33,10 @@ function initToday() {
   const todayReflection = corrections.find(c => c.date === today());
   if (todayReflection) {
     // Check reflection checkbox
-    const reflChk = document.getElementById('h-refl');
+    const reflChk = document.getElementById('italian-check-refl');
     if (reflChk) reflChk.checked = true;
     // Lock textarea and hide submit button
-    const reflTxt = document.getElementById('refl-txt');
+    const reflTxt = document.getElementById('reflection-text');
     if (reflTxt) {
       reflTxt.disabled = true;
       reflTxt.style.background = '#f5f5f5';
@@ -59,16 +59,16 @@ function initToday() {
     const st = document.getElementById('art2-status');
     if (st) st.textContent = '✅ ' + (day.habits.art2Title || 'Completed');
   }
-  if (day.reflection) document.getElementById('refl-txt').value = day.reflection;
+  if (day.reflection) document.getElementById('reflection-text').value = day.reflection;
   updRC();
   renderBlocks(); loadT3Intentions();
   const wk = weekId();
   const wd = weekData(wk);
   if (wd.weeks[wk].pushGoal) {
-    document.getElementById('pgb').style.display = 'block';
-    document.getElementById('pg-text').textContent = wd.weeks[wk].pushGoal;
+    document.getElementById('push-goal-banner').style.display = 'block';
+    document.getElementById('push-goal-text').textContent = wd.weeks[wk].pushGoal;
     const endOfWeek = new Date(wk); endOfWeek.setDate(endOfWeek.getDate() + 6);
-    document.getElementById('pg-countdown').textContent = Math.max(0, Math.ceil((endOfWeek - new Date()) / 86400000)) + ' days left this week';
+    document.getElementById('push-goal-countdown').textContent = Math.max(0, Math.ceil((endOfWeek - new Date()) / 86400000)) + ' days left this week';
   }
   if (day.sealed) lockToday();
   // Populate Anki count/target from cards data
@@ -85,7 +85,7 @@ function gateHabit(type) {
   const dd = dayData(today()); const day = dd.days[today()];
   if (type === 'anki') {
     const ct = parseInt(document.getElementById('anki-ct').textContent) || 0;
-    if (ct < 300) { document.getElementById('anki-w').style.display = 'block'; document.getElementById('h-anki').checked = false; return; }
+    if (ct < 300) { document.getElementById('anki-w').style.display = 'block'; document.getElementById('italian-check-anki').checked = false; return; }
     document.getElementById('anki-w').style.display = 'none'; day.habits.anki = true; day.habits.ankiCount = ct;
   } else if (type === 'art1' || type === 'art2') {
     const n = type === 'art1' ? 1 : 2;
@@ -184,9 +184,9 @@ function carryForwardTasks() {
 function saveT3Intentions() {
   const dd = dayData(today());
   dd.days[today()].t3intentions = {
-    work: _t3ReadChips('t3-work'),
-    school: _t3ReadChips('t3-school'),
-    life: _t3ReadChips('t3-life')
+    work: _t3ReadChips('daily-goals-work'),
+    school: _t3ReadChips('daily-goals-school'),
+    life: _t3ReadChips('daily-goals-life')
   };
   save(dd);
 }
@@ -291,23 +291,23 @@ function loadT3Intentions() {
   const t = dd.days[today()].t3intentions;
   if (t && (Array.isArray(t.work) || Array.isArray(t.school) || Array.isArray(t.life))) {
     // New array format
-    _t3RenderChips('t3-work', t.work || [], 'w');
-    _t3RenderChips('t3-school', t.school || [], 's');
-    _t3RenderChips('t3-life', t.life || [], 'l');
+    _t3RenderChips('daily-goals-work', t.work || [], 'w');
+    _t3RenderChips('daily-goals-school', t.school || [], 's');
+    _t3RenderChips('daily-goals-life', t.life || [], 'l');
   } else if (t && (t.work || t.school || t.life)) {
     // Old string format — convert
     const toArr = function(s, p) { return (s||'').split('\n').filter(Boolean).map(function(line) { return {text:line.trim(), id:_t3GenId(p)}; }); };
     const converted = { work: toArr(t.work,'w'), school: toArr(t.school,'s'), life: toArr(typeof t.life === 'string' ? t.life : [t.life1,t.life2,t.life3].filter(Boolean).join('\n'), 'l') };
     dd.days[today()].t3intentions = converted;
     save(dd);
-    _t3RenderChips('t3-work', converted.work, 'w');
-    _t3RenderChips('t3-school', converted.school, 's');
-    _t3RenderChips('t3-life', converted.life, 'l');
+    _t3RenderChips('daily-goals-work', converted.work, 'w');
+    _t3RenderChips('daily-goals-school', converted.school, 's');
+    _t3RenderChips('daily-goals-life', converted.life, 'l');
   } else {
     // Empty — just render empty containers with add buttons
-    _t3RenderChips('t3-work', [], 'w');
-    _t3RenderChips('t3-school', [], 's');
-    _t3RenderChips('t3-life', [], 'l');
+    _t3RenderChips('daily-goals-work', [], 'w');
+    _t3RenderChips('daily-goals-school', [], 's');
+    _t3RenderChips('daily-goals-life', [], 'l');
   }
   // Carry forward undone tasks from previous days
   carryForwardTasks();
@@ -315,9 +315,9 @@ function loadT3Intentions() {
   const dd2 = dayData(today());
   const t2 = dd2.days[today()].t3intentions;
   if (t2) {
-    _t3RenderChips('t3-work', t2.work || [], 'w');
-    _t3RenderChips('t3-school', t2.school || [], 's');
-    _t3RenderChips('t3-life', t2.life || [], 'l');
+    _t3RenderChips('daily-goals-work', t2.work || [], 'w');
+    _t3RenderChips('daily-goals-school', t2.school || [], 's');
+    _t3RenderChips('daily-goals-life', t2.life || [], 'l');
   }
   // Auto-populate from dissertation weekly goals (school)
   populateSchoolWeeklyGoals();
@@ -330,7 +330,7 @@ function populateSchoolWeeklyGoals() {
   const dayKey = getTodayDayKey();
   const dissGoals = getDissWeeklyGoalsForDayArray(dayKey);
   if (!dissGoals.length) return;
-  const container = document.getElementById('t3-school');
+  const container = document.getElementById('daily-goals-school');
   if (!container) return;
   // Get existing linked chips
   const existingLinked = {};
@@ -354,7 +354,7 @@ function populateSchoolWeeklyGoals() {
     } else {
       // Create new linked chip
       const chipData = { text: g.text, id: _t3GenId('s'), dissLinked: true, spanIndex: g.spanIndex };
-      const chip = _t3MakeChip(chipData, 't3-school', 's');
+      const chip = _t3MakeChip(chipData, 'daily-goals-school', 's');
       container.insertBefore(chip, addBtn);
     }
   });
@@ -383,7 +383,7 @@ function getWeeklyGoalsForToday() {
 
 function populateFromWeeklyGoals() {
   const goals = getWeeklyGoalsForToday();
-  const catMap = {work:'t3-work', school:'t3-school', life:'t3-life'};
+  const catMap = {work:'daily-goals-work', school:'daily-goals-school', life:'daily-goals-life'};
   const prefixMap = {work:'w', school:'s', life:'l'};
   ['work','school','life'].forEach(cat => {
     const items = goals[cat];
@@ -407,7 +407,7 @@ function populateFromWeeklyGoals() {
 }
 
 function updRC() {
-  const txt = document.getElementById('refl-txt').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('refl-wc');
+  const txt = document.getElementById('reflection-text').value, wc = txt.trim().split(/\s+/).filter(w => w).length, el = document.getElementById('reflection-wordcount');
   el.textContent = wc + ' / 200 words'; el.className = 'wc' + (wc > 0 && wc < 200 ? ' bad' : '');
   const dd = dayData(today()); dd.days[today()].reflection = txt; dd.days[today()].reflectionMod = Date.now(); save(dd);
 }
@@ -422,12 +422,12 @@ function sealDay() {
 // --- Daily Composition / Reflection Submit ---
 // ============ REFLECTION SUBMIT (Daily Composition) ============
 async function submitRefl() {
-  const txt = document.getElementById('refl-txt').value.trim();
+  const txt = document.getElementById('reflection-text').value.trim();
   const wc = txt.split(/\s+/).filter(w => w).length;
   if (wc < 200) { alert('Min 200 words required. Currently: ' + wc); return; }
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
-  const res = document.getElementById('refl-res');
+  const res = document.getElementById('reflection-result');
   res.style.display = 'block'; res.innerHTML = '<p style="font-size:18px">⏳ Sending to Claude for correction + flashcard generation...</p>';
   try {
     const feedbackPrompt = CORRECTION_PROMPT_DAILY(txt);
@@ -447,14 +447,14 @@ async function submitRefl() {
       renderFlashcardReview('refl-card-review', cards, 'Daily composition:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'composition');
     }
     // Lock textarea and hide submit button
-    document.getElementById('refl-txt').disabled = true;
-    document.getElementById('refl-txt').style.background = '#f5f5f5';
-    document.getElementById('refl-txt').style.cursor = 'not-allowed';
+    document.getElementById('reflection-text').disabled = true;
+    document.getElementById('reflection-text').style.background = '#f5f5f5';
+    document.getElementById('reflection-text').style.cursor = 'not-allowed';
     const submitBtn = document.querySelector('.btn.btn-p[onclick="submitRefl()"]');
     if (submitBtn) submitBtn.style.display = 'none';
     
     // Check reflection checkbox
-    const reflChk = document.getElementById('h-refl');
+    const reflChk = document.getElementById('italian-check-refl');
     if (reflChk) reflChk.checked = true;
     
     addLog('action', 'Italian composition submitted + corrected + ' + cards.length + ' cards generated');

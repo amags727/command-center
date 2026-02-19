@@ -295,8 +295,8 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .diss-day-btn.active{box-shadow:0 0 0 2px currentColor;transform:scale(1.1);font-weight:700}
 #diss-weekly-goals [data-day]{border-radius:2px;padding:0 2px}
 .wg-panel [data-day]{border-radius:2px;padding:0 2px}
-#wg-work [data-day],#wg-school [data-day],#wg-life [data-day]{border-radius:2px;padding:0 2px}
-#wg-work [data-wg-done],#wg-school [data-wg-done],#wg-life [data-wg-done]{text-decoration:line-through!important;opacity:.45}
+#week-goals-work [data-day],#week-goals-school [data-day],#week-goals-life [data-day]{border-radius:2px;padding:0 2px}
+#week-goals-work [data-wg-done],#week-goals-school [data-wg-done],#week-goals-life [data-wg-done]{text-decoration:line-through!important;opacity:.45}
 /* --- Goal Chips --- */
 .chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
 .goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:17px; line-height:1.5; max-width:100%; }
@@ -320,7 +320,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
   .goal-chip { font-size:20px !important; }
   .chip-add { font-size:20px !important; }
   #tab-week .card > details > summary { font-size:22px !important; }
-  #wg-work, #wg-school, #wg-life { font-size:18px !important; }
+  #week-goals-work, #week-goals-school, #week-goals-life { font-size:18px !important; }
 }
 /* Progress grid: 2-col on desktop, 1-col on mobile */
 .prog-grid{display:flex;flex-direction:column;gap:14px}
@@ -357,7 +357,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="tab active" id="tab-today">
 <h1 id="today-date"></h1>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px" id="today-label"></p>
-<div class="pgb" id="pgb" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="pg-text"></p><p style="font-size:11px;color:var(--muted)" id="pg-countdown"></p></div>
+<div class="pgb" id="push-goal-banner" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="push-goal-text"></p><p style="font-size:11px;color:var(--muted)" id="push-goal-countdown"></p></div>
 <div class="card" id="aotd-card">
 <h3>🗞️ Article of the Day</h3>
 <div id="aotd-content">
@@ -393,10 +393,10 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
-<div style="display:flex;flex-direction:column;gap:6px" id="t3-grid">
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="t3-work"><button class="chip-add" onclick="_t3AddNewChip('t3-work','w')">＋ Add</button></div></div>
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="t3-school"><button class="chip-add" onclick="_t3AddNewChip('t3-school','s')">＋ Add</button></div></div>
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="t3-life"><button class="chip-add" onclick="_t3AddNewChip('t3-life','l')">＋ Add</button></div></div>
+<div style="display:flex;flex-direction:column;gap:6px" id="daily-goals-grid">
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="daily-goals-work"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-work','w')">＋ Add</button></div></div>
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="daily-goals-school"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-school','s')">＋ Add</button></div></div>
+<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="daily-goals-life"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-life','l')">＋ Add</button></div></div>
 </div>
 </div>
 <div class="card">
@@ -406,19 +406,19 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="h-refl" disabled style="pointer-events:none"><b>Reflection</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-refl" disabled style="pointer-events:none"><b>Reflection</b></label>
 </div>
 <div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div>
 <input type="hidden" id="anki-ct-val"><input type="hidden" id="art1-t"><input type="hidden" id="art1-th"><input type="hidden" id="art2-t"><input type="hidden" id="art2-th"><span id="art1-status" style="display:none"></span><span id="art2-status" style="display:none"></span>
 <hr style="border:none;border-top:1px dashed var(--border);margin:10px 0">
 <h3 style="margin-bottom:6px">📝 Riflessione Giornaliera</h3>
-<div class="rarea"><textarea id="refl-txt" placeholder="Scrivi qui in italiano..." onkeyup="updRC()"></textarea></div>
-<div class="wc" id="refl-wc">0 / 200 words</div>
+<div class="rarea"><textarea id="reflection-text" placeholder="Scrivi qui in italiano..." onkeyup="updRC()"></textarea></div>
+<div class="wc" id="reflection-wordcount">0 / 200 words</div>
 <div class="flex mt8"><button class="btn btn-p" onclick="submitRefl()">Submit for Correction + Cards</button></div>
-<div id="refl-res" style="display:none" class="mt8"></div>
+<div id="reflection-result" style="display:none" class="mt8"></div>
 <div id="refl-card-review" style="display:none;margin-top:10px" class="card">
   <h3 style="font-size:20px">🎴 Review Flashcards</h3>
   <div id="refl-card-review-content"></div>
@@ -429,21 +429,21 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <!-- WEEK -->
 <div class="tab" id="tab-week">
-<h1>📊 Week of <span id="wk-date"></span></h1>
+<h1>📊 Week of <span id="week-date"></span></h1>
 <div class="card">
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="wk-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="week-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
 <div id="stretch-goals-container"></div>
 <details style="margin-bottom:10px">
   <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:4px">💼 Work</summary>
-  <div id="wg-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
+  <div id="week-goals-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
 </details>
 <details style="margin-bottom:10px">
   <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🎓 School</summary>
-  <div id="wg-school" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('school')"></div>
+  <div id="week-goals-school" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('school')"></div>
 </details>
 <details style="margin-bottom:10px">
   <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px">🌿 Life</summary>
-  <div id="wg-life" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('life')"></div>
+  <div id="week-goals-life" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('life')"></div>
 </details>
 <div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:4px">
   <span style="font-size:11px;color:var(--muted);margin-right:2px">Highlight:</span>
@@ -460,17 +460,17 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="card">
 <h3>📋 Daily Summaries</h3>
 <div id="daily-summaries">
-  <div id="ds-buttons" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"></div>
-  <div id="ds-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:13px"></div>
+  <div id="daily-summary-buttons" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"></div>
+  <div id="daily-summary-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:13px"></div>
 </div>
 </div>
 <div class="card"><h3>🔍 Weekly Review</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">Complete all prompts to unlock next week's planning.</p>
-<div class="rprompt"><label>What went well this week?</label><textarea id="wr-well" class="fin"></textarea></div>
-<div class="rprompt"><label>What didn't go as planned?</label><textarea id="wr-bad" class="fin"></textarea></div>
-<div class="rprompt"><label>What's the #1 thing to improve next week?</label><textarea id="wr-imp" class="fin"></textarea></div>
-<div class="rprompt"><label>Push Goal result — did you complete it? Evidence:</label><textarea id="wr-push" class="fin"></textarea></div>
+<div class="rprompt"><label>What went well this week?</label><textarea id="weekly-review-well" class="fin"></textarea></div>
+<div class="rprompt"><label>What didn't go as planned?</label><textarea id="weekly-review-bad" class="fin"></textarea></div>
+<div class="rprompt"><label>What's the #1 thing to improve next week?</label><textarea id="weekly-review-improve" class="fin"></textarea></div>
+<div class="rprompt"><label>Push Goal result — did you complete it? Evidence:</label><textarea id="weekly-review-push" class="fin"></textarea></div>
 <button class="btn btn-p mt8" onclick="submitWR()">Submit Weekly Review</button>
-<div id="wr-res" class="mt8" style="display:none"></div>
+<div id="weekly-review-result" class="mt8" style="display:none"></div>
 </div>
 </div>
 
