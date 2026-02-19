@@ -546,6 +546,8 @@ let _sgPendingImage = null;
 let _sgCompletingGoalId = null;
 
 function renderStretchGoals() {
+  // Don't nuke an active completion form during background sync/re-render
+  if (_sgCompletingGoalId) return;
   const wk = weekId();
   const sg = getStretchGoals(wk);
   const container = document.getElementById('stretch-goals-container');
