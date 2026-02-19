@@ -23,50 +23,50 @@
 h4.card-subtitle,.card-subtitle{font-size:var(--font-xl);margin-bottom:4px;font-weight:600}
 summary.card-subtitle{font-size:var(--font-sm);cursor:pointer}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:var(--font-md);line-height:1.6}
 h1{font-size:0.98em;font-weight:600}h2{font-size:0.84em;margin-bottom:10px;font-weight:600}h3{font-size:0.74em;margin-bottom:8px;font-weight:600}
 #cards-summary b{font-size:1.4em;font-weight:400}
-#cards-summary .cards-stat-label{font-size:15px}
+#cards-summary .cards-stat-label{font-size:var(--font-md)}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit;font-size:inherit}
 .top-bar{position:sticky;top:0;z-index:100;background:var(--card)}
 .nav{display:flex;border-bottom:2px solid var(--border);background:var(--card);overflow-x:auto;position:sticky;top:0;z-index:100;max-width:880px;margin:0 auto}
-.nav button{padding:10px 14px;border:none;background:none;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;display:inline-flex;flex-direction:column;align-items:center;gap:2px}.nav-icon{display:block;text-align:center;width:100%;font-size:1.3em;line-height:1}.nav-label{display:block;text-align:center;width:100%}
-.sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12px}
-.sync-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;width:180px}
-.sync-bar button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:var(--card);cursor:pointer}
+.nav button{padding:10px 14px;border:none;background:none;font-size:var(--font-sm);color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;display:inline-flex;flex-direction:column;align-items:center;gap:2px}.nav-icon{display:block;text-align:center;width:100%;font-size:1.3em;line-height:1}.nav-label{display:block;text-align:center;width:100%}
+.sync-bar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:var(--font-sm)}
+.sync-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);width:180px}
+.sync-bar button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-xs);background:var(--card);cursor:pointer}
 .sync-bar .btn-sync{background:var(--blue);color:#fff;border-color:var(--blue)}
-.sync-bar .btn-disc{background:var(--red);color:#fff;border-color:var(--red);font-size:10px}
+.sync-bar .btn-disc{background:var(--red);color:#fff;border-color:var(--red);font-size:var(--font-xs)}
 .nav button.active{color:var(--text);border-bottom-color:var(--blue);font-weight:600}
 .nav button:hover{background:var(--bl)}
 .tab{display:none;max-width:880px;margin:0 auto;padding:20px 16px}.tab.active{display:block}
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;box-shadow:var(--sh);font-size:1.0em}
-.label{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.label{display:inline-block;padding:2px 7px;border-radius:4px;font-size:var(--font-xs);font-weight:600}
 .l-work{background:var(--bl);color:var(--blue)}.l-gym{background:var(--gl);color:var(--green)}.l-ital{background:var(--ol);color:var(--orange)}.l-diss{background:var(--pl);color:var(--purple)}.l-social{background:var(--pkl);color:var(--pink)}.l-misc{background:var(--yl);color:var(--yellow)}
-.tblock{display:flex;border-left:3px solid var(--border);padding:7px 12px;margin:3px 0;border-radius:0 4px 4px 0;font-size:14px}
-.tblock .tm{min-width:85px;font-weight:600;color:var(--muted);font-size:13px}
+.tblock{display:flex;border-left:3px solid var(--border);padding:7px 12px;margin:3px 0;border-radius:0 4px 4px 0;font-size:var(--font-md)}
+.tblock .tm{min-width:85px;font-weight:600;color:var(--muted);font-size:var(--font-sm)}
 .tblock.work{border-left-color:var(--blue);background:var(--bl)}.tblock.gym{border-left-color:var(--green);background:var(--gl)}.tblock.italian{border-left-color:var(--orange);background:var(--ol)}.tblock.dissertation{border-left-color:var(--purple);background:var(--pl)}.tblock.social{border-left-color:var(--pink);background:var(--pkl)}
 .hrow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--border)}.hrow:last-child{border-bottom:none}
 .hchk{width:20px;height:20px;flex-shrink:0;margin-top:2px;accent-color:var(--green)}
-.hinfo{flex:1}.hname{font-weight:600;font-size:13px}.hdet{font-size:12px;color:var(--muted)}
-.hev{margin-top:5px}.hev input,.hev textarea{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px}.hev textarea{min-height:50px;resize:vertical}
-.ewarn{color:var(--red);font-size:11px;font-weight:600;display:none}
+.hinfo{flex:1}.hname{font-weight:600;font-size:var(--font-sm)}.hdet{font-size:var(--font-sm);color:var(--muted)}
+.hev{margin-top:5px}.hev input,.hev textarea{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)}.hev textarea{min-height:50px;resize:vertical}
+.ewarn{color:var(--red);font-size:var(--font-xs);font-weight:600;display:none}
 .timer-d{font-size:2.8em;font-family:'Courier New',monospace;text-align:center;padding:16px;letter-spacing:3px}
 .timer-c{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.timer-c button{padding:7px 18px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:13px}
+.timer-c button{padding:7px 18px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:var(--font-sm)}
 .timer-c .pri{background:var(--blue);color:#fff;border-color:var(--blue)}.timer-c .dan{background:var(--red);color:#fff;border-color:var(--red)}
 .timer-c button:disabled{opacity:.4;cursor:not-allowed}
 .sgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-width:280px}
 .scell{width:100%;aspect-ratio:1;border-radius:3px;background:#eee}.scell.done{background:var(--green)}.scell.partial{background:var(--yellow)}.scell.today{outline:2px solid var(--blue);outline-offset:1px}
-.iinput{display:flex;gap:8px;margin-bottom:14px}.iinput input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:6px;font-size:14px}.iinput button{padding:9px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px}
-.iitem{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:5px;background:var(--card);font-size:13px}
-.iitem .itxt{flex:1}.iitem select,.iitem button{padding:3px 7px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:none}.iitem .del{color:var(--red);border-color:var(--red)}
-.lentry{padding:7px 10px;border-left:3px solid var(--border);margin:3px 0;font-size:12px;background:#fafafa}
-.lentry .lt{color:var(--muted);font-size:10px;font-family:monospace}
+.iinput{display:flex;gap:8px;margin-bottom:14px}.iinput input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md)}.iinput button{padding:9px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px}
+.iitem{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:5px;background:var(--card);font-size:var(--font-sm)}
+.iitem .itxt{flex:1}.iitem select,.iitem button{padding:3px 7px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-xs);background:none}.iitem .del{color:var(--red);border-color:var(--red)}
+.lentry{padding:7px 10px;border-left:3px solid var(--border);margin:3px 0;font-size:var(--font-sm);background:#fafafa}
+.lentry .lt{color:var(--muted);font-size:var(--font-xs);font-family:monospace}
 .lentry.action{border-left-color:var(--blue)}.lentry.warning{border-left-color:var(--orange)}.lentry.sealed{border-left-color:var(--red);background:var(--rl)}.lentry.confession{border-left-color:var(--purple);background:var(--pl)}
 .pgb{background:linear-gradient(135deg,var(--pl),var(--pkl));border:2px solid var(--purple);border-radius:8px;padding:14px;margin-bottom:14px}
 .pgb h3{color:var(--purple)}
-.rarea textarea{width:100%;min-height:140px;padding:11px;border:1px solid var(--border);border-radius:6px;font-size:16px;line-height:1.7;resize:vertical}
-.wc{font-size:11px;color:var(--muted);text-align:right;margin-top:3px}.wc.bad{color:var(--red);font-weight:600}
+.rarea textarea{width:100%;min-height:140px;padding:11px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;resize:vertical}
+.wc{font-size:var(--font-xs);color:var(--muted);text-align:right;margin-top:3px}.wc.bad{color:var(--red);font-weight:600}
 /* Nested list styles for contenteditable notes */
 .wg-editor ul, .wg-editor ol { margin:0; padding-left:40px }
 .wg-editor ul { list-style-type:disc }
@@ -78,10 +78,10 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .wg-columns { display:flex; gap:8px; width:100%; min-height:30px }
 .wg-col { flex:1; min-width:0; border-left:2px solid var(--border); padding-left:8px; min-height:20px; outline:none }
 .wg-col:first-child { border-left:none; padding-left:0 }
-#today-notes { font-size:16px !important; }
+#today-notes { font-size:var(--font-md) !important; }
 #today-notes * { font-size:inherit !important; }
 @media(min-width:1024px){
-#today-notes { font-size:20px !important; }
+#today-notes { font-size:var(--font-xl) !important; }
 }
 #today-notes ul, #today-notes ol { margin:0; padding-left:40px }
 #today-notes ul { list-style-type:disc }
@@ -93,39 +93,39 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .chatc{border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .chatm{max-height:350px;overflow-y:auto;padding:14px;background:#fafafa}
 .cmsg{margin-bottom:10px}.cmsg.user{text-align:right}
-.cmsg .bbl{display:inline-block;max-width:80%;padding:7px 12px;border-radius:11px;font-size:13px;text-align:left}
+.cmsg .bbl{display:inline-block;max-width:80%;padding:7px 12px;border-radius:11px;font-size:var(--font-sm);text-align:left}
 .cmsg.user .bbl{background:var(--blue);color:#fff;border-bottom-right-radius:3px}
 .cmsg.ai .bbl{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:3px}
 .chatia{display:flex;gap:8px;padding:10px;background:var(--card);border-top:1px solid var(--border)}
-.chatia input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
-.chatia button{padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px}
-.apikey{margin-bottom:14px;padding:10px;background:var(--yl);border-radius:8px;font-size:13px}
-.apikey input{width:100%;padding:7px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:12px;margin-top:4px}
-.intention{padding:7px 10px;background:var(--yl);border-left:3px solid var(--yellow);margin:3px 0;border-radius:0 4px 4px 0;font-size:12px;font-style:italic}
-.bundle{padding:7px 10px;background:var(--gl);border-left:3px solid var(--green);margin:3px 0;border-radius:0 4px 4px 0;font-size:12px}
+.chatia input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-sm)}
+.chatia button{padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:var(--font-sm)}
+.apikey{margin-bottom:14px;padding:10px;background:var(--yl);border-radius:8px;font-size:var(--font-sm)}
+.apikey input{width:100%;padding:7px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:var(--font-sm);margin-top:4px}
+.intention{padding:7px 10px;background:var(--yl);border-left:3px solid var(--yellow);margin:3px 0;border-radius:0 4px 4px 0;font-size:var(--font-sm);font-style:italic}
+.bundle{padding:7px 10px;background:var(--gl);border-left:3px solid var(--green);margin:3px 0;border-radius:0 4px 4px 0;font-size:var(--font-sm)}
 .pbar{width:100%;height:10px;background:#eee;border-radius:5px;overflow:hidden;margin:3px 0}
 .pfill{height:100%;background:var(--purple);border-radius:5px;transition:width .3s}
 
 /* ===== DAY CALENDAR ===== */
-.cal-header{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer;user-select:none;-webkit-user-select:none;border-bottom:1px solid var(--border);position:relative}
+.cal-header{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0;font-size:var(--font-md);cursor:pointer;user-select:none;-webkit-user-select:none;border-bottom:1px solid var(--border);position:relative}
 .cal-header:hover{background:#fafafa}
-.cal-header .cal-toggle{position:absolute;right:8px;font-size:12px;color:var(--muted);transition:transform .2s}
+.cal-header .cal-toggle{position:absolute;right:8px;font-size:var(--font-sm);color:var(--muted);transition:transform .2s}
 .cal-header .cal-toggle.collapsed{transform:rotate(-90deg)}
 .cal-body{transition:max-height .3s ease,opacity .2s ease;overflow:hidden}
 .cal-body.collapsed{max-height:0!important;opacity:0;pointer-events:none}
 .cal-wrap{position:relative;height:1020px;overflow-y:auto;border-top:none;background:#fff;user-select:none;-webkit-user-select:none}
 .cal-grid{position:relative;margin-left:52px;height:1020px}
-.cal-hour-label{position:absolute;left:0;width:48px;text-align:right;font-size:11px;color:var(--muted);font-family:monospace;padding-right:6px;transform:translateY(-7px);pointer-events:none;z-index:2}
+.cal-hour-label{position:absolute;left:0;width:48px;text-align:right;font-size:var(--font-xs);color:var(--muted);font-family:monospace;padding-right:6px;transform:translateY(-7px);pointer-events:none;z-index:2}
 .cal-hour-line{position:absolute;left:52px;right:0;height:1px;background:var(--border);pointer-events:none;z-index:1}
 .cal-quarter-line{position:absolute;left:52px;right:0;height:1px;background:#f0f0ee;pointer-events:none;z-index:0}
 .cal-now-line{position:absolute;left:44px;right:0;height:2px;background:var(--red);z-index:15;pointer-events:none}
 .cal-now-line::before{content:'';position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--red)}
-.cal-block{position:absolute;left:4px;right:4px;border-radius:5px;padding:4px 8px;font-size:12px;cursor:pointer;z-index:10;overflow:hidden;border-left:3px solid;transition:box-shadow .15s}
+.cal-block{position:absolute;left:4px;right:4px;border-radius:5px;padding:4px 8px;font-size:var(--font-sm);cursor:pointer;z-index:10;overflow:hidden;border-left:3px solid;transition:box-shadow .15s}
 .cal-block:hover{box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:12}
 .cal-block .cb-title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-block .cb-desc{font-size:10px;opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-block .cb-time{font-size:10px;opacity:.7}
-.cal-block .cb-recur{position:absolute;top:3px;right:5px;font-size:10px;opacity:.5}
+.cal-block .cb-desc{font-size:var(--font-xs);opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-block .cb-time{font-size:var(--font-xs);opacity:.7}
+.cal-block .cb-recur{position:absolute;top:3px;right:5px;font-size:var(--font-xs);opacity:.5}
 .cal-block.work{background:var(--bl);border-left-color:var(--blue);color:#1e40af}
 .cal-block.gym{background:var(--gl);border-left-color:var(--green);color:#166534}
 .cal-block.italian{background:var(--ol);border-left-color:var(--orange);color:#9a3412}
@@ -137,158 +137,158 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .cal-resize-handle:hover{background:rgba(0,0,0,.1);border-radius:0 0 5px 5px}
 
 /* Calendar popover */
-.cal-popover{position:fixed;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:16px;width:300px;font-size:13px}
+.cal-popover{position:fixed;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:16px;width:300px;font-size:var(--font-sm)}
 .cal-popover .cp-row{margin-bottom:10px}
-.cal-popover .cp-row label{display:block;font-weight:600;font-size:11px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
-.cal-popover .cp-row input,.cal-popover .cp-row select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:13px}
+.cal-popover .cp-row label{display:block;font-weight:600;font-size:var(--font-xs);color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.cal-popover .cp-row input,.cal-popover .cp-row select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:5px;font-size:var(--font-sm)}
 .cal-popover .cp-time-row{display:flex;gap:8px;align-items:center}
 .cal-popover .cp-time-row input{width:auto;flex:1}
-.cal-popover .cp-time-row span{color:var(--muted);font-size:12px}
+.cal-popover .cp-time-row span{color:var(--muted);font-size:var(--font-sm)}
 .cal-popover .cp-cats{display:flex;gap:4px;flex-wrap:wrap}
-.cal-popover .cp-cat{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:2px solid transparent;opacity:.6;transition:all .15s}
+.cal-popover .cp-cat{padding:4px 10px;border-radius:12px;font-size:var(--font-xs);font-weight:600;cursor:pointer;border:2px solid transparent;opacity:.6;transition:all .15s}
 .cal-popover .cp-cat:hover{opacity:.85}
 .cal-popover .cp-cat.sel{opacity:1;border-color:currentColor}
 .cal-popover .cp-recur-opts{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
-.cal-popover .cp-recur-opt{padding:3px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:#f3f4f6;border:1px solid var(--border)}
+.cal-popover .cp-recur-opt{padding:3px 8px;border-radius:10px;font-size:var(--font-xs);cursor:pointer;background:#f3f4f6;border:1px solid var(--border)}
 .cal-popover .cp-recur-opt.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
 .cal-popover .cp-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:12px}
 .cal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:199;background:transparent}
-.rprompt{margin-bottom:10px}.rprompt label{display:block;font-weight:600;margin-bottom:3px;font-size:13px}
-.rprompt textarea{width:100%;min-height:70px;padding:7px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px}
-.atable{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.rprompt{margin-bottom:10px}.rprompt label{display:block;font-weight:600;margin-bottom:3px;font-size:var(--font-sm)}
+.rprompt textarea{width:100%;min-height:70px;padding:7px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:var(--font-sm)}
+.atable{width:100%;border-collapse:collapse;font-size:var(--font-sm);margin:10px 0}
 .atable th,.atable td{border:1px solid var(--border);padding:5px 8px;text-align:left}.atable th{background:#f5f5f5;font-weight:600}
 @media(max-width:600px){
-.nav button{padding:7px 9px;font-size:11px}
+.nav button{padding:7px 9px;font-size:var(--font-xs)}
 .timer-d{font-size:2em}
 .tblock{flex-direction:column}.tblock .tm{min-width:auto}
-.cal-hour-label{width:36px;font-size:9px;padding-right:3px}
+.cal-hour-label{width:36px;font-size:var(--font-xs);padding-right:3px}
 .cal-grid{margin-left:40px}
 .cal-hour-line{left:40px}
 .cal-quarter-line{left:40px}
 .cal-now-line{left:32px}
-.cal-block{left:2px;right:2px;padding:3px 5px;font-size:11px}
-.cal-block .cb-time{font-size:9px}
-.cal-block .cb-desc{font-size:9px}
+.cal-block{left:2px;right:2px;padding:3px 5px;font-size:var(--font-xs)}
+.cal-block .cb-time{font-size:var(--font-xs)}
+.cal-block .cb-desc{font-size:var(--font-xs)}
 .cal-popover{left:5px!important;right:5px!important;width:auto!important;max-width:100vw}
 }
 /* Desktop: bigger text, wider content, readable nav */
 @media(min-width:1024px){
 body{font-size:33px}
 h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
-#cards-summary b{font-size:20px}
-#cards-summary .cards-stat-label{font-size:20px}
+#cards-summary b{font-size:var(--font-xl)}
+#cards-summary .cards-stat-label{font-size:var(--font-xl)}
 .tab{max-width:1487px;padding:28px 40px}
 .nav{max-width:1487px;margin:0 auto;padding:0 40px;position:relative}
 .nav{justify-content:flex-start}
-.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:20px;min-width:60px}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:10px 20px;font-size:var(--font-xl);min-width:60px}
 .nav-icon{font-size:36px;display:block;width:100%;text-align:center;line-height:1}
-.nav-label{font-size:20px;font-weight:500}
-.sync-bar{font-size:18px;padding:8px 20px}
-.sync-bar input{font-size:18px;width:240px;padding:7px 12px}
-.sync-bar button{font-size:20px;padding:6px 14px}
+.nav-label{font-size:var(--font-xl);font-weight:500}
+.sync-bar{font-size:var(--font-lg);padding:8px 20px}
+.sync-bar input{font-size:var(--font-lg);width:240px;padding:7px 12px}
+.sync-bar button{font-size:var(--font-xl);padding:6px 14px}
 .card{padding:24px;margin-bottom:20px;font-size:1.69em}
 .card h2{font-size:0.56em}.card h3{font-size:0.48em}
-.hname{font-size:18px}
-.hdet{font-size:18px}
-.hev input,.hev textarea{font-size:18px;padding:10px 14px}
-.label{font-size:18px;padding:4px 12px}
-.tblock{font-size:18px;padding:12px 18px}
-.tblock .tm{font-size:18px;min-width:110px}
-.iitem{font-size:18px;padding:14px}
-.iinput input{font-size:18px;padding:14px 16px}
-.iinput button{font-size:20px;padding:14px 20px}
-.lentry{font-size:18px;padding:12px 16px}
-.lentry .lt{font-size:18px}
-.rarea textarea{font-size:18px;min-height:200px;padding:16px}
-.chatia input{font-size:18px;padding:10px 14px}
-.chatia button{font-size:20px;padding:10px 18px}
-.cmsg .bbl{font-size:18px;padding:10px 16px}
-.atable{font-size:18px}
+.hname{font-size:var(--font-lg)}
+.hdet{font-size:var(--font-lg)}
+.hev input,.hev textarea{font-size:var(--font-lg);padding:10px 14px}
+.label{font-size:var(--font-lg);padding:4px 12px}
+.tblock{font-size:var(--font-lg);padding:12px 18px}
+.tblock .tm{font-size:var(--font-lg);min-width:110px}
+.iitem{font-size:var(--font-lg);padding:14px}
+.iinput input{font-size:var(--font-lg);padding:14px 16px}
+.iinput button{font-size:var(--font-xl);padding:14px 20px}
+.lentry{font-size:var(--font-lg);padding:12px 16px}
+.lentry .lt{font-size:var(--font-lg)}
+.rarea textarea{font-size:var(--font-lg);min-height:200px;padding:16px}
+.chatia input{font-size:var(--font-lg);padding:10px 14px}
+.chatia button{font-size:var(--font-xl);padding:10px 18px}
+.cmsg .bbl{font-size:var(--font-lg);padding:10px 16px}
+.atable{font-size:var(--font-lg)}
 .atable th,.atable td{padding:8px 12px}
 .timer-d{font-size:4.7em}
 .sgrid{max-width:360px}
-.aotd-title{font-size:18px}
-.aotd-blurb{font-size:18px}
-.aotd-meta{font-size:18px}
-.aotd-cat{font-size:18px}
-.wc{font-size:18px}
-.ewarn{font-size:18px}
-.btn{font-size:20px;padding:8px 14px}
-.btn-s{font-size:20px;padding:6px 12px}
-.btn-p{font-size:20px;padding:10px 18px}
-.tr-table{font-size:18px}
+.aotd-title{font-size:var(--font-lg)}
+.aotd-blurb{font-size:var(--font-lg)}
+.aotd-meta{font-size:var(--font-lg)}
+.aotd-cat{font-size:var(--font-lg)}
+.wc{font-size:var(--font-lg)}
+.ewarn{font-size:var(--font-lg)}
+.btn{font-size:var(--font-xl);padding:8px 14px}
+.btn-s{font-size:var(--font-xl);padding:6px 12px}
+.btn-p{font-size:var(--font-xl);padding:10px 18px}
+.tr-table{font-size:var(--font-lg)}
 .tr-table td{padding:12px 14px}
-.rprompt label{font-size:18px}
-.rprompt textarea{font-size:18px;padding:10px}
+.rprompt label{font-size:var(--font-lg)}
+.rprompt textarea{font-size:var(--font-lg);padding:10px}
 }
 /* Article of the Day */
 .aotd{display:flex;gap:14px;align-items:flex-start}
 .aotd-icon{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bl);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
 .aotd-icon img{width:100%;height:100%;object-fit:cover}
 .aotd-body{flex:1;min-width:0}
-.aotd-title{font-weight:700;font-size:15px;margin-bottom:2px}
+.aotd-title{font-weight:700;font-size:var(--font-md);margin-bottom:2px}
 .aotd-title a{color:inherit;text-decoration:none;border-bottom:1px solid var(--border)}
 .aotd-title a:hover{border-bottom-color:var(--blue);color:var(--blue)}
-.aotd-meta{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.aotd-cat{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
+.aotd-meta{font-size:var(--font-xs);color:var(--muted);margin-bottom:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.aotd-cat{display:inline-block;padding:1px 6px;border-radius:3px;font-size:var(--font-xs);font-weight:700}
 .aotd-cat.it{background:var(--ol);color:var(--orange)}.aotd-cat.en{background:var(--bl);color:var(--blue)}.aotd-cat.other{background:var(--pl);color:var(--purple)}
-.aotd-blurb{font-size:13px;line-height:1.6;color:var(--text)}
-.aotd-claim{font-size:12px;color:var(--muted);font-style:italic;margin-top:4px;border-left:2px solid var(--border);padding-left:8px}
+.aotd-blurb{font-size:var(--font-sm);line-height:1.6;color:var(--text)}
+.aotd-claim{font-size:var(--font-sm);color:var(--muted);font-style:italic;margin-top:4px;border-left:2px solid var(--border);padding-left:8px}
 .aotd-actions{margin-top:8px;display:flex;gap:8px;align-items:center}
 .aotd-skeleton .sk{background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);background-size:200% 100%;animation:skPulse 1.5s infinite;border-radius:4px;height:14px;margin-bottom:6px}
 @keyframes skPulse{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 .flex{display:flex;gap:8px}.flex-1{flex:1}
-.btn{padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:var(--card);font-size:13px}
+.btn{padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:var(--card);font-size:var(--font-sm)}
 .btn-p{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-d{background:var(--red);color:#fff;border-color:var(--red)}
-.btn-s{background:var(--bl);font-size:12px;padding:5px 10px}
+.btn-s{background:var(--bl);font-size:var(--font-sm);padding:5px 10px}
 .mt8{margin-top:8px}.mb8{margin-bottom:8px}.mb4{margin-bottom:4px}
-.fin{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;width:100%}
+.fin{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);width:100%}
 /* Translation tab */
-.tr-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.7}
+.tr-table{width:100%;border-collapse:collapse;font-size:var(--font-md);line-height:1.7}
 .tr-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
 .tr-table td:first-child{border-right:1px solid var(--border)}
-.tr-table thead th{padding:8px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
+.tr-table thead th{padding:8px 12px;font-size:var(--font-sm);text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border)}
 .tr-table thead th:first-child{border-right:1px solid var(--border)}
 .tr-table tbody tr:hover{background:#fafaf8}
 .tr-table .it-col{cursor:text;position:relative}
-.tr-sel-popup{position:fixed;z-index:300;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:12px;width:280px;font-size:13px}
-.tr-sel-popup input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:6px}
-.tr-card-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;background:var(--card);font-size:13px}
+.tr-sel-popup{position:fixed;z-index:300;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:12px;width:280px;font-size:var(--font-sm)}
+.tr-sel-popup input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);margin-bottom:6px}
+.tr-card-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;background:var(--card);font-size:var(--font-sm)}
 .tr-card-item .front{font-weight:600;flex:1}.tr-card-item .back{color:var(--muted);flex:1}
 /* Dissertation Chapter Cards */
 .diss-ch-card{border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
-.diss-ch-header{display:flex;align-items:center;padding:10px 14px;cursor:pointer;background:var(--card);user-select:none;font-weight:600;font-size:15px;gap:8px}
+.diss-ch-header{display:flex;align-items:center;padding:10px 14px;cursor:pointer;background:var(--card);user-select:none;font-weight:600;font-size:var(--font-md);gap:8px}
 .diss-ch-header:hover{background:#f5f5f3}
-.diss-ch-arrow{transition:transform .2s;font-size:12px}
+.diss-ch-arrow{transition:transform .2s;font-size:var(--font-sm)}
 .diss-ch-arrow.open{transform:rotate(90deg)}
 .diss-ch-body{padding:0 14px 14px;display:none}
 .diss-ch-body.open{display:block;max-height:400px;overflow-y:auto}
 .diss-ch-actions{display:flex;gap:6px;margin-bottom:8px;align-items:center}
-.diss-ch-actions .btn{font-size:11px;padding:3px 8px}
-.diss-md-edit{width:100%;min-height:300px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.6;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:vertical;display:none}
+.diss-ch-actions .btn{font-size:var(--font-xs);padding:3px 8px}
+.diss-md-edit{width:100%;min-height:300px;font-family:'SF Mono',monospace;font-size:var(--font-sm);line-height:1.6;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:vertical;display:none}
 .diss-md-edit.active{display:block}
-.diss-md-rendered{font-size:14px;line-height:1.7;min-height:40px}
+.diss-md-rendered{font-size:var(--font-md);line-height:1.7;min-height:40px}
 .diss-md-rendered h1,.diss-md-rendered h2,.diss-md-rendered h3,.diss-md-rendered h4{margin:16px 0 8px;cursor:pointer}
-.diss-md-rendered h1{font-size:22px;border-bottom:1px solid var(--border);padding-bottom:6px}
-.diss-md-rendered h2{font-size:18px}
-.diss-md-rendered h3{font-size:15px}
-.diss-md-rendered h4{font-size:14px;color:var(--muted)}
+.diss-md-rendered h1{font-size:var(--font-xl);border-bottom:1px solid var(--border);padding-bottom:6px}
+.diss-md-rendered h2{font-size:var(--font-lg)}
+.diss-md-rendered h3{font-size:var(--font-md)}
+.diss-md-rendered h4{font-size:var(--font-md);color:var(--muted)}
 .diss-md-rendered p{margin:6px 0}
 .diss-md-rendered ul,.diss-md-rendered ol{margin:6px 0;padding-left:24px}
 .diss-md-rendered li{margin:3px 0}
 .diss-md-rendered blockquote{border-left:3px solid var(--purple);padding:4px 12px;margin:8px 0;color:var(--muted);background:var(--pl)}
-.diss-md-rendered code{background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:12px;font-family:'SF Mono',monospace}
+.diss-md-rendered code{background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:var(--font-sm);font-family:'SF Mono',monospace}
 .diss-md-rendered pre{background:#f3f4f6;padding:10px;border-radius:6px;overflow-x:auto;margin:8px 0}
 .diss-md-rendered pre code{background:none;padding:0}
 .diss-md-rendered hr{border:none;border-top:1px solid var(--border);margin:12px 0}
 .diss-md-rendered a{color:var(--blue);text-decoration:underline}
 .diss-md-rendered .diss-section{position:relative}
 .diss-md-rendered .diss-section-collapsed>.diss-section-content{display:none}
-.diss-md-rendered .diss-section-heading .sec-arrow{font-size:10px;margin-right:4px;display:inline-block;transition:transform .2s;transform:rotate(90deg)}
+.diss-md-rendered .diss-section-heading .sec-arrow{font-size:var(--font-xs);margin-right:4px;display:inline-block;transition:transform .2s;transform:rotate(90deg)}
 .diss-md-rendered .diss-section-collapsed>.diss-section-heading .sec-arrow{transform:rotate(0deg)}
-.diss-section-inline-edit{width:100%;min-height:100px;font-family:'SF Mono',monospace;font-size:13px;line-height:1.5;padding:8px;border:1px solid var(--purple);border-radius:4px;background:var(--bg);color:var(--text);resize:vertical;margin:4px 0}
-.diss-sync-status{font-size:11px;color:var(--muted);margin-left:auto}
+.diss-section-inline-edit{width:100%;min-height:100px;font-family:'SF Mono',monospace;font-size:var(--font-sm);line-height:1.5;padding:8px;border:1px solid var(--purple);border-radius:4px;background:var(--bg);color:var(--text);resize:vertical;margin:4px 0}
+.diss-sync-status{font-size:var(--font-xs);color:var(--muted);margin-left:auto}
 /* Weekly Goals day highlight buttons */
 .diss-day-btn[data-day="mon"]{background:#FFB3B3;color:#8B0000}.diss-day-btn[data-day="tue"]{background:#FFD9B3;color:#8B4513}.diss-day-btn[data-day="wed"]{background:#FFFFB3;color:#6B6B00}.diss-day-btn[data-day="thu"]{background:#B3FFB3;color:#006400}.diss-day-btn[data-day="fri"]{background:#B3D9FF;color:#00008B}.diss-day-btn[data-day="sat"]{background:#D9B3FF;color:#4B0082}.diss-day-btn[data-day="sun"]{background:#FFB3E6;color:#8B0060}
 .wg-day-btn[data-day="mon"]{background:#FFB3B3;color:#8B0000}.wg-day-btn[data-day="tue"]{background:#FFD9B3;color:#8B4513}.wg-day-btn[data-day="wed"]{background:#FFFFB3;color:#6B6B00}.wg-day-btn[data-day="thu"]{background:#B3FFB3;color:#006400}.wg-day-btn[data-day="fri"]{background:#B3D9FF;color:#00008B}.wg-day-btn[data-day="sat"]{background:#D9B3FF;color:#4B0082}.wg-day-btn[data-day="sun"]{background:#FFB3E6;color:#8B0060}
@@ -299,28 +299,28 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 #week-goals-work [data-wg-done],#week-goals-school [data-wg-done],#week-goals-life [data-wg-done]{text-decoration:line-through!important;opacity:.45}
 /* --- Goal Chips --- */
 .chip-container { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:30px; }
-.goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:17px; line-height:1.5; max-width:100%; }
+.goal-chip { display:inline-flex; align-items:center; gap:3px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2px 8px; font-size:var(--font-md); line-height:1.5; max-width:100%; }
 .goal-chip.linked { border-left:3px solid #B3D9FF; }
 .goal-chip .chip-text { outline:none; min-width:20px; word-break:break-word; }
 .goal-chip .chip-text:empty::before { content:attr(data-placeholder); color:var(--muted); }
-.goal-chip .chip-x { cursor:pointer; color:var(--muted); font-size:14px; margin-left:2px; line-height:1; }
+.goal-chip .chip-x { cursor:pointer; color:var(--muted); font-size:var(--font-md); margin-left:2px; line-height:1; }
 .goal-chip .chip-x:hover { color:var(--red,#e74c3c); }
-.chip-add { cursor:pointer; font-size:16px; color:var(--muted); border:1px dashed var(--border); border-radius:14px; padding:2px 10px; background:none; }
+.chip-add { cursor:pointer; font-size:var(--font-md); color:var(--muted); border:1px dashed var(--border); border-radius:14px; padding:2px 10px; background:none; }
 .chip-add:hover { color:var(--accent); border-color:var(--accent); }
-.chip-check { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent; transition:all .15s; }
+.chip-check { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:var(--font-sm); color:transparent; transition:all .15s; }
 .chip-check:hover { border-color:var(--green); }
 .goal-chip.done .chip-check { background:var(--green); border-color:var(--green); color:#fff; }
 .goal-chip.done .chip-text { text-decoration:line-through; opacity:.55; }
 .goal-chip.overdue { border-left:3px solid var(--red,#e74c3c); background:rgba(231,76,60,.06); }
-.goal-chip.overdue .chip-overdue-badge { font-size:9px; color:var(--red,#e74c3c); margin-right:2px; }
+.goal-chip.overdue .chip-overdue-badge { font-size:var(--font-xs); color:var(--red,#e74c3c); margin-right:2px; }
 .memory-chip-active { transition:all .15s; }
 .memory-chip-active:hover { background:var(--bl); box-shadow:0 2px 6px rgba(0,0,0,0.1); }
 .memory-chip-done { background:var(--gl); border-color:var(--green); opacity:0.85; }
 @media(min-width:1024px){
-  .goal-chip { font-size:20px !important; }
-  .chip-add { font-size:20px !important; }
-  #tab-week .card > details > summary { font-size:22px !important; }
-  #week-goals-work, #week-goals-school, #week-goals-life { font-size:18px !important; }
+  .goal-chip { font-size:var(--font-xl) !important; }
+  .chip-add { font-size:var(--font-xl) !important; }
+  #tab-week .card > details > summary { font-size:var(--font-xl) !important; }
+  #week-goals-work, #week-goals-school, #week-goals-life { font-size:var(--font-lg) !important; }
 }
 /* Progress grid: 2-col on desktop, 1-col on mobile */
 .prog-grid{display:flex;flex-direction:column;gap:14px}
@@ -334,7 +334,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <body>
 <div class="top-bar">
 <div class="sync-bar" id="sync-bar">
-<span id="sync-status">⚪ <span style="font-size:11px">Local only</span></span>
+<span id="sync-status">⚪ <span style="font-size:var(--font-xs)">Local only</span></span>
 <input id="sync-pass" type="password" placeholder="Sync passphrase…">
 <button class="btn-sync" onclick="doSyncConnect()">Connect</button>
 <button class="btn-disc" onclick="doSyncDisconnect()" style="display:none" id="sync-disc-btn">Disconnect</button>
@@ -349,15 +349,15 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <button onclick="switchTab('meals')"><span class="nav-icon">🍽️</span><span class="nav-label">Meals</span></button>
 <button onclick="switchTab('progress')"><span class="nav-icon">📈</span><span class="nav-label">Progress</span></button>
 <button onclick="switchTab('log')"><span class="nav-icon">📋</span><span class="nav-label">Log</span></button>
-<button onclick="forceUpdate()" title="Force update" style="font-size:16px;padding:8px 10px;flex:none">⟳</button>
+<button onclick="forceUpdate()" title="Force update" style="font-size:var(--font-md);padding:8px 10px;flex:none">⟳</button>
 </nav>
 </div>
 
 <!-- TODAY -->
 <div class="tab active" id="tab-today">
 <h1 id="today-date"></h1>
-<p style="color:var(--muted);font-size:12px;margin-bottom:14px" id="today-label"></p>
-<div class="pgb" id="push-goal-banner" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="push-goal-text"></p><p style="font-size:11px;color:var(--muted)" id="push-goal-countdown"></p></div>
+<p style="color:var(--muted);font-size:var(--font-sm);margin-bottom:14px" id="today-label"></p>
+<div class="pgb" id="push-goal-banner" style="display:none"><h3>🎯 Push Goal This Week</h3><p id="push-goal-text"></p><p style="font-size:var(--font-xs);color:var(--muted)" id="push-goal-countdown"></p></div>
 <div class="card" id="aotd-card">
 <h3>🗞️ Article of the Day</h3>
 <div id="aotd-content">
@@ -366,7 +366,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="sk" style="width:40%"></div>
 <div class="sk" style="width:90%"></div>
 <div class="sk" style="width:75%"></div>
-<p style="font-size:12px;color:var(--muted);margin-top:8px">🔍 Scanning RSS feeds & consulting Claude...</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-top:8px">🔍 Scanning RSS feeds & consulting Claude...</p>
 </div>
 <div id="aotd-result" style="display:none">
 <div class="aotd">
@@ -381,35 +381,35 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="aotd-actions">
 <a id="aotd-read-link" href="#" target="_blank" rel="noopener" class="btn btn-s" style="text-decoration:none">Read →</a>
 <a id="aotd-archive-link" href="#" target="_blank" rel="noopener" class="btn btn-s" style="text-decoration:none;display:none">📦 Archive</a>
-<button class="btn btn-s" onclick="forceNewArticle()" style="font-size:11px">🔄 New pick</button>
+<button class="btn btn-s" onclick="forceNewArticle()" style="font-size:var(--font-xs)">🔄 New pick</button>
 </div>
 </div>
 <div id="aotd-nokey" style="display:none">
-<p style="font-size:13px;color:var(--muted)">Set your <a href="#" onclick="switchTab('claude');return false" style="color:var(--blue)">Anthropic API key</a> to enable Article of the Day.</p>
+<p style="font-size:var(--font-sm);color:var(--muted)">Set your <a href="#" onclick="switchTab('claude');return false" style="color:var(--blue)">Anthropic API key</a> to enable Article of the Day.</p>
 </div>
 <div id="aotd-error" style="display:none">
-<p style="font-size:13px;color:var(--muted)" id="aotd-error-msg"></p>
+<p style="font-size:var(--font-sm);color:var(--muted)" id="aotd-error-msg"></p>
 </div>
 </div>
 </div>
 <div class="card"><h3>🎯 Daily Goals</h3>
 <div style="display:flex;flex-direction:column;gap:6px" id="daily-goals-grid">
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="daily-goals-work"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-work','w')">＋ Add</button></div></div>
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="daily-goals-school"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-school','s')">＋ Add</button></div></div>
-<div><h4 style="font-size:22px;margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="daily-goals-life"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-life','l')">＋ Add</button></div></div>
+<div><h4 style="font-size:var(--font-xl);margin-bottom:4px;color:var(--blue)">💼 Work</h4><div class="chip-container" id="daily-goals-work"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-work','w')">＋ Add</button></div></div>
+<div><h4 style="font-size:var(--font-xl);margin-bottom:4px;color:var(--purple)">🎓 School</h4><div class="chip-container" id="daily-goals-school"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-school','s')">＋ Add</button></div></div>
+<div><h4 style="font-size:var(--font-xl);margin-bottom:4px;color:var(--green)">🌱 Life</h4><div class="chip-container" id="daily-goals-life"><button class="chip-add" onclick="_t3AddNewChip('daily-goals-life','l')">＋ Add</button></div></div>
 </div>
 </div>
 <div class="card">
 <h3>📝 Notes</h3>
-<div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:16px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
+<div id="today-notes" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveTodayNotes()"></div>
 </div>
 <div class="card"><div id="cal-container"></div><div class="flex mt8" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="btn btn-s" onclick="calZoom(-1)">🔍−</button><button class="btn btn-s" onclick="calZoom(1)">🔍+</button><button class="btn btn-s" onclick="exportICS()">📤 Export .ics</button><label class="btn btn-s" style="display:inline-block;cursor:pointer">📥 Import .ics <input type="file" accept=".ics" onchange="importICS(event)" style="display:none"></label></div></div>
 <div class="card"><h3>🇮🇹 Italian Work</h3>
 <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0">
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
-<label style="display:flex;align-items:center;gap:6px;font-size:18px"><input type="checkbox" class="hchk" id="italian-check-refl" disabled style="pointer-events:none"><b>Reflection</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:var(--font-lg)"><input type="checkbox" class="hchk" id="italian-check-anki" disabled style="pointer-events:none"><b>Anki</b> — <span id="anki-ct" style="font-weight:700">0</span> / <span id="anki-target">0</span></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:var(--font-lg)"><input type="checkbox" class="hchk" id="italian-check-art1" disabled style="pointer-events:none"><b>Article 1</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:var(--font-lg)"><input type="checkbox" class="hchk" id="italian-check-art2" disabled style="pointer-events:none"><b>Article 2</b></label>
+<label style="display:flex;align-items:center;gap:6px;font-size:var(--font-lg)"><input type="checkbox" class="hchk" id="italian-check-refl" disabled style="pointer-events:none"><b>Reflection</b></label>
 </div>
 <div class="ewarn" id="anki-w" style="display:none">⚠ Less than 300 — doesn't count</div>
 <input type="hidden" id="anki-ct-val"><input type="hidden" id="art1-t"><input type="hidden" id="art1-th"><input type="hidden" id="art2-t"><input type="hidden" id="art2-th"><span id="art1-status" style="display:none"></span><span id="art2-status" style="display:none"></span>
@@ -420,51 +420,51 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="flex mt8"><button class="btn btn-p" onclick="submitRefl()">Submit for Correction + Cards</button></div>
 <div id="reflection-result" style="display:none" class="mt8"></div>
 <div id="refl-card-review" style="display:none;margin-top:10px" class="card">
-  <h3 style="font-size:20px">🎴 Review Flashcards</h3>
+  <h3 style="font-size:var(--font-xl)">🎴 Review Flashcards</h3>
   <div id="refl-card-review-content"></div>
 </div>
 </div>
-<div class="card" style="text-align:center"><button class="btn btn-d" onclick="sealDay()">🔒 Seal Today (Cannot Undo)</button><p style="font-size:11px;color:var(--muted);margin-top:4px">Locks all entries for today. Auto-seals at midnight.</p></div>
+<div class="card" style="text-align:center"><button class="btn btn-d" onclick="sealDay()">🔒 Seal Today (Cannot Undo)</button><p style="font-size:var(--font-xs);color:var(--muted);margin-top:4px">Locks all entries for today. Auto-seals at midnight.</p></div>
 </div>
 
 <!-- WEEK -->
 <div class="tab" id="tab-week">
 <h1>📊 Week of <span id="week-date"></span></h1>
 <div class="card">
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="week-goal-label" style="font-size:13px;font-weight:600">This Week</span><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 Weekly Goals</h3><button class="btn" style="font-size:var(--font-xs);padding:2px 8px" onclick="shiftWeekGoals(-1)">◀</button><span id="week-goal-label" style="font-size:var(--font-sm);font-weight:600">This Week</span><button class="btn" style="font-size:var(--font-xs);padding:2px 8px" onclick="shiftWeekGoals(1)">▶</button></div>
 <div id="stretch-goals-container"></div>
 <details style="margin-bottom:10px">
-  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:4px">💼 Work</summary>
-  <div id="week-goals-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
+  <summary style="cursor:pointer;font-size:var(--font-sm);font-weight:600;color:var(--blue);margin-bottom:4px">💼 Work</summary>
+  <div id="week-goals-work" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('work')"></div>
 </details>
 <details style="margin-bottom:10px">
-  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🎓 School</summary>
-  <div id="week-goals-school" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('school')"></div>
+  <summary style="cursor:pointer;font-size:var(--font-sm);font-weight:600;color:var(--purple);margin-bottom:4px">🎓 School</summary>
+  <div id="week-goals-school" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('school')"></div>
 </details>
 <details style="margin-bottom:10px">
-  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px">🌿 Life</summary>
-  <div id="week-goals-life" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('life')"></div>
+  <summary style="cursor:pointer;font-size:var(--font-sm);font-weight:600;color:var(--green);margin-bottom:4px">🌿 Life</summary>
+  <div id="week-goals-life" contenteditable="true" class="wg-editor" style="min-height:1.6em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff" oninput="saveWeekGoals('life')"></div>
 </details>
 <div style="display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:4px">
-  <span style="font-size:11px;color:var(--muted);margin-right:2px">Highlight:</span>
-  <button class="btn btn-s wg-day-btn" data-day="mon" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
-  <button class="btn btn-s wg-day-btn" data-day="tue" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
-  <button class="btn btn-s wg-day-btn" data-day="wed" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
-  <button class="btn btn-s wg-day-btn" data-day="thu" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
-  <button class="btn btn-s wg-day-btn" data-day="fri" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
-  <button class="btn btn-s wg-day-btn" data-day="sat" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
-  <button class="btn btn-s wg-day-btn" data-day="sun" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
-  <button class="btn btn-s" onmousedown="event.preventDefault()" onclick="weekGoalClearHighlightsAuto()" style="min-width:42px;font-size:11px;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove, or click with no selection to clear all in focused editor">✕ Clear</button>
+  <span style="font-size:var(--font-xs);color:var(--muted);margin-right:2px">Highlight:</span>
+  <button class="btn btn-s wg-day-btn" data-day="mon" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('mon')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">MON</button>
+  <button class="btn btn-s wg-day-btn" data-day="tue" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('tue')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">TUES</button>
+  <button class="btn btn-s wg-day-btn" data-day="wed" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('wed')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">WED</button>
+  <button class="btn btn-s wg-day-btn" data-day="thu" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('thu')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">THURS</button>
+  <button class="btn btn-s wg-day-btn" data-day="fri" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('fri')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">FRI</button>
+  <button class="btn btn-s wg-day-btn" data-day="sat" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sat')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">SAT</button>
+  <button class="btn btn-s wg-day-btn" data-day="sun" onmousedown="event.preventDefault()" onclick="weekGoalAssignDayAuto('sun')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">SUN</button>
+  <button class="btn btn-s" onmousedown="event.preventDefault()" onclick="weekGoalClearHighlightsAuto()" style="min-width:42px;font-size:var(--font-xs);background:#f0f0f0;color:#666" title="Select highlighted text + click to remove, or click with no selection to clear all in focused editor">✕ Clear</button>
 </div>
 </div>
 <div class="card">
 <h3>📋 Daily Summaries</h3>
 <div id="daily-summaries">
   <div id="daily-summary-buttons" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px"></div>
-  <div id="daily-summary-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:13px"></div>
+  <div id="daily-summary-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:var(--font-sm)"></div>
 </div>
 </div>
-<div class="card"><h3>🔍 Weekly Review</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">Complete all prompts to unlock next week's planning.</p>
+<div class="card"><h3>🔍 Weekly Review</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Complete all prompts to unlock next week's planning.</p>
 <div class="rprompt"><label>What went well this week?</label><textarea id="weekly-review-well" class="fin"></textarea></div>
 <div class="rprompt"><label>What didn't go as planned?</label><textarea id="weekly-review-bad" class="fin"></textarea></div>
 <div class="rprompt"><label>What's the #1 thing to improve next week?</label><textarea id="weekly-review-improve" class="fin"></textarea></div>
@@ -479,20 +479,20 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="tab" id="tab-dissertation">
 <h1>📝 Dissertation</h1>
 <div class="card">
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 <span id="diss-week-label">Weekly Goals</span></h3><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftDissWeekGoals(-1)">◀</button><button class="btn" style="font-size:10px;padding:2px 8px" onclick="shiftDissWeekGoals(1)">▶</button><span id="diss-week-indicator" style="display:none;font-size:11px;color:var(--orange);font-weight:600">⚠ Next Week</span></div>
-<div id="diss-weekly-goals" contenteditable="true" class="wg-editor" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><h3 style="margin:0">🎯 <span id="diss-week-label">Weekly Goals</span></h3><button class="btn" style="font-size:var(--font-xs);padding:2px 8px" onclick="shiftDissWeekGoals(-1)">◀</button><button class="btn" style="font-size:var(--font-xs);padding:2px 8px" onclick="shiftDissWeekGoals(1)">▶</button><span id="diss-week-indicator" style="display:none;font-size:var(--font-xs);color:var(--orange);font-weight:600">⚠ Next Week</span></div>
+<div id="diss-weekly-goals" contenteditable="true" class="wg-editor" style="min-height:3em;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveDissWeeklyGoals()"></div>
 <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;align-items:center">
-<span style="font-size:11px;color:var(--muted);margin-right:4px">Highlight:</span>
-<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissAssignDay('mon')" style="min-width:32px;font-size:11px;border:2px solid transparent">MON</button>
-<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissAssignDay('tue')" style="min-width:32px;font-size:11px;border:2px solid transparent">TUES</button>
-<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissAssignDay('wed')" style="min-width:32px;font-size:11px;border:2px solid transparent">WED</button>
-<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissAssignDay('thu')" style="min-width:32px;font-size:11px;border:2px solid transparent">THURS</button>
-<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissAssignDay('fri')" style="min-width:32px;font-size:11px;border:2px solid transparent">FRI</button>
-<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissAssignDay('sat')" style="min-width:32px;font-size:11px;border:2px solid transparent">SAT</button>
-<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissAssignDay('sun')" style="min-width:32px;font-size:11px;border:2px solid transparent">SUN</button>
-<button class="btn btn-s" onclick="dissClearHighlights()" style="min-width:42px;font-size:11px;border:2px solid transparent;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
+<span style="font-size:var(--font-xs);color:var(--muted);margin-right:4px">Highlight:</span>
+<button class="btn btn-s diss-day-btn" data-day="mon" onclick="dissAssignDay('mon')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">MON</button>
+<button class="btn btn-s diss-day-btn" data-day="tue" onclick="dissAssignDay('tue')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">TUES</button>
+<button class="btn btn-s diss-day-btn" data-day="wed" onclick="dissAssignDay('wed')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">WED</button>
+<button class="btn btn-s diss-day-btn" data-day="thu" onclick="dissAssignDay('thu')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">THURS</button>
+<button class="btn btn-s diss-day-btn" data-day="fri" onclick="dissAssignDay('fri')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">FRI</button>
+<button class="btn btn-s diss-day-btn" data-day="sat" onclick="dissAssignDay('sat')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">SAT</button>
+<button class="btn btn-s diss-day-btn" data-day="sun" onclick="dissAssignDay('sun')" style="min-width:32px;font-size:var(--font-xs);border:2px solid transparent">SUN</button>
+<button class="btn btn-s" onclick="dissClearHighlights()" style="min-width:42px;font-size:var(--font-xs);border:2px solid transparent;background:#f0f0f0;color:#666" title="Select highlighted text + click to remove one, or click with no selection to clear all">✕ Clear</button>
 </div>
-<p style="font-size:11px;color:var(--muted);margin-top:4px">Select text, then click a day button to assign it</p>
+<p style="font-size:var(--font-xs);color:var(--muted);margin-top:4px">Select text, then click a day button to assign it</p>
 </div>
 
 <div id="diss-chapter-cards">
@@ -507,7 +507,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="diss-ch-card" data-ch="ch2">
 <div class="diss-ch-header" onclick="toggleDissChapter('ch2')"><span class="diss-ch-arrow" id="diss-arrow-ch2">▶</span>Chapter 2: Data Economy (Closed)<span class="diss-sync-status" id="diss-sync-ch2"></span></div>
 <div class="diss-ch-body" id="diss-body-ch2">
-<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch2')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch2')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch2')">⬆ Push to Local</button><span style="font-size:var(--font-xs);color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch2" oninput="dissAutoSave('ch2')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch2"></div>
 </div>
@@ -515,7 +515,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="diss-ch-card" data-ch="ch3">
 <div class="diss-ch-header" onclick="toggleDissChapter('ch3')"><span class="diss-ch-arrow" id="diss-arrow-ch3">▶</span>Chapter 3: Data Economy (Open)<span class="diss-sync-status" id="diss-sync-ch3"></span></div>
 <div class="diss-ch-body" id="diss-body-ch3">
-<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button><span style="font-size:11px;color:var(--muted)">⌘⇧V = full edit</span></div>
+<div class="diss-ch-actions"><button class="btn" onclick="dissLinkFile('ch3')">📂 Link File</button><button class="btn" onclick="dissPullLocal('ch3')">⬇ Pull Local</button><button class="btn" onclick="dissPushLocal('ch3')">⬆ Push to Local</button><span style="font-size:var(--font-xs);color:var(--muted)">⌘⇧V = full edit</span></div>
 <textarea class="diss-md-edit" id="diss-edit-ch3" oninput="dissAutoSave('ch3')"></textarea>
 <div class="diss-md-rendered" id="diss-render-ch3"></div>
 </div>
@@ -529,10 +529,10 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="tab" id="tab-claude">
 <h1>🤖 Claude Integration</h1>
 <div class="apikey"><b>Anthropic API Key</b> (stored locally only, never sent anywhere except Anthropic)<input type="password" id="api-key" placeholder="sk-ant-..." onchange="saveKey()"></div>
-<div class="card"><h3>💬 Chat</h3><p style="font-size:12px;color:var(--muted);margin-bottom:8px">Claude has context about your habits, goals, and progress.</p>
+<div class="card"><h3>💬 Chat</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Claude has context about your habits, goals, and progress.</p>
 <div class="chatc"><div class="chatm" id="chat-msgs"></div><div class="chatia"><input id="chat-in" placeholder="Ask Claude anything..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">Send</button></div></div></div>
-<div class="card"><h3>📝 Italian Corrections</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Results from your daily reflection submissions appear here.</p><div id="corrections-area" style="max-height:400px;overflow-y:auto"><p style="color:var(--muted);font-size:13px;font-style:italic">No corrections yet. Submit your daily Italian reflection from the Today tab.</p></div></div>
-<div class="card"><h3>🃏 Generated Anki Cards</h3><p style="font-size:12px;color:var(--muted);margin-bottom:6px">Cards follow your C2 ruleset. Copy or download.</p><div id="anki-area"><p style="color:var(--muted);font-size:13px;font-style:italic">No cards generated yet.</p></div><div class="flex mt8"><button class="btn btn-s" onclick="copyAnki()">📋 Copy All Cards</button><button class="btn btn-s" onclick="dlAnki()">⬇ Download .txt</button></div></div>
+<div class="card"><h3>📝 Italian Corrections</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px">Results from your daily reflection submissions appear here.</p><div id="corrections-area" style="max-height:400px;overflow-y:auto"><p style="color:var(--muted);font-size:var(--font-sm);font-style:italic">No corrections yet. Submit your daily Italian reflection from the Today tab.</p></div></div>
+<div class="card"><h3>🃏 Generated Anki Cards</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px">Cards follow your C2 ruleset. Copy or download.</p><div id="anki-area"><p style="color:var(--muted);font-size:var(--font-sm);font-style:italic">No cards generated yet.</p></div><div class="flex mt8"><button class="btn btn-s" onclick="copyAnki()">📋 Copy All Cards</button><button class="btn btn-s" onclick="dlAnki()">⬇ Download .txt</button></div></div>
 </div>
 
 <!-- CARDS -->
@@ -544,11 +544,11 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div><b id="cards-learning-ct" style="color:#ef4444">0</b> <span class="cards-stat-label" style="color:var(--muted)">learning</span></div>
 <div><b id="cards-review-remaining" style="color:#22c55e">0</b> <span class="cards-stat-label" style="color:var(--muted)">to review</span></div>
 <div><b id="cards-reviewed-today" style="color:#8b5cf6">0</b> <span class="cards-stat-label" style="color:var(--muted)">reviewed today</span></div>
-<div style="margin-top:8px;font-size:12px;color:var(--muted)">
-  <label>New/day: <input type="number" id="cards-new-limit" class="fin" style="width:55px;font-size:12px" value="20" min="1" max="200" onchange="saveCardSettings()"></label>
-  <label style="margin-left:8px">Review cap: <input type="number" id="cards-review-cap" class="fin" style="width:65px;font-size:12px" value="200" min="1" max="9999" onchange="saveCardSettings()"></label>
+<div style="margin-top:8px;font-size:var(--font-sm);color:var(--muted)">
+  <label>New/day: <input type="number" id="cards-new-limit" class="fin" style="width:55px;font-size:var(--font-sm)" value="20" min="1" max="200" onchange="saveCardSettings()"></label>
+  <label style="margin-left:8px">Review cap: <input type="number" id="cards-review-cap" class="fin" style="width:65px;font-size:var(--font-sm)" value="200" min="1" max="9999" onchange="saveCardSettings()"></label>
 </div>
-<div id="cards-limit-status" style="margin-top:4px;font-size:12px"></div>
+<div id="cards-limit-status" style="margin-top:4px;font-size:var(--font-sm)"></div>
 <button class="btn btn-p" onclick="startStudy()">▶ Study Now</button>
 <button class="btn btn-s" id="cards-add-more-btn" style="display:none" onclick="addMoreCards()">➕ Add 5 more new cards</button>
 </div>
@@ -556,19 +556,19 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <div id="study-area" style="display:none">
 <div class="card" style="min-height:400px;text-align:center;position:relative" onclick="flipCard()">
-<div id="study-front" style="font-size:20px;padding:20px 10px;cursor:pointer"></div>
+<div id="study-front" style="font-size:var(--font-xl);padding:20px 10px;cursor:pointer"></div>
 <div id="study-back" style="display:none;padding:16px 10px;border-top:1px dashed var(--border);margin-top:12px">
-<div id="study-back-content" style="font-size:20px;margin-bottom:16px"></div>
+<div id="study-back-content" style="font-size:var(--font-xl);margin-bottom:16px"></div>
 <div class="flex" style="justify-content:center;gap:6px;flex-wrap:wrap">
-<button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);min-width:70px" onclick="event.stopPropagation();rateCard(1)">Again<br><span style="font-size:10px">&lt;1min</span></button>
-<button class="btn" style="background:var(--orange);color:#fff;border-color:var(--orange);min-width:70px" onclick="event.stopPropagation();rateCard(2)">Hard<br><span style="font-size:10px" id="hard-ivl"></span></button>
-<button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);min-width:70px" onclick="event.stopPropagation();rateCard(3)">Good<br><span style="font-size:10px" id="good-ivl"></span></button>
-<button class="btn" style="background:var(--blue);color:#fff;border-color:var(--blue);min-width:70px" onclick="event.stopPropagation();rateCard(4)">Easy<br><span style="font-size:10px" id="easy-ivl"></span></button>
+<button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);min-width:70px" onclick="event.stopPropagation();rateCard(1)">Again<br><span style="font-size:var(--font-xs)">&lt;1min</span></button>
+<button class="btn" style="background:var(--orange);color:#fff;border-color:var(--orange);min-width:70px" onclick="event.stopPropagation();rateCard(2)">Hard<br><span style="font-size:var(--font-xs)" id="hard-ivl"></span></button>
+<button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);min-width:70px" onclick="event.stopPropagation();rateCard(3)">Good<br><span style="font-size:var(--font-xs)" id="good-ivl"></span></button>
+<button class="btn" style="background:var(--blue);color:#fff;border-color:var(--blue);min-width:70px" onclick="event.stopPropagation();rateCard(4)">Easy<br><span style="font-size:var(--font-xs)" id="easy-ivl"></span></button>
 </div>
 </div>
-<p style="font-size:11px;color:var(--muted);margin-top:10px;cursor:pointer" onclick="flipCard()" id="study-hint">tap to flip</p>
+<p style="font-size:var(--font-xs);color:var(--muted);margin-top:10px;cursor:pointer" onclick="flipCard()" id="study-hint">tap to flip</p>
 </div>
-<div style="text-align:center"><button id="undo-card-btn" class="btn btn-s" style="margin-right:8px;opacity:.35;pointer-events:none" onclick="undoCardResponse()">⟲ Undo <span style="font-size:10px;opacity:.6">⌘Z</span></button><button class="btn btn-s" onclick="endStudy()">✕ End Session</button></div>
+<div style="text-align:center"><button id="undo-card-btn" class="btn btn-s" style="margin-right:8px;opacity:.35;pointer-events:none" onclick="undoCardResponse()">⟲ Undo <span style="font-size:var(--font-xs);opacity:.6">⌘Z</span></button><button class="btn btn-s" onclick="endStudy()">✕ End Session</button></div>
 </div>
 
 <div class="card"><h3>➕ Add Cards</h3>
@@ -587,22 +587,22 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <!-- Vocab List -->
 <div id="add-mode-vocab" style="display:none">
-<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Enter words or phrases, one per line. Claude will generate flashcard proposals.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px">Enter words or phrases, one per line. Claude will generate flashcard proposals.</p>
 <textarea class="fin" id="vocab-list-text" rows="8" placeholder="parola&#10;frase esempio&#10;un'altra parola..."></textarea>
 <div class="flex mt8"><button class="btn btn-p" onclick="submitVocabList()">🤖 Generate Flashcards</button></div>
-<div id="vocab-list-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+<div id="vocab-list-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 <div id="vocab-list-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
 
 <!-- Pre-Made Cards (CSV) -->
 <div id="add-mode-premade" style="display:none">
-<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Upload a CSV or TSV file with your flashcards.</p>
-<div class="flex mb8"><label class="btn btn-s" style="cursor:pointer">📁 Choose File <input type="file" accept=".csv,.tsv,.txt" onchange="handleCSVUpload(event)" style="display:none" id="csv-file-input"></label><span id="csv-file-name" style="font-size:12px;color:var(--muted);align-self:center"></span></div>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px">Upload a CSV or TSV file with your flashcards.</p>
+<div class="flex mb8"><label class="btn btn-s" style="cursor:pointer">📁 Choose File <input type="file" accept=".csv,.tsv,.txt" onchange="handleCSVUpload(event)" style="display:none" id="csv-file-input"></label><span id="csv-file-name" style="font-size:var(--font-sm);color:var(--muted);align-self:center"></span></div>
 <div id="csv-preview" style="display:none">
-<p style="font-size:12px;color:var(--muted);margin-bottom:6px">Preview (first 10 rows). Select which columns are Front and Back:</p>
-<div class="flex mb4" style="gap:12px;font-size:12px">
-<label>Front column: <select class="fin" id="csv-front-col" style="width:auto;font-size:12px" onchange="renderCSVPreview()"></select></label>
-<label>Back column: <select class="fin" id="csv-back-col" style="width:auto;font-size:12px" onchange="renderCSVPreview()"></select></label>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px">Preview (first 10 rows). Select which columns are Front and Back:</p>
+<div class="flex mb4" style="gap:12px;font-size:var(--font-sm)">
+<label>Front column: <select class="fin" id="csv-front-col" style="width:auto;font-size:var(--font-sm)" onchange="renderCSVPreview()"></select></label>
+<label>Back column: <select class="fin" id="csv-back-col" style="width:auto;font-size:var(--font-sm)" onchange="renderCSVPreview()"></select></label>
 </div>
 <div style="overflow-x:auto"><table class="atable" id="csv-preview-table"></table></div>
 <div class="flex mt8"><button class="btn btn-p" onclick="importCSVCards()">Import <span id="csv-row-count">0</span> Cards</button></div>
@@ -638,43 +638,43 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div id="tr-article-mode">
 <div class="card">
 <h3>📰 Fetch & Translate Article</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Paste an Italian article URL or text. Claude will produce a side-by-side translation. Select any Italian word/phrase to create a flashcard.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Paste an Italian article URL or text. Claude will produce a side-by-side translation. Select any Italian word/phrase to create a flashcard.</p>
 <div class="flex mb8">
 <input class="fin flex-1" id="tr-url" placeholder="Paste URL (e.g. from Corriere, Repubblica, Internazionale...)">
 <button class="btn btn-p" onclick="trFetchURL()">Fetch & Translate</button>
 </div>
-<details class="mb8"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">Or paste text directly</summary>
+<details class="mb8"><summary style="cursor:pointer;font-size:var(--font-sm);color:var(--muted)">Or paste text directly</summary>
 <textarea class="fin mt8" id="tr-raw" rows="6" placeholder="Paste Italian article text here..."></textarea>
 <button class="btn btn-p mt8" onclick="trTranslateRaw()">Translate</button>
 </details>
-<div id="tr-status" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+<div id="tr-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:4px"></div>
 </div>
 
 <div class="card" id="tr-result-card" style="display:none">
 <h3 id="tr-title" style="margin-bottom:4px"></h3>
-<p style="font-size:11px;color:var(--muted);margin-bottom:10px" id="tr-meta"></p>
+<p style="font-size:var(--font-xs);color:var(--muted);margin-bottom:10px" id="tr-meta"></p>
 <div style="overflow-x:auto">
 <table class="tr-table" id="tr-table">
 <thead><tr><th style="width:50%">🇮🇹 Italiano</th><th style="width:50%">🇬🇧 English</th></tr></thead>
 <tbody id="tr-tbody"></tbody>
 </table>
 </div>
-<p style="font-size:11px;color:var(--muted);margin-top:10px">💡 Highlight any Italian word or phrase to collect it for flashcards.</p>
+<p style="font-size:var(--font-xs);color:var(--muted);margin-top:10px">💡 Highlight any Italian word or phrase to collect it for flashcards.</p>
 </div>
 
 <div class="card" id="tr-reflection-card" style="display:none">
 <h3>✍️ Reflection (in Italian)</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Write a short reflection about this article in Italian. Minimum 50 words.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Write a short reflection about this article in Italian. Minimum 50 words.</p>
 <div class="rarea"><textarea id="tr-refl-txt" placeholder="Scrivi una riflessione su questo articolo..." oninput="trUpdReflWC()"></textarea></div>
 <div class="wc" id="tr-refl-wc">0 / 50 words</div>
 <div class="flex mt8" style="gap:8px;flex-wrap:wrap;align-items:center">
-<span style="font-size:12px;color:var(--muted)">Log as:</span>
+<span style="font-size:var(--font-sm);color:var(--muted)">Log as:</span>
 <button class="btn btn-p" id="tr-refl-submit-btn" onclick="trSubmitReflectionAuto()">✅ Submit as Article 1</button>
 </div>
-<div id="tr-refl-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+<div id="tr-refl-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 <div id="tr-refl-result" style="display:none;margin-top:10px" class="card" >
-<h4 style="font-size:20px;margin-bottom:6px">📝 Claude's Feedback</h4>
-<div id="tr-refl-feedback" style="font-size:18px;line-height:1.6"></div>
+<h4 style="font-size:var(--font-xl);margin-bottom:6px">📝 Claude's Feedback</h4>
+<div id="tr-refl-feedback" style="font-size:var(--font-lg);line-height:1.6"></div>
 </div>
 <div id="tr-refl-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
@@ -682,25 +682,25 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <!-- Prose Reproduction Exercise -->
 <div class="card" id="tr-repro-card" style="display:none">
 <h3>✍️ Prose Reproduction Exercise</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Read the article carefully, then click "Start Reproduction" to hide the English and reproduce the marked paragraphs from memory. Tests your ability to internalize native Italian syntax, register, and rhythm.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Read the article carefully, then click "Start Reproduction" to hide the English and reproduce the marked paragraphs from memory. Tests your ability to internalize native Italian syntax, register, and rhythm.</p>
 <button class="btn btn-p" id="tr-repro-start-btn" onclick="trStartRepro()" style="margin-bottom:8px">🔒 Start Reproduction (logs as Article 2)</button>
 <div id="tr-repro-progress" style="display:none;margin-bottom:8px"></div>
-<div id="tr-repro-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+<div id="tr-repro-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 <div id="tr-repro-result" style="display:none;margin-top:10px" class="card">
-<h4 style="font-size:20px;margin-bottom:6px">📝 Reproduction Evaluation</h4>
-<div id="tr-repro-feedback" style="font-size:18px;line-height:1.6"></div>
+<h4 style="font-size:var(--font-xl);margin-bottom:6px">📝 Reproduction Evaluation</h4>
+<div id="tr-repro-feedback" style="font-size:var(--font-lg);line-height:1.6"></div>
 </div>
 <div id="tr-repro-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
 
 <div class="card" id="tr-collected-card" style="display:none">
 <h3>🃏 Collected Words (<span id="tr-coll-ct">0</span>)</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Words you highlighted while reading. Submit them all at once below.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Words you highlighted while reading. Submit them all at once below.</p>
 <div class="flex mb8">
 <button class="btn btn-p" onclick="trSubmitWords()">🤖 Auto-translate All & Create Cards</button>
 <button class="btn btn-s" onclick="trClearCollected()">Clear All</button>
 </div>
-<div id="tr-words-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+<div id="tr-words-status" style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px"></div>
 <div id="tr-collected-list"></div>
 <div id="tr-words-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
@@ -715,9 +715,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div id="tr-book-mode" style="display:none">
 <div class="card">
 <h3>📖 Book Translation</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload Kindle screenshots or photos of book pages. Claude will OCR and translate them page by page.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:10px">Upload Kindle screenshots or photos of book pages. Claude will OCR and translate them page by page.</p>
 <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
-<span style="font-size:13px;font-weight:600">Direction:</span>
+<span style="font-size:var(--font-sm);font-weight:600">Direction:</span>
 <button id="bk-dir-it2en" class="btn btn-s" onclick="bkSetDir('it2en')" style="background:var(--blue);color:#fff;border-color:var(--blue)">🇮🇹 → 🇬🇧</button>
 <button id="bk-dir-en2it" class="btn btn-s" onclick="bkSetDir('en2it')">🇬🇧 → 🇮🇹</button>
 </div>
@@ -725,9 +725,9 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <label class="btn btn-p" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px">
 📷 Upload Pages <input type="file" id="bk-img-input" accept="image/*" multiple onchange="bkImagesSelected(this)" style="display:none">
 </label>
-<span style="font-size:11px;color:var(--muted)">Select multiple images at once</span>
+<span style="font-size:var(--font-xs);color:var(--muted)">Select multiple images at once</span>
 </div>
-<div id="bk-upload-status" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+<div id="bk-upload-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 </div>
 
 <div class="card" id="bk-thumbs-card" style="display:none">
@@ -741,27 +741,27 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="card" id="bk-reader-card" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
 <button class="btn btn-s" id="bk-prev-btn" onclick="bkPrevPage()" disabled>◀ Prev</button>
-<span style="font-weight:600;font-size:14px" id="bk-page-label">Page 1 of 1</span>
+<span style="font-weight:600;font-size:var(--font-md)" id="bk-page-label">Page 1 of 1</span>
 <button class="btn btn-s" id="bk-next-btn" onclick="bkNextPage()" disabled>Next ▶</button>
 </div>
-<div id="bk-page-status" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px"></div>
+<div id="bk-page-status" style="font-size:var(--font-sm);color:var(--muted);text-align:center;margin-bottom:8px"></div>
 <div style="overflow-x:auto">
 <table class="tr-table" id="bk-table">
 <thead><tr><th style="width:50%" id="bk-th-src">🇮🇹 Italiano</th><th style="width:50%" id="bk-th-tgt">🇬🇧 English</th></tr></thead>
 <tbody id="bk-tbody"></tbody>
 </table>
 </div>
-<p style="font-size:11px;color:var(--muted);margin-top:10px">💡 Highlight words in the source column to collect them for flashcards.</p>
+<p style="font-size:var(--font-xs);color:var(--muted);margin-top:10px">💡 Highlight words in the source column to collect them for flashcards.</p>
 </div>
 
 <div class="card" id="bk-collected-card" style="display:none">
 <h3>🃏 Collected Words (<span id="bk-coll-ct">0</span>)</h3>
-<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Words you highlighted while reading. Submit them all at once below.</p>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Words you highlighted while reading. Submit them all at once below.</p>
 <div class="flex mb8">
 <button class="btn btn-p" onclick="bkSubmitWords()">🤖 Generate Flashcards</button>
 <button class="btn btn-s" onclick="bkClearCollected()">Clear All</button>
 </div>
-<div id="bk-words-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+<div id="bk-words-status" style="font-size:var(--font-sm);color:var(--muted);margin-bottom:6px"></div>
 <div id="bk-collected-list"></div>
 <div id="bk-words-card-review" style="display:none;margin-top:10px" class="card"></div>
 </div>
@@ -776,15 +776,15 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <div class="card">
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-<b style="font-size:13px">Day Type:</b>
-<button id="meal-day-workout" class="active" onclick="setDayType('workout')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:13px;background:var(--card);cursor:pointer">🏋️ Workout</button>
-<button id="meal-day-rest" onclick="setDayType('rest')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:13px;background:var(--card);cursor:pointer">😴 Rest</button>
+<b style="font-size:var(--font-sm)">Day Type:</b>
+<button id="meal-day-workout" class="active" onclick="setDayType('workout')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);background:var(--card);cursor:pointer">🏋️ Workout</button>
+<button id="meal-day-rest" onclick="setDayType('rest')" style="padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);background:var(--card);cursor:pointer">😴 Rest</button>
 </div>
-<div id="meal-targets-display" style="font-size:13px;color:var(--muted)"></div>
+<div id="meal-targets-display" style="font-size:var(--font-sm);color:var(--muted)"></div>
 <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
-<b style="font-size:13px">⚖️ Weight:</b>
-<input type="number" id="meal-weight-in" placeholder="lbs" step="0.1" min="0" max="500" onchange="saveWeight()" style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
-<span style="font-size:12px;color:var(--muted)">lbs</span>
+<b style="font-size:var(--font-sm)">⚖️ Weight:</b>
+<input type="number" id="meal-weight-in" placeholder="lbs" step="0.1" min="0" max="500" onchange="saveWeight()" style="width:90px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
+<span style="font-size:var(--font-sm);color:var(--muted)">lbs</span>
 </div>
 </div>
 
@@ -792,19 +792,19 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 #meal-day-workout.active,#meal-day-rest.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 .meal-rings{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:10px 0}
 .meal-ring-item{text-align:center}
-.meal-ring-label{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+.meal-ring-label{font-size:var(--font-sm);font-weight:600;color:var(--muted);margin-top:2px}
 .meal-entry{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--border)}
 .meal-entry:last-child{border-bottom:none}
-.meal-entry-name{font-weight:600;font-size:13px;flex:1}
-.meal-entry-macros{font-size:12px;color:var(--muted)}
-.meal-qty-input{width:52px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:12px;text-align:center}
+.meal-entry-name{font-weight:600;font-size:var(--font-sm);flex:1}
+.meal-entry-macros{font-size:var(--font-sm);color:var(--muted)}
+.meal-qty-input{width:52px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);text-align:center}
 .meal-lib-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
 .meal-lib-item:last-child{border-bottom:none}
 .meal-lib-info{display:flex;flex-direction:column;gap:1px}
-.meal-lib-name{font-weight:600;font-size:13px}
-.meal-lib-macros{font-size:11px;color:var(--muted)}
+.meal-lib-name{font-weight:600;font-size:var(--font-sm)}
+.meal-lib-macros{font-size:var(--font-xs);color:var(--muted)}
 .meal-lib-actions{display:flex;gap:4px;align-items:center}
-.meal-ac-item{padding:6px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)}
+.meal-ac-item{padding:6px 10px;cursor:pointer;font-size:var(--font-sm);border-bottom:1px solid var(--border)}
 .meal-ac-item:hover{background:var(--bl)}
 #meal-autocomplete{position:absolute;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:4px;max-height:200px;overflow-y:auto;width:100%;box-shadow:var(--sh)}
 </style>
@@ -814,24 +814,24 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div class="card">
 <h3>Add Food</h3>
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-<label style="padding:6px 12px;background:var(--bl);color:var(--blue);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+<label style="padding:6px 12px;background:var(--bl);color:var(--blue);border-radius:4px;cursor:pointer;font-size:var(--font-sm);font-weight:600">
 📷 Photo <input type="file" id="meal-img-input" accept="image/*" onchange="mealImageSelected(this)" style="display:none">
 </label>
-<span style="font-size:11px;color:var(--muted)">or paste image (Cmd+V)</span>
+<span style="font-size:var(--font-xs);color:var(--muted)">or paste image (Cmd+V)</span>
 </div>
 <div id="meal-img-preview" style="margin-bottom:8px"></div>
 <div style="position:relative;margin-bottom:8px">
-<input type="text" id="meal-name-in" placeholder="Food name (autocompletes from library)" oninput="mealNameInput()" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+<input type="text" id="meal-name-in" placeholder="Food name (autocompletes from library)" oninput="mealNameInput()" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
 <div id="meal-autocomplete" style="display:none"></div>
 </div>
-<textarea id="meal-desc-in" placeholder="Description (optional — helps Claude analyze photos)" rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;resize:vertical;margin-bottom:8px"></textarea>
+<textarea id="meal-desc-in" placeholder="Description (optional — helps Claude analyze photos)" rows="2" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);resize:vertical;margin-bottom:8px"></textarea>
 <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-<input type="number" id="meal-cal-in" placeholder="Calories" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-<input type="number" id="meal-prot-in" placeholder="Protein g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-<input type="number" id="meal-carb-in" placeholder="Carbs g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-<input type="number" id="meal-fat-in" placeholder="Fat g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+<input type="number" id="meal-cal-in" placeholder="Calories" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
+<input type="number" id="meal-prot-in" placeholder="Protein g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
+<input type="number" id="meal-carb-in" placeholder="Carbs g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
+<input type="number" id="meal-fat-in" placeholder="Fat g" style="width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm)">
 </div>
-<button id="meal-submit-btn" onclick="submitFood()" style="padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">➕ Add Food</button>
+<button id="meal-submit-btn" onclick="submitFood()" style="padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:var(--font-sm);font-weight:600;cursor:pointer">➕ Add Food</button>
 </div>
 
 <div class="card">
@@ -841,11 +841,11 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 
 <div class="card">
 <div onclick="toggleMealLibrary()" style="cursor:pointer;display:flex;align-items:center;gap:8px">
-<span id="meal-lib-chevron" style="font-size:12px">▶</span>
+<span id="meal-lib-chevron" style="font-size:var(--font-sm)">▶</span>
 <h3 style="margin:0">Stored Meals</h3>
 </div>
 <div id="meal-library-body" style="display:none;margin-top:10px">
-<input type="text" id="meal-lib-search" placeholder="Search meals..." oninput="filterMealLibrary()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;margin-bottom:8px">
+<input type="text" id="meal-lib-search" placeholder="Search meals..." oninput="filterMealLibrary()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:var(--font-sm);margin-bottom:8px">
 <div id="meal-library-list"></div>
 </div>
 </div>
@@ -860,7 +860,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <button class="btn btn-s prog-range-btn" data-range="ytd" onclick="setProgressRange('ytd')">YTD</button>
 <button class="btn btn-s prog-range-btn" data-range="all" onclick="setProgressRange('all')">All</button>
 </div>
-<p id="progress-empty" style="display:none;color:var(--muted);font-size:13px">No data yet — start using the app and charts will appear here.</p>
+<p id="progress-empty" style="display:none;color:var(--muted);font-size:var(--font-sm)">No data yet — start using the app and charts will appear here.</p>
 <div class="prog-grid">
 <div class="card prog-cell"><h3>🃏 Anki Activity</h3><div style="position:relative;height:320px"><canvas id="chart-anki"></canvas></div></div>
 <div class="card prog-cell"><h3>🇮🇹 Italian Scores</h3><div style="position:relative;height:320px"><canvas id="chart-italian"></canvas></div></div>
@@ -873,7 +873,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <h1>📋 Activity Log</h1>
 <div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
 <div class="card"><h3>📖 Confession / Note</h3><div class="flex"><textarea class="fin flex-1" id="confess-in" placeholder="Honest note to future self..." rows="2"></textarea><button class="btn btn-s" onclick="addConfession()">Log</button></div></div>
-<div class="card"><h3>🎯 Memory List</h3><p style="font-size:12px;color:var(--muted);margin-bottom:10px">Your weekly stretch goals — the experiences worth remembering.</p><div id="memory-list-container"></div></div>
+<div class="card"><h3>🎯 Memory List</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:10px">Your weekly stretch goals — the experiences worth remembering.</p><div id="memory-list-container"></div></div>
 <div id="log-entries" style="max-height:500px;overflow-y:auto"></div>
 <div class="card" style="margin-top:12px"><h3>📦 Weekly Archives</h3><button class="btn btn-s" onclick="manualArchiveWeek()" style="margin-bottom:8px">📸 Archive Current Week + Email</button><div id="week-archives"></div></div>
 <div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
@@ -883,8 +883,8 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div id="site-lock-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center">
   <div style="background:var(--card);border-radius:12px;padding:32px;max-width:500px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
     <h2 style="font-size:28px;margin-bottom:16px;color:var(--red)">🔒 Site Locked</h2>
-    <p style="font-size:16px;margin-bottom:24px;line-height:1.6">You must set your three weekly stretch goals before accessing the site. These goals should push you out of your comfort zone and create memorable experiences.</p>
-    <button class="btn btn-p" onclick="goToWeekTab()" style="font-size:18px;padding:12px 24px">Go to Week Tab →</button>
+    <p style="font-size:var(--font-md);margin-bottom:24px;line-height:1.6">You must set your three weekly stretch goals before accessing the site. These goals should push you out of your comfort zone and create memorable experiences.</p>
+    <button class="btn btn-p" onclick="goToWeekTab()" style="font-size:var(--font-lg);padding:12px 24px">Go to Week Tab →</button>
   </div>
 </div>
 
@@ -903,7 +903,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .stretch-goals-submission .sg-input-group label {
   display:block;
   font-weight:600;
-  font-size:13px;
+  font-size:var(--font-sm);
   margin-bottom:4px;
   color:var(--muted);
 }
@@ -912,7 +912,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
   padding:10px 12px;
   border:1px solid var(--border);
   border-radius:6px;
-  font-size:14px;
+  font-size:var(--font-md);
 }
 
 .stretch-goals-grid {
@@ -947,7 +947,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 }
 
 .sg-badge {
-  font-size:11px;
+  font-size:var(--font-xs);
   padding:2px 8px;
   border-radius:12px;
   font-weight:600;
@@ -968,12 +968,12 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
   color:#fff;
   padding:2px 8px;
   border-radius:12px;
-  font-size:11px;
+  font-size:var(--font-xs);
   font-weight:600;
 }
 
 .sg-text {
-  font-size:15px;
+  font-size:var(--font-md);
   line-height:1.5;
   margin-bottom:8px;
   font-weight:500;
@@ -982,7 +982,7 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 .sg-scores {
   display:flex;
   gap:12px;
-  font-size:12px;
+  font-size:var(--font-sm);
   color:var(--muted);
   margin-bottom:10px;
 }
@@ -1012,24 +1012,24 @@ body.site-locked #tab-week * {
 
 @media(min-width:1024px) {
   .stretch-goals-submission .sg-input-group label {
-    font-size:18px;
+    font-size:var(--font-lg);
   }
   .stretch-goals-submission .sg-input-group input {
-    font-size:18px;
+    font-size:var(--font-lg);
     padding:12px 16px;
   }
   .sg-text {
-    font-size:20px;
+    font-size:var(--font-xl);
   }
   .sg-scores {
-    font-size:18px;
+    font-size:var(--font-lg);
   }
   .sg-badge {
-    font-size:16px;
+    font-size:var(--font-md);
     padding:4px 12px;
   }
   .sg-completed-badge {
-    font-size:16px;
+    font-size:var(--font-md);
     padding:4px 12px;
   }
 }
