@@ -21,7 +21,7 @@ All text sizing is controlled by CSS custom properties defined in `index.html <s
 | Your name | HTML tag | CSS class (if any) | Current Size | Where it's used |
 |---|---|---|---|---|
 | **Tab page title** | `<h1>` | — | ~28px (CSS) | One per tab: "📅 Today", "📊 Week of…", "📝 Dissertation", etc. |
-| **Tab page title (alt)** | `<h2>` | — | ~24px (CSS) | Meals ("🍽️ Meal Planning"), Progress ("📈 Progress") |
+| **Tab page title (alt)** | ~~`<h2>`~~ now `<h1>` | — | ~28px (CSS) | All tabs now use h1: Meals, Progress included |
 | **Card section title** | `<h3>` | — | CSS default | Every card header: "🎯 Daily Goals", "📝 Notes", "🇮🇹 Italian Work", etc. |
 | **Card subtitle** | `<h4>` | `.card-subtitle` | 20px | Category labels within a card: "💼 Work", "🎓 School", "🌱 Life" |
 | **Collapsible heading** | `<summary>` | `.card-subtitle` | inherits h4 | Week tab Work/School/Life (inside `<details>` elements) |
@@ -64,10 +64,10 @@ Legend:
 - **Page title** (today's date) — `<h1 id="today-date">` — h1
 - **Day label** (day of week / status) — `id="today-label"` — fine-print
 
-- **Push Goal banner** — `id="push-goal-banner"` (currently `pgb`) — conditionally shown card
+- **Push Goal banner** — `id="push-goal-banner"` — conditionally shown card
   - Banner title "🎯 Push Goal This Week" — `<h3>` — h3
-  - Push goal text — `id="push-goal-text"` (currently `pg-text`) — body
-  - Push goal countdown — `id="push-goal-countdown"` (currently `pg-countdown`) — fine-print
+  - Push goal text — `id="push-goal-text"` — body
+  - Push goal countdown — `id="push-goal-countdown"` — fine-print
 
 - **Article of the Day card** — `id="aotd-card"` — card
   - Card title "🗞️ Article of the Day" — `<h3>` — h3
@@ -86,14 +86,14 @@ Legend:
 
 - **Daily Goals card** — card (no id on wrapper)
   - Card title "🎯 Daily Goals" — `<h3>` — h3
-  - Goals grid — `id="daily-goals-grid"` (currently `t3-grid`)
+  - Goals grid — `id="daily-goals-grid"`
     - **Work subtitle** "💼 Work" — `<h4>` — card-subtitle, blue
-      - Work chips container — `id="daily-goals-work"` (currently `t3-work`)
+      - Work chips container — `id="daily-goals-work"`
       - "+ Add" button — `.chip-add`
     - **School subtitle** "🎓 School" — `<h4>` — card-subtitle, purple
-      - School chips container — `id="daily-goals-school"` (currently `t3-school`)
+      - School chips container — `id="daily-goals-school"`
     - **Life subtitle** "🌱 Life" — `<h4>` — card-subtitle, green
-      - Life chips container — `id="daily-goals-life"` (currently `t3-life`)
+      - Life chips container — `id="daily-goals-life"`
 
 - **Notes card** — card (no id on wrapper)
   - Card title "📝 Notes" — `<h3>` — h3
@@ -105,19 +105,19 @@ Legend:
 
 - **Italian Work card** — card (no id on wrapper)
   - Card title "🇮🇹 Italian Work" — `<h3>` — h3
-  - **Anki checkbox row** — `id="italian-check-anki"` (currently `h-anki`) — emphasis
+  - **Anki checkbox row** — `id="italian-check-anki"` — emphasis
     - Anki count — `id="anki-ct"` / target — `id="anki-target"`
-  - **Article 1 checkbox row** — `id="italian-check-art1"` (currently `h-art1`) — emphasis
-  - **Article 2 checkbox row** — `id="italian-check-art2"` (currently `h-art2`) — emphasis
-  - **Reflection checkbox row** — `id="italian-check-refl"` (currently `h-refl`) — emphasis
+  - **Article 1 checkbox row** — `id="italian-check-art1"` — emphasis
+  - **Article 2 checkbox row** — `id="italian-check-art2"` — emphasis
+  - **Reflection checkbox row** — `id="italian-check-refl"` — emphasis
   - Anki warning — `id="anki-w"` — fine-print
   - Hidden fields: `anki-ct-val`, `art1-t`, `art1-th`, `art2-t`, `art2-th`, `art1-status`, `art2-status`
 
 - **Daily Reflection sub-section** (inside Italian Work card)
   - Sub-title "📝 Riflessione Giornaliera" — `<h3>` — h3
-  - Reflection textarea — `id="reflection-text"` (currently `refl-txt`) — body
-  - Word count — `id="reflection-wordcount"` (currently `refl-wc`) — fine-print
-  - Reflection result — `id="reflection-result"` (currently `refl-res`)
+  - Reflection textarea — `id="reflection-text"` — body
+  - Word count — `id="reflection-wordcount"` — fine-print
+  - Reflection result — `id="reflection-result"`
   - Flashcard review sub-card — `id="refl-card-review"`
     - Sub-title "🎴 Review Flashcards" — `<h3>` — display
 
@@ -129,36 +129,36 @@ Legend:
 
 ### 📊 Week Tab (`id="tab-week"`)
 
-- **Page title** "📊 Week of [date]" — `<h1>` with `<span id="week-date">` (currently `wk-date`) — h1
+- **Page title** "📊 Week of [date]" — `<h1>` with `<span id="week-date">` — h1
 
 - **Weekly Goals card** — card (no id on wrapper)
   - Card title "🎯 Weekly Goals" — `<h3>` — h3
-  - Week navigator label — `id="week-goal-label"` (currently `wk-goal-label`) — helper
+  - Week navigator label — `id="week-goal-label"` — helper
   - Prev/Next week buttons — `.btn`
   - Stretch goals container — `id="stretch-goals-container"` — dynamic content
   - **Work collapsible** — `<details>` → `<summary>` "💼 Work" — card-subtitle, blue
-    - Work goals editor — `id="week-goals-work"` (currently `wg-work`) — body, contenteditable
+    - Work goals editor — `id="week-goals-work"` — body, contenteditable
   - **School collapsible** — `<details>` → `<summary>` "🎓 School" — card-subtitle, purple
-    - School goals editor — `id="week-goals-school"` (currently `wg-school`) — body, contenteditable
+    - School goals editor — `id="week-goals-school"` — body, contenteditable
   - **Life collapsible** — `<details>` → `<summary>` "🌿 Life" — card-subtitle, green
-    - Life goals editor — `id="week-goals-life"` (currently `wg-life`) — body, contenteditable
+    - Life goals editor — `id="week-goals-life"` — body, contenteditable
   - Day highlight buttons (MON–SUN) — `.wg-day-btn` — fine-print
   - Clear highlights button — fine-print
 
 - **Daily Summaries card** — card
   - Card title "📋 Daily Summaries" — `<h3>` — h3
-  - Day buttons — `id="daily-summary-buttons"` (currently `ds-buttons`)
-  - Summary content — `id="daily-summary-content"` (currently `ds-content`) — helper
+  - Day buttons — `id="daily-summary-buttons"`
+  - Summary content — `id="daily-summary-content"` — helper
 
 - **Weekly Review card** — card
   - Card title "🔍 Weekly Review" — `<h3>` — h3
   - Description text — helper
-  - "What went well?" prompt — `id="weekly-review-well"` (currently `wr-well`) — body
-  - "What didn't go as planned?" prompt — `id="weekly-review-bad"` (currently `wr-bad`) — body
-  - "What's the #1 thing to improve?" prompt — `id="weekly-review-improve"` (currently `wr-imp`) — body
-  - "Push Goal result" prompt — `id="weekly-review-push"` (currently `wr-push`) — body
+  - "What went well?" prompt — `id="weekly-review-well"` — body
+  - "What didn't go as planned?" prompt — `id="weekly-review-bad"` — body
+  - "What's the #1 thing to improve?" prompt — `id="weekly-review-improve"` — body
+  - "Push Goal result" prompt — `id="weekly-review-push"` — body
   - Submit button — `.btn btn-p`
-  - Review result — `id="weekly-review-result"` (currently `wr-res`)
+  - Review result — `id="weekly-review-result"`
 
 ---
 
@@ -345,7 +345,7 @@ Legend:
 
 ### 🍽️ Meals Tab (`id="tab-meals"`)
 
-- **Page title** "🍽️ Meal Planning" — `<h2>` — h2 (should be h1 for consistency)
+- **Page title** "🍽️ Meal Planning" — `<h1>` — h1
 
 - **Day Type & Targets card** — card (no id)
   - "Day Type:" label — `<b>` — helper
@@ -382,7 +382,7 @@ Legend:
 
 ### 📈 Progress Tab (`id="tab-progress"`)
 
-- **Page title** "📈 Progress" — `<h2>` — h2 (should be h1 for consistency)
+- **Page title** "📈 Progress" — `<h1>` — h1
 
 - **Range buttons** — `.prog-range-btn`: 14d, 30d, YTD, All
 
@@ -439,7 +439,7 @@ Legend:
 
 ## ID Rename Log
 
-IDs listed as "(currently `old-id`)" above will be renamed. Full rename map:
+All renames below are **completed**. Old IDs no longer exist in the codebase.
 
 - `pgb` → `push-goal-banner`
 - `pg-text` → `push-goal-text`
