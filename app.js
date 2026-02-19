@@ -411,7 +411,8 @@ function checkSiteLock() {
   const wk = weekId();
   const hasGoals = hasStretchGoals(wk);
   const modal = document.getElementById('site-lock-modal');
-  // Dev bypass: localStorage flag
+  // Dev bypass: localStorage flag or URL param
+  if (window.location.search.includes('devbypass=1')) localStorage.setItem('cc_devbypass', '1');
   if (localStorage.getItem('cc_devbypass') === '1') {
     if (modal) modal.style.display = 'none';
     document.body.classList.remove('site-locked');
