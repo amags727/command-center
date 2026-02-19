@@ -22,7 +22,7 @@ function getMealLibrary() {
 // ---- Render ----
 function renderMeals() {
   const m = getMealData();
-  const targets = MEAL_TARGETS[m.dayType];
+  const targets = MEAL_TARGETS[m.dayType] || MEAL_TARGETS.workout;
   // Day type toggle
   document.getElementById('meal-day-workout').classList.toggle('active', m.dayType === 'workout');
   document.getElementById('meal-day-rest').classList.toggle('active', m.dayType === 'rest');
@@ -323,11 +323,22 @@ async function submitFood() {
     const prot = parseInt(document.getElementById('meal-prot-in').value) || 0;
     const carb = parseInt(document.getElementById('meal-carb-in').value) || 0;
     const fat = parseInt(document.getElementById('meal-fat-in').value) || 0;
-    _addFoodEntry(name || 'Meal', cal, prot, carb, fat);
-    // Increment usage
-    const lib = getMealLibrary();
-    const m = lib.find(x => x.id === _mealSelectedStoredId);
-    if (m) { m.usageCount = (m.usageCount || 0) + 1; const d = getGlobal(); save(d); }
+    // Use single snapshot for both entry + usage increment
+    const d = load();
+    if (!d.days) d.days = {};
+    if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
+    if (!d.days[today()].meals) d.days[today()].meals = { dayType: 'workout', entries: [] };
+    if (!d.days[today()].meals.entries) d.days[today()].meals.entries = [];
+    d.days[today()].meals.entries.push({
+      name: name || 'Meal', unitCal: cal, unitProt: prot, unitCarb: carb, unitFat: fat,
+      calories: cal, protein: prot, carbs: carb, fat: fat,
+      qty: 1, timestamp: new Date().toISOString()
+    });
+    if (d.mealLibrary) {
+      const m = d.mealLibrary.find(x => x.id === _mealSelectedStoredId);
+      if (m) m.usageCount = (m.usageCount || 0) + 1;
+    }
+    save(d);
     _clearMealForm();
     renderMeals();
     return;
@@ -473,19 +484,24 @@ async function analyzeFoodWithClaude(key, imageDataUrl, name, description) {
 }
 
 function _addFoodEntry(name, cal, prot, carb, fat) {
-  const dd = dayData(today());
-  if (!dd.days[today()].meals) dd.days[today()].meals = { dayType: 'workout', entries: [] };
-  dd.days[today()].meals.entries.push({
+  // Use single load() to avoid snapshot races
+  const d = load();
+  if (!d.days) d.days = {};
+  if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
+  if (!d.days[today()].meals) d.days[today()].meals = { dayType: 'workout', entries: [] };
+  if (!d.days[today()].meals.entries) d.days[today()].meals.entries = [];
+  d.days[today()].meals.entries.push({
     name: name, unitCal: cal, unitProt: prot, unitCarb: carb, unitFat: fat,
     calories: cal, protein: prot, carbs: carb, fat: fat,
     qty: 1, timestamp: new Date().toISOString()
   });
-  save(dd);
+  save(d);
 }
 
 function _offerSaveMeal(name, cal, prot, carb, fat, desc) {
   if (!name || name === 'Food' || name === 'Meal') return;
-  const d = getGlobal();
+  // Use single load() to avoid overwrite race with _addFoodEntry
+  const d = load();
   if (!d.mealLibrary) d.mealLibrary = [];
   const existing = d.mealLibrary.find(m => m.name.toLowerCase() === name.toLowerCase());
   if (existing) { existing.usageCount = (existing.usageCount || 0) + 1; save(d); return; }
