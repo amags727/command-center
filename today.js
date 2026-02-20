@@ -201,6 +201,7 @@ function _t3ReadChips(containerId) {
     const obj = { text: chip.querySelector('.chip-text').textContent.trim(), id: chip.dataset.chipId || '' };
     if (chip.dataset.dissLinked === 'true') { obj.dissLinked = true; obj.spanIndex = parseInt(chip.dataset.spanIndex) || 0; }
     if (chip.dataset.done === 'true') obj.done = true;
+    if (chip.dataset.overdue === 'true') { obj.overdue = true; obj.originalDate = chip.dataset.originalDate || ''; }
     return obj;
   }).filter(function(c) { return c.text; });
 }
@@ -224,6 +225,7 @@ function _t3MakeChip(chipData, containerId, prefix) {
   chip.className = 'goal-chip' + (chipData.dissLinked ? ' linked' : '') + (chipData.done ? ' done' : '') + (chipData.overdue ? ' overdue' : '');
   chip.dataset.chipId = chipData.id || _t3GenId(prefix);
   if (chipData.done) chip.dataset.done = 'true';
+  if (chipData.overdue) { chip.dataset.overdue = 'true'; chip.dataset.originalDate = chipData.originalDate || ''; }
   if (chipData.dissLinked) {
     chip.dataset.dissLinked = 'true';
     chip.dataset.spanIndex = chipData.spanIndex;
