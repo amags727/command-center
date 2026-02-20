@@ -325,6 +325,34 @@ function loadT3Intentions() {
   populateSchoolWeeklyGoals();
   // Auto-populate from weekly goals (work + life)
   populateFromWeeklyGoals();
+  // Final deduplication pass — remove chips with duplicate text within each category
+  _t3Deduplicate();
+}
+
+function _t3Deduplicate() {
+  const dd = dayData(today());
+  const t = dd.days[today()].t3intentions;
+  if (!t) return;
+  let changed = false;
+  ['work','school','life'].forEach(function(cat) {
+    const arr = t[cat];
+    if (!Array.isArray(arr)) return;
+    const seen = {};
+    const deduped = [];
+    arr.forEach(function(chip) {
+      const key = (chip.text || '').trim();
+      if (!key || seen[key]) { changed = true; return; }
+      seen[key] = true;
+      deduped.push(chip);
+    });
+    t[cat] = deduped;
+  });
+  if (changed) {
+    save(dd);
+    _t3RenderChips('daily-goals-work', t.work || [], 'w');
+    _t3RenderChips('daily-goals-school', t.school || [], 's');
+    _t3RenderChips('daily-goals-life', t.life || [], 'l');
+  }
 }
 
 function populateSchoolWeeklyGoals() {
@@ -399,6 +427,7 @@ function populateFromWeeklyGoals() {
     const addBtn = container.querySelector('.chip-add');
     items.forEach(text => {
       if (existingTexts.has(text)) return;
+      existingTexts.add(text);
       const chipData = { text, id: _t3GenId(prefixMap[cat]), linked: true };
       const chip = _t3MakeChip(chipData, catMap[cat], prefixMap[cat]);
       chip.classList.add('linked');
