@@ -124,6 +124,7 @@ function updateMealQty(idx, val) {
   const q = parseFloat(val);
   if (isNaN(q) || q <= 0) return;
   entries[idx].qty = q;
+  dd.days[today()].meals.lastMod = Date.now();
   save(dd);
   renderMeals();
 }
@@ -131,6 +132,7 @@ function updateMealQty(idx, val) {
 function removeMealEntry(idx) {
   const dd = dayData(today());
   dd.days[today()].meals.entries.splice(idx, 1);
+  dd.days[today()].meals.lastMod = Date.now();
   save(dd);
   renderMeals();
 }
@@ -203,6 +205,7 @@ function quickAddStoredMeal(id) {
     calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat,
     qty: 1, timestamp: new Date().toISOString()
   });
+  d.days[today()].meals.lastMod = Date.now();
   meal.usageCount = (meal.usageCount || 0) + 1;
   save(d);
   renderMeals();
@@ -495,6 +498,7 @@ function _addFoodEntry(name, cal, prot, carb, fat) {
     calories: cal, protein: prot, carbs: carb, fat: fat,
     qty: 1, timestamp: new Date().toISOString()
   });
+  d.days[today()].meals.lastMod = Date.now();
   save(d);
 }
 

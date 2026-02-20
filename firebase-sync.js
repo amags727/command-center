@@ -138,22 +138,14 @@ const FirebaseSync = (() => {
       }
     }
 
-    // meals: union entries by timestamp, keep dayType/weight from higher lastMod side
+    // meals: last-write-wins — take whichever side has the higher lastMod timestamp
+    // This prevents deleted items from reappearing and edited quantities from reverting
     if (localDay.meals || remoteDay.meals) {
       const lm = localDay.meals || {};
       const rm = remoteDay.meals || {};
-      // Merge entries by timestamp (dedup)
-      const seen = new Set();
-      const mergedEntries = [];
-      for (const entry of [...(lm.entries || []), ...(rm.entries || [])]) {
-        const key = (entry.timestamp || '') + '|' + (entry.name || '');
-        if (!seen.has(key)) { seen.add(key); mergedEntries.push(entry); }
-      }
-      mergedEntries.sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
-      // Keep dayType and weight from whichever side has more data
-      const base = (lm.entries || []).length >= (rm.entries || []).length ? lm : rm;
-      merged.meals = Object.assign({}, base);
-      merged.meals.entries = mergedEntries;
+      const lMod = lm.lastMod || 0;
+      const rMod = rm.lastMod || 0;
+      merged.meals = lMod >= rMod ? JSON.parse(JSON.stringify(lm)) : JSON.parse(JSON.stringify(rm));
     }
 
     // italian: per-field OR for boolean checkboxes, keep longer for strings

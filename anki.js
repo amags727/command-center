@@ -24,8 +24,25 @@ function getAnkiDailyTarget() {
   const reviewCap = getReviewCap(settings);
   const dueReviews = d.cards.filter(c => (c.due || 0) <= now && c.queue !== -1 && c.queue !== 0).length;
   const availableNew = Math.min(newLimit, d.cards.filter(c => c.queue === 0).length);
-  // Cap to review cap — you can't study more than this in one day
-  const target = Math.min(dueReviews + availableNew, reviewCap);
+
+  // Check for weekly flashcard review target set alongside stretch goals
+  let weeklyTarget = 0;
+  try {
+    const wk = weekId();
+    const wd = weekData(wk);
+    weeklyTarget = (wd.weeks[wk] && wd.weeks[wk].flashcardReviewTarget) || 0;
+  } catch (e) { /* weekId/weekData not ready yet */ }
+
+  let target;
+  if (weeklyTarget > 0) {
+    // Weekly target set: displayed = min(weeklyTarget, dueReviews + 30 baseline new cards)
+    const NEW_BASELINE = 30;
+    target = Math.min(weeklyTarget, dueReviews + NEW_BASELINE);
+  } else {
+    // No weekly target: fall back to old logic
+    target = Math.min(dueReviews + availableNew, reviewCap);
+  }
+
   if (d.cards.length > 0 && target > 0) { localStorage.setItem(key, target); if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange(); }
   return target;
 }
@@ -60,36 +77,90 @@ function getNewIntroducedToday() {
   return d.cards.filter(c => c.queue !== 0 && c.firstReviewDate === today()).length;
 }
 function getTotalReviewedToday() {
-  const d = getCards();
-  return d.cards.filter(c => c.reviewedToday === today()).length;
+  const d = getCards(), now = todayDayNum();
+  // Only count cards that were reviewed today AND are cleared (due tomorrow or later)
+  return d.cards.filter(c => c.reviewedToday === today() && (c.due || 0) > now).length;
 }
 
 function sm2(card, quality) {
-  // SM-2 algorithm: quality 1=Again, 2=Hard, 3=Good, 4=Easy
+  // SM-2 algorithm with learning steps
+  // quality: 1=Again, 2=Hard, 3=Good, 4=Easy
   const c = Object.assign({}, card);
   c.reps = (c.reps || 0);
   c.lapses = (c.lapses || 0);
   c.ease = c.ease || 2500; // factor * 1000
   c.ivl = c.ivl || 0;
+  c.learningStep = c.learningStep || 0;
   c.reviewedToday = today();
   c.lastMod = Date.now();
   // Track when a new card gets its first review
   if (card.queue === 0 && !c.firstReviewDate) c.firstReviewDate = today();
 
-  if (quality === 1) { // Again
-    c.lapses++; c.reps = 0; c.ivl = 0; c.ease = Math.max(1300, c.ease - 200);
-    c.due = todayDayNum(); // re-show today (end of queue)
-    c.queue = 1; // learning
-  } else if (quality === 2) { // Hard
-    if (c.ivl === 0) { c.ivl = 1; } else { c.ivl = Math.max(1, Math.round(c.ivl * 1.2)); }
-    c.ease = Math.max(1300, c.ease - 150);
-    c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
-  } else if (quality === 3) { // Good
-    if (c.ivl === 0) { c.ivl = 1; } else if (c.ivl === 1) { c.ivl = 6; } else { c.ivl = Math.round(c.ivl * c.ease / 1000); }
-    c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
-  } else if (quality === 4) { // Easy
-    if (c.ivl === 0) { c.ivl = 4; } else { c.ivl = Math.round(c.ivl * c.ease / 1000 * 1.3); }
-    c.ease += 150; c.due = todayDayNum() + c.ivl; c.reps++; c.queue = 2;
+  const isLearning = (c.queue === 0 || c.queue === 1);
+  const isLapse = (c.queue === 1 && c.reps > 0); // was a review card that lapsed
+  const isNewLearning = isLearning && !isLapse;   // brand new card in learning
+  // New cards need 2 steps to graduate, lapsed cards need 1
+  const stepsNeeded = isLapse ? 1 : 2;
+
+  if (isLearning) {
+    // ── Learning / Relearning phase (fixed intervals, no ease calc) ──
+    if (quality === 1) { // Again
+      if (c.queue === 0) c.lapses = 0; // first time seeing it, not really a lapse
+      else c.lapses++;
+      c.learningStep = 0;
+      c.ease = Math.max(1300, c.ease - 200);
+      c.due = todayDayNum(); // re-show in session
+      c.queue = 1;
+    } else if (quality === 2) { // Hard — stay at current step, re-show
+      c.ease = Math.max(1300, c.ease - 150);
+      c.due = todayDayNum(); // re-show in session
+      c.queue = 1;
+    } else if (quality === 3) { // Good — advance one step
+      c.learningStep++;
+      if (c.learningStep >= stepsNeeded) {
+        // Graduate
+        c.ivl = isLapse ? 1 : 1; // graduate interval = 1 day
+        c.due = todayDayNum() + c.ivl;
+        c.reps++;
+        c.queue = 2;
+      } else {
+        // Stay in learning, re-show later in session
+        c.due = todayDayNum();
+        c.queue = 1;
+      }
+    } else if (quality === 4) { // Easy — immediate graduation with bonus
+      c.ivl = 4;
+      c.ease += 150;
+      c.due = todayDayNum() + c.ivl;
+      c.reps++;
+      c.queue = 2;
+      c.learningStep = stepsNeeded; // mark as fully graduated
+    }
+  } else {
+    // ── Review phase (ease-based intervals) ──
+    if (quality === 1) { // Again — lapse back to learning
+      c.lapses++;
+      c.learningStep = 0;
+      c.ivl = 0;
+      c.ease = Math.max(1300, c.ease - 200);
+      c.due = todayDayNum(); // re-show in session
+      c.queue = 1; // back to learning
+    } else if (quality === 2) { // Hard
+      c.ivl = Math.max(1, Math.round(c.ivl * 1.2));
+      c.ease = Math.max(1300, c.ease - 150);
+      c.due = todayDayNum() + c.ivl;
+      c.reps++;
+    } else if (quality === 3) { // Good
+      if (c.ivl === 1) { c.ivl = 6; }
+      else { c.ivl = Math.round(c.ivl * c.ease / 1000); }
+      c.due = todayDayNum() + c.ivl;
+      c.reps++;
+    } else if (quality === 4) { // Easy
+      c.ivl = Math.round(c.ivl * c.ease / 1000 * 1.3);
+      c.ease += 150;
+      c.due = todayDayNum() + c.ivl;
+      c.reps++;
+    }
   }
   return c;
 }
@@ -295,7 +366,8 @@ function rateCard(quality) {
   save(d);
   // Immediate sync push — don't lose card review progress
   if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
-  if (quality === 1) { // Again: re-queue at end
+  // Re-queue any card that's still due today (learning cards from Again, Hard, or first Good on new cards)
+  if (updated.due === todayDayNum()) {
     studyQueue.push(updated);
   }
   studyIdx++;
@@ -316,7 +388,8 @@ function undoCardResponse() {
   if (idx === -1) { lastCardAction = null; return; }
   d.cards[idx] = lastCardAction.cardBefore;
   save(d);
-  if (lastCardAction.quality === 1 && studyQueue.length > lastCardAction.queueLenBefore) {
+  // Remove re-queued card if one was added
+  if (studyQueue.length > lastCardAction.queueLenBefore) {
     studyQueue.pop();
   }
   studyIdx = lastCardAction.studyIdxBefore;

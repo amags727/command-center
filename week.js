@@ -562,7 +562,12 @@ function renderStretchGoals() {
         <div style="margin-bottom:8px">
           <input type="text" id="sg-goal-1" placeholder="Goal 1: Try a pottery class..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:4px">
           <input type="text" id="sg-goal-2" placeholder="Goal 2: Attend a local theater show..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:4px">
-          <input type="text" id="sg-goal-3" placeholder="Goal 3: Watch Cinema Paradiso..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+          <input type="text" id="sg-goal-3" placeholder="Goal 3: Watch Cinema Paradiso..." maxlength="200" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <label style="font-size:12px;color:var(--muted);white-space:nowrap">📚 Flashcard review target:</label>
+            <input type="number" id="sg-anki-target" placeholder="e.g. 200" min="1" max="9999" style="width:80px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+            <span style="font-size:11px;color:var(--muted)">cards/day for the week</span>
+          </div>
         </div>
         <button id="sg-submit-btn" class="btn btn-s" onclick="submitStretchGoals()" style="font-size:12px">Submit for AI Approval</button>
         <div id="sg-eval-result" style="margin-top:10px"></div>
@@ -662,9 +667,18 @@ async function submitStretchGoals() {
         submitted: true,
         submittedDate: new Date().toISOString()
       };
+      // Save weekly flashcard review target
+      const ankiTargetInput = document.getElementById('sg-anki-target');
+      const ankiTarget = ankiTargetInput ? parseInt(ankiTargetInput.value) : 0;
+      if (ankiTarget > 0) {
+        wd.weeks[wk].flashcardReviewTarget = ankiTarget;
+      }
       save(wd);
+      // Clear the cached daily target so it recalculates with the new weekly target
+      localStorage.removeItem('anki_target_' + today());
       
       result.innerHTML += '<p style="color:var(--green);font-weight:600;margin-top:12px">✅ Goals approved! Site unlocked.</p>';
+      if (ankiTarget > 0) result.innerHTML += '<p style="font-size:12px;color:var(--muted);margin-top:4px">📚 Flashcard target set: ' + ankiTarget + ' cards/day</p>';
       addLog('action', 'Stretch goals submitted for ' + wk);
       
       // Re-enable button so it stays available
