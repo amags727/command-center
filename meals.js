@@ -126,6 +126,8 @@ function updateMealQty(idx, val) {
   entries[idx].qty = q;
   dd.days[today()].meals.lastMod = Date.now();
   save(dd);
+  // Immediate push — don't let sync overwrite the edit with stale remote data
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
   renderMeals();
 }
 
@@ -134,6 +136,8 @@ function removeMealEntry(idx) {
   dd.days[today()].meals.entries.splice(idx, 1);
   dd.days[today()].meals.lastMod = Date.now();
   save(dd);
+  // Immediate push — don't let sync overwrite the delete with stale remote data
+  if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
   renderMeals();
 }
 
@@ -337,11 +341,13 @@ async function submitFood() {
       calories: cal, protein: prot, carbs: carb, fat: fat,
       qty: 1, timestamp: new Date().toISOString()
     });
+    d.days[today()].meals.lastMod = Date.now();
     if (d.mealLibrary) {
       const m = d.mealLibrary.find(x => x.id === _mealSelectedStoredId);
       if (m) m.usageCount = (m.usageCount || 0) + 1;
     }
     save(d);
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     _clearMealForm();
     renderMeals();
     return;
