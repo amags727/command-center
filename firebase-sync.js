@@ -23,6 +23,7 @@ const FirebaseSync = (() => {
   let _importCooldown = 0;
   let _lastPushTs = 0;
   let _lastPushFingerprint = '';
+  let _lastPushedKeyHashes = {}; // per-key hash for dirty tracking
   let _initialPullDone = false;
   let _cachedAuthToken = null; // cached for beforeunload
 
@@ -642,12 +643,40 @@ const FirebaseSync = (() => {
     return _initialPullDone;
   }
 
+  // Strip large binary data (base64 images) from stretchGoals before sync
+  function _stripImagesFromCmdCenter(raw) {
+    try {
+      const d = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!d || !d.weeks) return raw;
+      let changed = false;
+      for (const wk of Object.keys(d.weeks)) {
+        const sg = d.weeks[wk].stretchGoals;
+        if (!sg || !sg.goals) continue;
+        for (const goal of sg.goals) {
+          if (goal.completionEvidence && goal.completionEvidence.images && goal.completionEvidence.images.length) {
+            // Replace base64 images with placeholder count — keeps the structure, drops the data
+            goal.completionEvidence._imageCount = goal.completionEvidence.images.length;
+            goal.completionEvidence._imagesStripped = true;
+            goal.completionEvidence.images = [];
+            changed = true;
+          }
+        }
+      }
+      return changed ? JSON.stringify(d) : (typeof raw === 'string' ? raw : JSON.stringify(raw));
+    } catch(e) {
+      return typeof raw === 'string' ? raw : JSON.stringify(raw);
+    }
+  }
+
   function _buildPayload() {
     const data = {};
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (k === 'sync_passphrase' || k === '_lastSync') continue;
-      data[encodeKey(k)] = localStorage.getItem(k);
+      let val = localStorage.getItem(k);
+      // Strip base64 images from cmdcenter before pushing to Firebase
+      if (k === 'cmdcenter') val = _stripImagesFromCmdCenter(val);
+      data[encodeKey(k)] = val;
     }
     return data;
   }
@@ -672,26 +701,65 @@ const FirebaseSync = (() => {
     _doPush();
   }
 
+  // Simple fast hash for dirty-key comparison (DJB2)
+  function _quickHash(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash + str.charCodeAt(i)) & 0xFFFFFFFF;
+    }
+    return hash.toString(36);
+  }
+
   function _doPush() {
     if (Date.now() < _importCooldown || _importing) return;
     const data = _buildPayload();
-    // Fingerprint check
-    const sortedKeys = Object.keys(data).sort();
-    const fingerprint = sortedKeys.map(k => k + '=' + data[k]).join('\n');
-    if (fingerprint === _lastPushFingerprint) return;
-    
+
+    // Compute per-key hashes and find changed keys
+    const currentHashes = {};
+    const changedData = {};
+    let hasChanges = false;
+    for (const k of Object.keys(data)) {
+      const val = data[k];
+      const h = _quickHash(typeof val === 'string' ? val : JSON.stringify(val));
+      currentHashes[k] = h;
+      if (_lastPushedKeyHashes[k] !== h) {
+        changedData[k] = val;
+        hasChanges = true;
+      }
+    }
+    // Check for deleted keys (in last push but not in current)
+    for (const k of Object.keys(_lastPushedKeyHashes)) {
+      if (!(k in currentHashes)) {
+        changedData[k] = null; // Firebase: null = delete
+        hasChanges = true;
+      }
+    }
+
+    if (!hasChanges) return;
+
     const ts = Date.now();
-    data._lastSync = ts;
+    changedData._lastSync = ts;
+    currentHashes._lastSync = _quickHash(String(ts));
     _lastPushTs = ts;
-    _lastPushFingerprint = fingerprint;
+    _lastPushedKeyHashes = currentHashes;
     localStorage.setItem('_lastSync', String(ts));
-    
-    db.ref(userPath + '/data').set(data)
+
+    // Use update() for incremental writes instead of set() for full overwrite
+    // This reduces bandwidth and conflict surface significantly
+    db.ref(userPath + '/data').update(changedData)
       .then(() => {
         setStatus(navigator.onLine ? 'synced' : 'offline');
         refreshAuthToken(); // keep token fresh
       })
-      .catch(e => { console.error('Push error:', e); setStatus('error'); });
+      .catch(e => {
+        console.error('Incremental push error, falling back to full push:', e);
+        // Fallback: full push if update fails
+        data._lastSync = ts;
+        db.ref(userPath + '/data').set(data).catch(e2 => {
+          console.error('Full push also failed:', e2);
+          setStatus('error');
+        });
+      });
   }
 
   function disconnect() {
