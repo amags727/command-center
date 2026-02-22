@@ -348,6 +348,7 @@ document.addEventListener('keydown', function(e) {
       }
       return;
     }
+    // Cmd/Ctrl+Click on links inside contenteditable — handled by delegated listener below
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === 'Digit8' || e.code === 'Digit7')) {
       e.preventDefault();
       document.execCommand(e.code === 'Digit7' ? 'insertOrderedList' : 'insertUnorderedList');
@@ -461,6 +462,21 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // Check if site should be locked
   checkSiteLock();
+  // Delegated click handler: Cmd/Ctrl+Click opens links inside contenteditable editors
+  // Regular click places cursor (normal contenteditable behavior)
+  // Also handles plain tap on mobile (no Cmd key) since there's no cursor placement intent
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const editor = link.closest('[contenteditable="true"]');
+    if (!editor) return;
+    // On desktop: require Cmd/Ctrl modifier. On mobile/touch: always open (no modifier keys).
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!isTouchDevice && !e.metaKey && !e.ctrlKey) return; // desktop: let normal cursor placement happen
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(link.href, '_blank', 'noopener');
+  }, true);
   // Add CSS animation for celebration
   const style = document.createElement('style');
   style.textContent = '@keyframes sgFadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } }';
