@@ -1,9 +1,11 @@
 // ============ BOOK MODE ============
 let _bkDir = 'it2en'; // or 'en2it'
 let _bkPages = []; // [{img: base64DataURL, status: 'pending'|'processing'|'ready'|'error', paragraphs: [{src,tgt},...]}]
+let _bkStagedPages = []; // [{img: base64DataURL}] — staging area before submission
 let _bkCurrentPage = 0;
 let _bkCollectedWords = [];
 let _bkProcessingIdx = -1; // currently processing page index
+let _bkDragIdx = -1; // drag source index for staging reorder
 
 function bkSetDir(dir) {
   _bkDir = dir;
@@ -45,32 +47,136 @@ async function _callClaudeVision(key, imageBase64, mediaType, textPrompt, maxTok
   return data.content[0].text;
 }
 
+// ---- Staging: images load here first, user reorders, then submits ----
+
 function bkImagesSelected(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
   const status = document.getElementById('bk-upload-status');
   status.textContent = '⏳ Loading ' + files.length + ' image(s)...';
   let loaded = 0;
-  const newPages = [];
+  const newItems = [];
   files.forEach((file, i) => {
     const reader = new FileReader();
     reader.onload = function(e) {
-      newPages.push({ img: e.target.result, status: 'pending', paragraphs: [], originalIndex: i });
+      newItems.push({ img: e.target.result, _sortIdx: i });
       loaded++;
       if (loaded === files.length) {
-        // Sort by original file order
-        newPages.sort((a, b) => a.originalIndex - b.originalIndex);
-        _bkPages = _bkPages.concat(newPages);
-        status.textContent = '✅ ' + files.length + ' page(s) added. Total: ' + _bkPages.length;
+        newItems.sort((a, b) => a._sortIdx - b._sortIdx);
+        newItems.forEach(item => _bkStagedPages.push({ img: item.img }));
+        status.textContent = '✅ ' + files.length + ' page(s) loaded. Arrange below, then submit.';
         input.value = '';
-        bkRenderThumbs();
-        // Start processing if not already running
-        if (_bkProcessingIdx === -1) bkProcessNext();
+        bkRenderStaging();
       }
     };
     reader.readAsDataURL(file);
   });
 }
+
+function bkAddMoreImages(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  let loaded = 0;
+  const newItems = [];
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      newItems.push({ img: e.target.result, _sortIdx: i });
+      loaded++;
+      if (loaded === files.length) {
+        newItems.sort((a, b) => a._sortIdx - b._sortIdx);
+        newItems.forEach(item => _bkStagedPages.push({ img: item.img }));
+        input.value = '';
+        bkRenderStaging();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function bkRenderStaging() {
+  const card = document.getElementById('bk-staging-card');
+  const grid = document.getElementById('bk-staging-grid');
+  const ct = document.getElementById('bk-staging-ct');
+  if (!_bkStagedPages.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  ct.textContent = _bkStagedPages.length;
+  grid.innerHTML = _bkStagedPages.map((p, i) => {
+    return '<div draggable="true" data-idx="' + i + '" ' +
+      'ondragstart="bkStageDragStart(event,' + i + ')" ' +
+      'ondragover="bkStageDragOver(event)" ' +
+      'ondrop="bkStageDrop(event,' + i + ')" ' +
+      'ondragend="bkStageDragEnd(event)" ' +
+      'style="position:relative;flex-shrink:0;text-align:center;width:100px;cursor:grab;' +
+      'border:2px solid var(--border);border-radius:6px;padding:4px;background:var(--card);' +
+      'transition:transform 0.15s,box-shadow 0.15s">' +
+      '<img src="' + p.img + '" style="width:92px;height:120px;object-fit:cover;border-radius:4px;pointer-events:none">' +
+      '<div style="font-size:11px;font-weight:600;margin-top:3px;color:var(--muted)">Page ' + (i + 1) + '</div>' +
+      '<button onclick="bkRemoveStaged(' + i + ')" ' +
+      'style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;' +
+      'background:var(--red);color:#fff;border:none;font-size:12px;line-height:20px;text-align:center;' +
+      'cursor:pointer;padding:0">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function bkStageDragStart(e, idx) {
+  _bkDragIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', idx);
+  // Slight visual feedback
+  setTimeout(() => { e.target.style.opacity = '0.4'; }, 0);
+}
+
+function bkStageDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function bkStageDrop(e, dropIdx) {
+  e.preventDefault();
+  if (_bkDragIdx < 0 || _bkDragIdx === dropIdx) return;
+  // Reorder: remove from old position, insert at new
+  const item = _bkStagedPages.splice(_bkDragIdx, 1)[0];
+  _bkStagedPages.splice(dropIdx, 0, item);
+  _bkDragIdx = -1;
+  bkRenderStaging();
+}
+
+function bkStageDragEnd(e) {
+  e.target.style.opacity = '1';
+  _bkDragIdx = -1;
+}
+
+function bkRemoveStaged(i) {
+  _bkStagedPages.splice(i, 1);
+  bkRenderStaging();
+}
+
+function bkClearStaged() {
+  if (_bkStagedPages.length && !confirm('Clear all ' + _bkStagedPages.length + ' staged pages?')) return;
+  _bkStagedPages = [];
+  bkRenderStaging();
+  document.getElementById('bk-upload-status').textContent = '';
+}
+
+function bkSubmitStaged() {
+  if (!_bkStagedPages.length) { alert('No pages to submit.'); return; }
+  // Move staged pages into the processing pipeline in current order
+  const newPages = _bkStagedPages.map(p => ({
+    img: p.img, status: 'pending', paragraphs: []
+  }));
+  _bkPages = _bkPages.concat(newPages);
+  _bkStagedPages = [];
+  // Hide staging, show thumbs
+  document.getElementById('bk-staging-card').style.display = 'none';
+  document.getElementById('bk-upload-status').textContent = '✅ ' + newPages.length + ' page(s) submitted for translation.';
+  bkRenderThumbs();
+  // Start processing if not already running
+  if (_bkProcessingIdx === -1) bkProcessNext();
+}
+
+// ---- Existing pipeline (unchanged) ----
 
 function bkRenderThumbs() {
   const card = document.getElementById('bk-thumbs-card');

@@ -746,6 +746,19 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 <div id="bk-upload-status" style="font-size:var(--font-sm);color:var(--muted);margin-top:6px"></div>
 </div>
 
+<div class="card" id="bk-staging-card" style="display:none">
+<h3>📋 Arrange Pages (<span id="bk-staging-ct">0</span>)</h3>
+<p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Drag and drop to reorder. Click ✕ to remove. Pages will be translated in this order.</p>
+<div id="bk-staging-grid" style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 0;min-height:100px"></div>
+<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<button class="btn btn-p" onclick="bkSubmitStaged()">✅ Submit for Translation</button>
+<label class="btn btn-s" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+➕ Add More <input type="file" accept="image/*" multiple onchange="bkAddMoreImages(this)" style="display:none">
+</label>
+<button class="btn btn-s" onclick="bkClearStaged()" style="color:var(--red);border-color:var(--red)">✕ Clear All</button>
+</div>
+</div>
+
 <div class="card" id="bk-thumbs-card" style="display:none">
 <h3>📑 Pages (<span id="bk-page-total">0</span>)</h3>
 <div id="bk-thumbs" style="display:flex;gap:6px;overflow-x:auto;padding:6px 0"></div>
