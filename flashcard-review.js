@@ -1,43 +1,51 @@
 // ============ FLASHCARD REVIEW SHARED INFRASTRUCTURE ============
 // ============ FLASHCARD REVIEW SHARED INFRASTRUCTURE ============
 
-const FLASH_CARD_RULES = `Core Structure Rules:
-- Each lexical item generates exactly two cards: one definition/translation card and one cloze card. These must be paired and adjacent.
-- No orphan cards. Every word/expression must have both cards.
+const FLASH_CARD_RULES = `=== HARD FORMAT CONSTRAINTS (violations will be rejected) ===
 
-Definition / Translation Card Rules:
-- The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
-- Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
-- CRITICAL: Italian definitions must be DECLARATIVE, never interrogative. Use direct paraphrases or explanations. NEVER use question format like "Cosa significa quando..." or "Che cosa vuol dire...". Example: For "rivolgersi contro" → "produrre l'effetto opposto a quello desiderato" NOT "Cosa significa quando una situazione produce l'effetto opposto?"
-- CRITICAL: No meta-framing on the prompt side. Do NOT start definitions with "Verbo che significa...", "Espressione che indica...", "Aggettivo che descrive...", "Sostantivo che...", "Termine che..." or any similar pattern that labels the part of speech before giving the actual definition. Just give the definition directly. Example: For "sviluppare" the front should be "'approfondire un argomento' o 'espandere una teoria', più formale di 'elaborare su'" NOT "Verbo che significa 'approfondire un argomento'...".
-- Exception for English on the prompt side: discourse operators, rhetorical frames, and stance-setting expressions (e.g. "per inciso", "non tanto X quanto Y", "da persona che + verbo", "As someone who...", "To decide what truly matters to me") should default to English-led prompts describing the FUNCTION of the move, because these are intention→form mappings where English better captures the rhetorical intent. Single concrete words and short expressions always get Italian definitions.
-- When the target word is a conjugated verb, the definition card should present the word in its INFINITIVE form on the answer side. Do NOT put the conjugated form as the answer — put the infinitive. Do NOT label the conjugation (e.g. never write "3rd person singular" or "presente indicativo"). The student highlighted the word because they don't know the meaning, not because they need conjugation practice.
-- Answer side always includes: the Italian target word/expression (infinitive for verbs) + a brief English gloss.
-- The gloss should flag register (colloquial, informal, legal, literary, vulgar, etc.) and if the term is archaic or has a more common modern alternative.
+1. Definition card fronts must be DIRECT DECLARATIVE Italian paraphrases.
+   GOOD: 'approfondire un argomento' o 'espandere una teoria', più formale di 'elaborare su'
+   BAD: Verbo che significa 'approfondire un argomento'...
+   BAD: Cosa significa quando una situazione produce l'effetto opposto?
+   BAD: Come si scrive il nome del satellite naturale della Terra?
+   Rule: No questions. No "Verbo/Espressione/Aggettivo/Termine che significa/indica/descrive..." framing. Just the definition directly.
+
+2. Definition card fronts must NOT contain the target Italian word.
+
+3. Cloze sentences must be SELF-CONTAINED — answerable without the source text.
+   GOOD: L'alpinismo in alta quota è pericoloso, e questo è un problema della cultura ________ stessa
+   BAD: un problema quasi inevitabile della cultura ________
+   If the original sentence lacks enough cues, REWRITE it.
+
+4. Each lexical item generates exactly 2 cards (definition + cloze), paired and adjacent. No orphans.
+
+=== DEFINITION CARD RULES ===
+
+- Italian-language definitions by default. Idiomatic, modern, explanatory — not dictionary-literal.
+- English-led prompts ONLY for: discourse operators, rhetorical frames, stance-setting expressions (e.g. "per inciso", "As someone who...") where Italian paraphrase would lose the rhetorical intent.
+- Verbs on the answer side: INFINITIVE form only. No conjugation labels.
+- Answer side: Italian target word/expression + brief English gloss. Flag register (colloquial, literary, vulgar, etc.) and markedness.
 - Prefer natural Italian over calques.
 
-Cloze Card Rules:
-- The cloze must test productive knowledge (produce the target form, not just recognize it).
-- Verbs must be conjugated in context. Never use infinitives as cloze answers.
-- Prefer present tense or passato prossimo. No passato remoto unless unavoidable.
-- Rich contextual cues are mandatory. The sentence must contain enough information that the word is inferable.
-- CRITICAL: Cloze sentences must be fully self-contained — answerable by someone who has NOT read the source text. Do NOT simply copy the student's original sentence with a blank. If the original sentence lacks enough semantic cues to uniquely determine the answer, REWRITE the cloze sentence to embed the necessary context. Example: "un problema quasi inevitabile della cultura ________" is unanswerable without external context. Rewrite to something like: "L'alpinismo in alta quota è pericoloso, e questo è un problema della cultura ________ stessa" where the topic makes the answer inferable.
-- Natural syntax and discourse flow take priority.
+=== CLOZE CARD RULES ===
 
-Register, Usage, and Accuracy Rules:
-- Register must be explicit somewhere in the pair (especially colloquial/vulgar, legal/bureaucratic, literary/antiquated).
-- Avoid over-formalization. Prefer contemporary usage.
-- The two cards don't need to mirror each other structurally. Together they must lock down meaning, usage, and form.
+- Test productive knowledge — the blank requires producing the form, not recognizing it.
+- Verbs: conjugated in context. Never infinitives as answers.
+- Prefer presente or passato prossimo. No passato remoto unless unavoidable.
+- Rich contextual cues mandatory. Natural syntax and discourse flow.
 
-Exceptions to the Two-Card Rule:
-- For tense/mood errors (wrong tense, missed congiuntivo, indicativo vs congiuntivo, etc.) where the learner knows the word but produced the wrong form: generate ONLY a cloze card testing the correct tense/mood in context. No definition card needed.
-- Do NOT generate any cards for: gender/number agreement slips, one-off article choice slips, or typographic/punctuation fixes. These are mechanical and not worth flashcard space.
-- EXCEPTION: If an article choice error reflects a SEMANTIC pattern (generic vs definite vs partitive where meaning changes, or systematic omission of articles on abstract nouns due to English interference), it IS worth a card. Only skip true one-off slips.
+=== EXCEPTIONS ===
 
-Scope Rules:
+- Tense/mood errors where the learner knows the word but used wrong form: cloze-only (no definition card).
+- No cards for: gender/number slips, one-off article slips, typos. UNLESS the article error reflects a systematic L1 interference pattern.
+
+=== SCOPE ===
+
 - One lexical target per pair. No combining unrelated words.
-- Mixed directionality (IT→EN or EN→IT) is allowed depending on learning value.
-- Be explicit about markedness (odd, dated, sarcastic, regionally marked, unusually strong).`;
+- Mixed directionality (IT→EN or EN→IT) allowed.
+- Flag markedness explicitly (dated, sarcastic, regional, unusually strong).`;
+
+const CARD_GENERATION_PREAMBLE = `IMPORTANT: Every definition card front must be a direct Italian paraphrase — no questions, no "Verbo che..." labels. Cards violating this format will be auto-rejected.\n\n`;
 
 const COMPOSITION_EXTRACTION_RULES = `Extraction Rules from Corrected Composition Exercises (targeting C2-level control):
 
@@ -496,7 +504,7 @@ async function submitRefl() {
     d.corrections.push({ date: today(), text: txt, response: feedbackResp, score: scoreData });
     save(d);
     // Now generate flashcards
-    const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+    const cardPrompt = `${CARD_GENERATION_PREAMBLE}You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     let cards = _parseCardsJSON(cardResp);
     // Auto-strip meta-framing prefixes ("Verbo che significa..." etc.)

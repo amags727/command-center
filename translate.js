@@ -240,7 +240,7 @@ async function trSubmitWords() {
   try {
     const article = CAL._currentArticle || {};
     const articleContext = article.title ? 'Article: "' + article.title + '" (' + (article.difficulty || '?') + ')\n' : '';
-    const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\n${articleContext}The student highlighted these words/phrases while reading:\n${trCollectedWords.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
+    const prompt = `${CARD_GENERATION_PREAMBLE}You are generating flashcards for an Italian language learner at C1-C2 level.\n\n${articleContext}The student highlighted these words/phrases while reading:\n${trCollectedWords.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const resp = await callClaude(key, prompt);
     let cards = _parseCardsJSON(resp);
     _stripMetaFraming(cards);
@@ -345,7 +345,7 @@ async function trSubmitReflection(num) {
     // Immediate sync push — don't lose article completion data
     if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Now generate flashcards from the reflection corrections
-    const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardPrompt = `${CARD_GENERATION_PREAMBLE}You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     let cards = _parseCardsJSON(cardResp);
     _stripMetaFraming(cards);
@@ -443,7 +443,7 @@ Sii diretto e fattuale. Niente incoraggiamenti.`;
     // Immediate sync push — don't lose article completion data
     if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Generate flashcards
-    const cardPrompt = `You are generating flashcards from a corrected Italian article summary.\n\nArticle: "${title}"\nStudent summary:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardPrompt = `${CARD_GENERATION_PREAMBLE}You are generating flashcards from a corrected Italian article summary.\n\nArticle: "${title}"\nStudent summary:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     let cards = _parseCardsJSON(cardResp);
     _stripMetaFraming(cards);
@@ -587,7 +587,7 @@ async function trSubmitRepro() {
     // Immediate sync push — don't lose article completion data
     if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Generate flashcards from reproduction errors
-    const cardPrompt = `You are generating flashcards from a prose reproduction exercise.\n\nThe student read an Italian article and attempted to reproduce key paragraphs from memory.\n\nClaude's evaluation:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the errors and interference patterns identified above, generate 5-8 flashcard items following the extraction and card construction rules. Focus on constructions where the student's reproduction diverged from native Italian patterns.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
+    const cardPrompt = `${CARD_GENERATION_PREAMBLE}You are generating flashcards from a prose reproduction exercise.\n\nThe student read an Italian article and attempted to reproduce key paragraphs from memory.\n\nClaude's evaluation:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the errors and interference patterns identified above, generate 5-8 flashcard items following the extraction and card construction rules. Focus on constructions where the student's reproduction diverged from native Italian patterns.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     let cards = _parseCardsJSON(cardResp);
     _stripMetaFraming(cards);
