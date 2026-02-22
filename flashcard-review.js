@@ -9,6 +9,7 @@ Definition / Translation Card Rules:
 - The prompt side must NOT contain the target Italian word. The definition must be paraphrastic or translational.
 - Definitions must be in Italian 99%+ of the time. Italian-language definitions should be idiomatic, modern, and explanatory (not dictionary-literal). Single words and short expressions always get Italian definitions, no exceptions.
 - CRITICAL: Italian definitions must be DECLARATIVE, never interrogative. Use direct paraphrases or explanations. NEVER use question format like "Cosa significa quando..." or "Che cosa vuol dire...". Example: For "rivolgersi contro" → "produrre l'effetto opposto a quello desiderato" NOT "Cosa significa quando una situazione produce l'effetto opposto?"
+- CRITICAL: No meta-framing on the prompt side. Do NOT start definitions with "Verbo che significa...", "Espressione che indica...", "Aggettivo che descrive...", "Sostantivo che...", "Termine che..." or any similar pattern that labels the part of speech before giving the actual definition. Just give the definition directly. Example: For "sviluppare" the front should be "'approfondire un argomento' o 'espandere una teoria', più formale di 'elaborare su'" NOT "Verbo che significa 'approfondire un argomento'...".
 - Exception for English on the prompt side: discourse operators, rhetorical frames, and stance-setting expressions (e.g. "per inciso", "non tanto X quanto Y", "da persona che + verbo", "As someone who...", "To decide what truly matters to me") should default to English-led prompts describing the FUNCTION of the move, because these are intention→form mappings where English better captures the rhetorical intent. Single concrete words and short expressions always get Italian definitions.
 - When the target word is a conjugated verb, the definition card should present the word in its INFINITIVE form on the answer side. Do NOT put the conjugated form as the answer — put the infinitive. Do NOT label the conjugation (e.g. never write "3rd person singular" or "presente indicativo"). The student highlighted the word because they don't know the meaning, not because they need conjugation practice.
 - Answer side always includes: the Italian target word/expression (infinitive for verbs) + a brief English gloss.
@@ -241,6 +242,22 @@ function _parseCardsJSON(resp) {
     } catch(e2) { /* give up */ }
   }
   return [];
+}
+
+// ============ META-FRAMING STRIP ============
+const _META_FRAME_RE = /^(verbo|espressione|aggettivo|sostantivo|avverbio|termine|locuzione|parola|nome)\s+che\s+(significa|indica|descrive|esprime|denota|si\s+usa|si\s+riferisce|vuol\s+dire)\s*/i;
+
+function _stripMetaFraming(cards) {
+  for (const c of cards) {
+    const front = (c.front || '').trim();
+    const m = front.match(_META_FRAME_RE);
+    if (m) {
+      let stripped = front.slice(m[0].length);
+      if (stripped.length > 0) stripped = stripped.charAt(0).toUpperCase() + stripped.slice(1);
+      c.front = stripped;
+    }
+  }
+  return cards;
 }
 
 // ============ QUESTION-FORMAT CARD DETECTION & REWRITING ============
@@ -482,6 +499,8 @@ async function submitRefl() {
     const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
     let cards = _parseCardsJSON(cardResp);
+    // Auto-strip meta-framing prefixes ("Verbo che significa..." etc.)
+    _stripMetaFraming(cards);
     // Auto-rewrite any question-format definition cards
     if (cards.length > 0) {
       const { clean, dominated } = _detectQuestionCards(cards);
