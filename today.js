@@ -10,19 +10,31 @@ function initToday() {
   document.getElementById('today-label').textContent = labels[dayNum] || '';
   const dd = dayData(today());
   const day = dd.days[today()];
-  // Backfill article habits from readingHistory (covers articles submitted before fix)
+  // Derive article completion from readingHistory (authoritative source)
+  // This runs every time, not just as a backfill, to ensure Today always reflects reality
   const rh = dd.readingHistory || [];
   const todaysArticles = rh.filter(a => a.date === today());
+  let artDirty = false;
   if (todaysArticles.length >= 1 && !day.habits.art1) {
     day.habits.art1 = true;
-    day.habits.art1Title = todaysArticles[0].title || 'Completed';
-    save(dd);
+    day.habits.art1Title = day.habits.art1Title || todaysArticles[0].title || 'Completed';
+    artDirty = true;
   }
   if (todaysArticles.length >= 2 && !day.habits.art2) {
     day.habits.art2 = true;
-    day.habits.art2Title = todaysArticles[1].title || 'Completed';
-    save(dd);
+    day.habits.art2Title = day.habits.art2Title || todaysArticles[1].title || 'Completed';
+    artDirty = true;
   }
+  // Also restore titles if they got blanked by a bad merge but readingHistory has them
+  if (day.habits.art1 && !day.habits.art1Title && todaysArticles.length >= 1) {
+    day.habits.art1Title = todaysArticles[0].title || 'Completed';
+    artDirty = true;
+  }
+  if (day.habits.art2 && !day.habits.art2Title && todaysArticles.length >= 2) {
+    day.habits.art2Title = todaysArticles[1].title || 'Completed';
+    artDirty = true;
+  }
+  if (artDirty) save(dd);
   ['anki','art1','art2'].forEach(h => {
     const el = document.getElementById('h-' + h);
     if (el && day.habits[h]) el.checked = true;
