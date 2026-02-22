@@ -391,6 +391,84 @@ const FirebaseSync = (() => {
       result.dissSessions = merged;
     }
 
+    // Merge recurringBlocks: union by ID, keep higher lastMod per block
+    if (local.recurringBlocks || remote.recurringBlocks) {
+      const lMap = new Map((local.recurringBlocks || []).map(b => [b.id, b]));
+      const rMap = new Map((remote.recurringBlocks || []).map(b => [b.id, b]));
+      const allIds = new Set([...lMap.keys(), ...rMap.keys()]);
+      result.recurringBlocks = [];
+      for (const id of allIds) {
+        const lb = lMap.get(id);
+        const rb = rMap.get(id);
+        if (!lb) result.recurringBlocks.push(rb);
+        else if (!rb) result.recurringBlocks.push(lb);
+        else result.recurringBlocks.push((rb.lastMod || 0) > (lb.lastMod || 0) ? rb : lb);
+      }
+    }
+
+    // Merge dissChapterContent: per-chapter, keep longer content
+    if (local.dissChapterContent || remote.dissChapterContent) {
+      const ld = local.dissChapterContent || {};
+      const rd = remote.dissChapterContent || {};
+      result.dissChapterContent = {};
+      const allChs = new Set([...Object.keys(ld), ...Object.keys(rd)]);
+      for (const ch of allChs) {
+        const l = (ld[ch] || '').toString();
+        const r = (rd[ch] || '').toString();
+        result.dissChapterContent[ch] = l.length >= r.length ? l : r;
+      }
+    }
+
+    // Merge interferenceProfile: union by normalized pattern, sum counts, keep earliest firstSeen
+    if (local.interferenceProfile || remote.interferenceProfile) {
+      const byPattern = new Map();
+      for (const entry of [...(local.interferenceProfile || []), ...(remote.interferenceProfile || [])]) {
+        const key = (entry.pattern || '').toLowerCase();
+        if (!key) continue;
+        const existing = byPattern.get(key);
+        if (!existing) {
+          byPattern.set(key, { ...entry });
+        } else {
+          existing.count = Math.max(existing.count || 1, entry.count || 1);
+          if (entry.firstSeen && (!existing.firstSeen || entry.firstSeen < existing.firstSeen)) existing.firstSeen = entry.firstSeen;
+          if (entry.lastSeen && (!existing.lastSeen || entry.lastSeen > existing.lastSeen)) existing.lastSeen = entry.lastSeen;
+        }
+      }
+      result.interferenceProfile = Array.from(byPattern.values())
+        .sort((a, b) => (b.count || 0) - (a.count || 0))
+        .slice(0, 20);
+    }
+
+    // Merge aotdHistory: union by date+title+action
+    if (local.aotdHistory || remote.aotdHistory) {
+      const seen = new Set();
+      const merged = [];
+      for (const entry of [...(local.aotdHistory || []), ...(remote.aotdHistory || [])]) {
+        const key = (entry.date || '') + '|' + (entry.title || '').slice(0, 60) + '|' + (entry.action || '');
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      result.aotdHistory = merged.slice(-100);
+    }
+
+    // Merge aotdPrior: keep longer preference profile
+    if (local.aotdPrior || remote.aotdPrior) {
+      const l = (local.aotdPrior || '').toString();
+      const r = (remote.aotdPrior || '').toString();
+      result.aotdPrior = l.length >= r.length ? l : r;
+    }
+
+    // Merge aotdConsolidatedAt: keep higher value
+    if (local.aotdConsolidatedAt || remote.aotdConsolidatedAt) {
+      result.aotdConsolidatedAt = Math.max(local.aotdConsolidatedAt || 0, remote.aotdConsolidatedAt || 0);
+    }
+
+    // Merge appUpdates: keep longer HTML
+    if (local.appUpdates || remote.appUpdates) {
+      const l = (local.appUpdates || '').toString();
+      const r = (remote.appUpdates || '').toString();
+      result.appUpdates = l.length >= r.length ? l : r;
+    }
+
     return result;
   }
 
@@ -683,26 +761,20 @@ const FirebaseSync = (() => {
     if (syncEnabled) refreshAuthToken();
   }, 600000);
 
-  // 4. Before unload — last-resort save using synchronous XHR with auth token
+  // 4. Before unload — push immediately if there are pending changes
+  // NOTE: synchronous XHR was removed because it's unreliable on mobile Safari
+  // and sendBeacon with POST creates child nodes in Firebase, corrupting data.
+  // The visibilitychange handler (item 1 above) already calls pushImmediate()
+  // when the tab goes hidden, which covers the main use case. This handler
+  // ensures localStorage is saved (which it always is since save() writes immediately).
   window.addEventListener('beforeunload', () => {
     if (!syncEnabled || !db || !userPath || !_initialPullDone || _importing) return;
-    const data = _buildPayload();
-    const ts = Date.now();
-    data._lastSync = ts;
-    localStorage.setItem('_lastSync', String(ts));
-
-    const url = FIREBASE_CONFIG.databaseURL + '/' + userPath + '/data.json' +
-      (_cachedAuthToken ? '?auth=' + _cachedAuthToken : '');
+    // Data is already in localStorage (save() writes synchronously).
+    // The visibilitychange 'hidden' event fires before beforeunload and calls pushImmediate().
+    // As a belt-and-suspenders measure, fire one more non-blocking push attempt.
     try {
-      // Synchronous XHR with PUT (correct method for Firebase overwrite)
-      const xhr = new XMLHttpRequest();
-      xhr.open('PUT', url, false); // synchronous
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify(data));
-    } catch (e) {
-      // Last resort: try sendBeacon (will create child node, but better than nothing)
-      try { navigator.sendBeacon(url, JSON.stringify(data)); } catch (e2) { /* give up */ }
-    }
+      _doPush();
+    } catch (e) { /* best effort */ }
   });
 
   return { init, connect, disconnect, onChange, isConnected, isInitialPullDone, pushAll, pushImmediate };

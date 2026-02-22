@@ -348,12 +348,39 @@ function renderAOTD(article) {
   }
 }
 
+// AOTD data helpers — store in cmdcenter instead of separate localStorage keys
+function _getAotdCache() {
+  const d = load();
+  return { data: d.aotdCache || null, date: d.aotdCacheDate || null, lastCategory: d.aotdLastCategory || 'none' };
+}
+function _setAotdCache(article, dateStr) {
+  const d = load();
+  d.aotdCache = article;
+  d.aotdCacheDate = dateStr;
+  d.aotdLastCategory = (article && article.category) || 'none';
+  save(d);
+  // Also keep in localStorage for backward compat (will be read by old code on other device until it updates)
+  try { localStorage.setItem('aotd_data', JSON.stringify(article)); } catch(e) {}
+  try { localStorage.setItem('aotd_date', dateStr); } catch(e) {}
+  try { localStorage.setItem('aotd_lastCategory', (article && article.category) || 'none'); } catch(e) {}
+}
+
 async function fetchArticleOfTheDay(force) {
   const today = new Date().toISOString().slice(0, 10);
-  const cached = localStorage.getItem('aotd_data');
-  const cachedDate = localStorage.getItem('aotd_date');
-  if (!force && cached && cachedDate === today) {
-    try { renderAOTD(JSON.parse(cached)); return; } catch(e) { /* re-fetch */ }
+  const cache = _getAotdCache();
+  // Migrate: if cmdcenter has no cache but localStorage does, pull it in
+  if (!cache.data && localStorage.getItem('aotd_data')) {
+    try {
+      const migrated = JSON.parse(localStorage.getItem('aotd_data'));
+      _setAotdCache(migrated, localStorage.getItem('aotd_date') || today);
+      const cache2 = _getAotdCache();
+      if (!force && cache2.data && cache2.date === today) {
+        try { renderAOTD(cache2.data); return; } catch(e) {}
+      }
+    } catch(e) {}
+  }
+  if (!force && cache.data && cache.date === today) {
+    try { renderAOTD(cache.data); return; } catch(e) { /* re-fetch */ }
   }
   const key = localStorage.getItem('cc_apikey');
   if (!key) {
@@ -368,19 +395,16 @@ async function fetchArticleOfTheDay(force) {
   try {
     const pool = await fetchAllRSSItems();
     if (pool.length === 0) throw new Error('No RSS feeds responded. Check your connection.');
-    const lastCat = localStorage.getItem('aotd_lastCategory') || 'none';
+    const lastCat = cache.lastCategory || 'none';
     let result = await askClaudeForArticle(pool, lastCat, false);
-    // Handle resample / reject
     if (result.resample) {
       console.log('AOTD: Claude rejected pool —', result.reason);
       result = await askClaudeForArticle(pool, lastCat, true);
       if (result.resample) {
-        // Force pick: take the first item from a different category than last time
         const fallback = pool.find(i => i.category !== lastCat) || pool[0];
         result = { title: fallback.title, url: fallback.link, source: fallback.source, category: fallback.category, blurb: 'Auto-selected (Claude found no standout piece today). ' + (fallback.description || ''), claim: null, image: fallback.image };
       }
     }
-    // Check Wayback Machine for an archive link
     try {
       const wbResp = await fetch('https://archive.org/wayback/available?url=' + encodeURIComponent(result.url), { signal: AbortSignal.timeout(6000) });
       if (wbResp.ok) {
@@ -390,12 +414,7 @@ async function fetchArticleOfTheDay(force) {
         }
       }
     } catch(e) { /* Wayback check is best-effort */ }
-    localStorage.setItem('aotd_date', today);
-    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
-    localStorage.setItem('aotd_data', JSON.stringify(result));
-    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
-    localStorage.setItem('aotd_lastCategory', result.category || 'none');
-    if (typeof FirebaseSync !== 'undefined') FirebaseSync.onChange();
+    _setAotdCache(result, today);
     renderAOTD(result);
   } catch(e) {
     document.getElementById('aotd-loading').style.display = 'none';
@@ -410,7 +429,12 @@ async function fetchArticleOfTheDay(force) {
 
 function forceNewArticle() {
   aotdTrack('skip');
+  const d = load();
+  d.aotdCache = null;
+  d.aotdCacheDate = null;
+  save(d);
   localStorage.removeItem('aotd_date');
   localStorage.removeItem('aotd_data');
   fetchArticleOfTheDay(true);
 }
+
