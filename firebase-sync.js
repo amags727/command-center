@@ -84,14 +84,30 @@ const FirebaseSync = (() => {
     // sealed: logical OR — once sealed, stays sealed
     merged.sealed = !!(localDay.sealed || remoteDay.sealed);
 
-    // habits: per-habit OR — once checked, stays checked
-    // BUT preserve non-boolean habit values (ankiCount, art1Title, etc.) from the checked side
+    // habits: per-habit OR for booleans, keep-longer for strings, keep-max for numbers
     const lh = localDay.habits || {};
     const rh = remoteDay.habits || {};
-    merged.habits = Object.assign({}, lh, rh);
-    for (const key of Object.keys(merged.habits)) {
-      if (typeof lh[key] === 'boolean' || typeof rh[key] === 'boolean') {
-        merged.habits[key] = !!(lh[key] || rh[key]);
+    merged.habits = {};
+    const allHabitKeys = new Set([...Object.keys(lh), ...Object.keys(rh)]);
+    for (const key of allHabitKeys) {
+      const lv = lh[key];
+      const rv = rh[key];
+      if (lv === undefined) { merged.habits[key] = rv; continue; }
+      if (rv === undefined) { merged.habits[key] = lv; continue; }
+      if (typeof lv === 'boolean' || typeof rv === 'boolean') {
+        // Boolean fields: OR — once checked, stays checked
+        merged.habits[key] = !!(lv || rv);
+      } else if (typeof lv === 'string' || typeof rv === 'string') {
+        // String metadata (art1Title, art1Thoughts, etc.): keep the longer/non-empty one
+        const ls = (lv || '').toString();
+        const rs = (rv || '').toString();
+        merged.habits[key] = ls.length >= rs.length ? ls : rs;
+      } else if (typeof lv === 'number' || typeof rv === 'number') {
+        // Numeric metadata (ankiCount): keep the higher value
+        merged.habits[key] = Math.max(lv || 0, rv || 0);
+      } else {
+        // Fallback: remote wins
+        merged.habits[key] = rv;
       }
     }
 

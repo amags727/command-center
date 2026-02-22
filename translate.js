@@ -322,18 +322,20 @@ async function trSubmitReflection(num) {
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title;
+    // Atomic save: readingHistory + habit flags in a single load/save cycle
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
     d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, cardCount: 0, reflectionWords: wc, score: scoreData });
-    save(d);
-    // Also persist article habit to day data so Today tab checkmark survives reload
-    const dd2 = dayData(today());
-    const dayObj = dd2.days[today()];
+    if (!d.days) d.days = {};
+    if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
     const artKey = 'art' + num;
-    dayObj.habits[artKey] = true;
-    dayObj.habits[artKey + 'Title'] = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
-    dayObj.habits[artKey + 'Thoughts'] = txt;
-    save(dd2);
+    d.days[today()].habits[artKey] = true;
+    d.days[today()].habits[artKey + 'Title'] = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
+    d.days[today()].habits[artKey + 'Thoughts'] = txt;
+    d.days[today()].lastMod = Date.now();
+    save(d);
+    // Immediate sync push — don't lose article completion data
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Now generate flashcards from the reflection corrections
     const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
@@ -411,16 +413,19 @@ Sii diretto e fattuale. Niente incoraggiamenti.`;
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title + ' [Summary]';
+    // Atomic save: readingHistory + habit flags in a single load/save cycle
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
     d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, type: 'summary', summaryWords: wc, score: scoreData });
+    if (!d.days) d.days = {};
+    if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
+    d.days[today()].habits['art' + num] = true;
+    d.days[today()].habits['art' + num + 'Title'] = title + ' [Summary]';
+    d.days[today()].habits['art' + num + 'Thoughts'] = txt;
+    d.days[today()].lastMod = Date.now();
     save(d);
-    const dd2 = dayData(today());
-    const dayObj = dd2.days[today()];
-    dayObj.habits['art' + num] = true;
-    dayObj.habits['art' + num + 'Title'] = title + ' [Summary]';
-    dayObj.habits['art' + num + 'Thoughts'] = txt;
-    save(dd2);
+    // Immediate sync push — don't lose article completion data
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Generate flashcards
     const cardPrompt = `You are generating flashcards from a corrected Italian article summary.\n\nArticle: "${title}"\nStudent summary:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
@@ -544,18 +549,19 @@ async function trSubmitRepro() {
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title + ' [Reproduction]';
-    // Save to readingHistory with type: reproduction
+    // Atomic save: readingHistory + habit flags in a single load/save cycle
     const d = load();
     if (!d.readingHistory) d.readingHistory = [];
     d.readingHistory.push({ date: today(), title, difficulty: article.difficulty, type: 'reproduction', score: scoreData });
+    if (!d.days) d.days = {};
+    if (!d.days[today()]) d.days[today()] = { habits: {}, calBlocks: [], reflection: '', sealed: false };
+    d.days[today()].habits['art' + num] = true;
+    d.days[today()].habits['art' + num + 'Title'] = title + ' [Reproduction]';
+    d.days[today()].habits['art' + num + 'Thoughts'] = paragraphs.map(p => p.reproduction).join('\n\n');
+    d.days[today()].lastMod = Date.now();
     save(d);
-    // Persist habit
-    const dd2 = dayData(today());
-    const dayObj = dd2.days[today()];
-    dayObj.habits['art' + num] = true;
-    dayObj.habits['art' + num + 'Title'] = title + ' [Reproduction]';
-    dayObj.habits['art' + num + 'Thoughts'] = paragraphs.map(p => p.reproduction).join('\n\n');
-    save(dd2);
+    // Immediate sync push — don't lose article completion data
+    if (typeof FirebaseSync !== 'undefined' && FirebaseSync.pushImmediate) FirebaseSync.pushImmediate();
     // Generate flashcards from reproduction errors
     const cardPrompt = `You are generating flashcards from a prose reproduction exercise.\n\nThe student read an Italian article and attempted to reproduce key paragraphs from memory.\n\nClaude's evaluation:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the errors and interference patterns identified above, generate 5-8 flashcard items following the extraction and card construction rules. Focus on constructions where the student's reproduction diverged from native Italian patterns.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);

@@ -151,12 +151,12 @@ function sm2(card, quality) {
       c.due = todayDayNum() + c.ivl;
       c.reps++;
     } else if (quality === 3) { // Good
-      if (c.ivl === 1) { c.ivl = 6; }
-      else { c.ivl = Math.round(c.ivl * c.ease / 1000); }
+      c.ivl = Math.max(1, Math.round(c.ivl * c.ease / 1000));
       c.due = todayDayNum() + c.ivl;
       c.reps++;
     } else if (quality === 4) { // Easy
-      c.ivl = Math.round(c.ivl * c.ease / 1000 * 1.3);
+      const goodIvl = Math.max(1, Math.round(c.ivl * c.ease / 1000));
+      c.ivl = Math.max(goodIvl + 1, Math.round(c.ivl * c.ease / 1000 * 1.3));
       c.ease += 150;
       c.due = todayDayNum() + c.ivl;
       c.reps++;

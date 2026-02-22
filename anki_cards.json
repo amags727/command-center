@@ -624,22 +624,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082752",
-    "front": "Dirty",
-    "back": "Sporco",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20575,
-    "ivl": 117,
-    "ease": 2650,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082754",
     "front": "Inappropriate",
     "back": "Inopportuno",
@@ -1090,7 +1074,7 @@
   {
     "id": "anki_1713266082784",
     "front": "To pile up",
-    "back": "Accastarsi",
+    "back": "Accatastarsi",
     "tags": [
       "anki-import"
     ],
@@ -1106,7 +1090,7 @@
   {
     "id": "anki_1713266082785",
     "front": "Le sedie si possono ______ in quel angolo.",
-    "back": "Accastare",
+    "back": "Accatastare",
     "tags": [
       "anki-import"
     ],
@@ -1680,22 +1664,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082822",
-    "front": "Literature",
-    "back": "Letteratura",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20562,
-    "ivl": 70,
-    "ease": 2950,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082823",
     "front": "La ______ italiana è ricca di classici.",
     "back": "Letteratura",
@@ -1874,7 +1842,7 @@
   {
     "id": "anki_1713266082834",
     "front": "Boorish, uncouth",
-    "back": "Buzurro",
+    "back": "Buzzurro",
     "tags": [
       "anki-import"
     ],
@@ -2080,22 +2048,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082848",
-    "front": "Steam",
-    "back": "Vapore",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20523,
-    "ivl": 40,
-    "ease": 2650,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082849",
     "front": "Quando l'acqua bolle, si forma il _____.",
     "back": "Vapore",
@@ -2203,22 +2155,6 @@
     "ivl": 101,
     "ease": 2650,
     "reps": 20,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713266082856",
-    "front": "Scalability",
-    "back": "Scalabilità",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20525,
-    "ivl": 35,
-    "ease": 2800,
-    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -2336,22 +2272,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082864",
-    "front": "Barrier",
-    "back": "Barriera",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20498,
-    "ivl": 20,
-    "ease": 2650,
-    "reps": 17,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082865",
     "front": "La Grande Barriera Corallina è una _____ naturale.",
     "back": "Barriera",
@@ -2464,22 +2384,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082872",
-    "front": "Engine",
-    "back": "Motore",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20526,
-    "ivl": 67,
-    "ease": 2650,
-    "reps": 19,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082873",
     "front": "Il _____ della macchina è molto potente.",
     "back": "Motore",
@@ -2491,22 +2395,6 @@
     "ivl": 78,
     "ease": 2650,
     "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713266082874",
-    "front": "Path",
-    "back": "Percorso",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20507,
-    "ivl": 33,
-    "ease": 2800,
-    "reps": 16,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -2528,22 +2416,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713266082876",
-    "front": "Establishment",
-    "back": "Stabilimento",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20572,
-    "ivl": 100,
-    "ease": 2800,
-    "reps": 12,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713266082877",
     "front": "Lo _____ di una nuova filiale richiederà tempo.",
     "back": "Stabilimento",
@@ -2555,22 +2427,6 @@
     "ivl": 23,
     "ease": 2800,
     "reps": 18,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713266082878",
-    "front": "Petition",
-    "back": "Petizione",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20517,
-    "ivl": 58,
-    "ease": 2650,
-    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -2946,7 +2802,7 @@
   {
     "id": "anki_1713445469407",
     "front": "Altitude",
-    "back": "Altezzo",
+    "back": "Altezza",
     "tags": [
       "anki-import"
     ],
@@ -2962,7 +2818,7 @@
   {
     "id": "anki_1713445469408",
     "front": "La città si trova a un ______ di 200 metri sul livello del mare.",
-    "back": "Altezzo",
+    "back": "Altezza",
     "tags": [
       "anki-import"
     ],
@@ -3472,22 +3328,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161710",
-    "front": "Real",
-    "back": "Reale",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20508,
-    "ivl": 48,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161711",
     "front": "Exit (the market)",
     "back": "Uscita (dal mercato)",
@@ -3520,22 +3360,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161713",
-    "front": "Compare",
-    "back": "Confrontare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20508,
-    "ivl": 25,
-    "ease": 2650,
-    "reps": 18,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161714",
     "front": "Actual",
     "back": "Effettivo",
@@ -3563,22 +3387,6 @@
     "ivl": 78,
     "ease": 2800,
     "reps": 18,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161716",
-    "front": "Elasticity",
-    "back": "Elasticità",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20558,
-    "ivl": 99,
-    "ease": 2800,
-    "reps": 11,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -3632,22 +3440,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161720",
-    "front": "Rife with",
-    "back": "Pieno di",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20500,
-    "ivl": 11,
-    "ease": 2500,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161721",
     "front": "Fraught with",
     "back": "Pieno di",
@@ -3675,38 +3467,6 @@
     "ivl": 16,
     "ease": 2500,
     "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161723",
-    "front": "Cohort",
-    "back": "Coorte",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20545,
-    "ivl": 87,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161724",
-    "front": "Unconventional",
-    "back": "Non convenzionale",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20529,
-    "ivl": 40,
-    "ease": 2800,
-    "reps": 14,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -3792,22 +3552,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161730",
-    "front": "Incomplete",
-    "back": "Incompleto",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20587,
-    "ivl": 100,
-    "ease": 2650,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161731",
     "front": "Broadly",
     "back": "Largamente",
@@ -3872,54 +3616,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161735",
-    "front": "Environment",
-    "back": "Ambiente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20564,
-    "ivl": 103,
-    "ease": 2500,
-    "reps": 21,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161736",
-    "front": "Setting",
-    "back": "Contesto",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20508,
-    "ivl": 50,
-    "ease": 2500,
-    "reps": 25,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161737",
-    "front": "Uninhabitable",
-    "back": "Inabitabile",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20537,
-    "ivl": 77,
-    "ease": 2500,
-    "reps": 16,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161738",
     "front": "Embrace the idea",
     "back": "Abbracciare l'idea",
@@ -3931,38 +3627,6 @@
     "ivl": 19,
     "ease": 2650,
     "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161739",
-    "front": "Disorienting",
-    "back": "Disorientante",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20501,
-    "ivl": 24,
-    "ease": 2450,
-    "reps": 33,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161740",
-    "front": "Nostalgia",
-    "back": "Nostalgia",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20555,
-    "ivl": 96,
-    "ease": 2800,
-    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -4080,38 +3744,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1713551161748",
-    "front": "Glow",
-    "back": "Splendere",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20527,
-    "ivl": 70,
-    "ease": 2650,
-    "reps": 20,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161749",
-    "front": "Field (like a farm)",
-    "back": "Campo",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20700,
-    "ivl": 211,
-    "ease": 2950,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1713551161750",
     "front": "Interact with",
     "back": "Interagire con",
@@ -4203,22 +3835,6 @@
     "ivl": 62,
     "ease": 2650,
     "reps": 21,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1713551161757",
-    "front": "Improvement",
-    "back": "Miglioramento",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20600,
-    "ivl": 121,
-    "ease": 2800,
-    "reps": 8,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -5682,7 +5298,7 @@
   {
     "id": "anki_1713813318972",
     "front": "since, as",
-    "back": "giacché",
+    "back": "giacché — (formale/scritto) since, as; equivalente colloquiale: siccome, dato che",
     "tags": [
       "anki-import"
     ],
@@ -6464,38 +6080,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880557",
-    "front": "Right here",
-    "back": "Proprio qui",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20530,
-    "ivl": 41,
-    "ease": 2800,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880558",
-    "front": "Right now",
-    "back": "Proprio ora",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20501,
-    "ivl": 10,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880559",
     "front": "He’s very good at running",
     "back": "È molto bravo a correre",
@@ -6544,70 +6128,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880564",
-    "front": "The Firm",
-    "back": "L'azienda",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20528,
-    "ivl": 38,
-    "ease": 2800,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880565",
-    "front": "The shop",
-    "back": "Il negozio",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20529,
-    "ivl": 68,
-    "ease": 2500,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880566",
-    "front": "The incumbent",
-    "back": "L'incumbente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20505,
-    "ivl": 30,
-    "ease": 2650,
-    "reps": 17,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880567",
-    "front": "To illustrate how",
-    "back": "Per illustrare come",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20499,
-    "ivl": 8,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880568",
     "front": "The number of carriers in the airline market has fallen",
     "back": "Il numero di vettori nel mercato aereo è diminuito",
@@ -6635,38 +6155,6 @@
     "ivl": 56,
     "ease": 2650,
     "reps": 34,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880570",
-    "front": "Iceland",
-    "back": "Islanda",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20538,
-    "ivl": 80,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880571",
-    "front": "Elsewhere",
-    "back": "Altrove",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20514,
-    "ivl": 31,
-    "ease": 2800,
-    "reps": 15,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -6704,22 +6192,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880574",
-    "front": "Remote (location)",
-    "back": "Remoto (luogo)",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20511,
-    "ivl": 21,
-    "ease": 2600,
-    "reps": 23,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880575",
     "front": "Responsive",
     "back": "Reattivo",
@@ -6747,22 +6219,6 @@
     "ivl": 11,
     "ease": 2650,
     "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880577",
-    "front": "Imply that",
-    "back": "Implicare che",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20506,
-    "ivl": 47,
-    "ease": 2650,
-    "reps": 14,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -6832,38 +6288,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880582",
-    "front": "To impact",
-    "back": "Impattare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20509,
-    "ivl": 21,
-    "ease": 2650,
-    "reps": 12,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880583",
-    "front": "To schedule",
-    "back": "Programmare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20554,
-    "ivl": 93,
-    "ease": 2500,
-    "reps": 14,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880584",
     "front": "Enforce the law",
     "back": "Far rispettare la legge",
@@ -6875,22 +6299,6 @@
     "ivl": 36,
     "ease": 2800,
     "reps": 16,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880585",
-    "front": "Annually",
-    "back": "Annualmente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20542,
-    "ivl": 54,
-    "ease": 2800,
-    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -6944,38 +6352,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880589",
-    "front": "Coefficient",
-    "back": "Coefficiente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20497,
-    "ivl": 19,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880590",
-    "front": "The pattern (in the data)",
-    "back": "Il modello (nei dati)",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20531,
-    "ivl": 36,
-    "ease": 2650,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880591",
     "front": "The pattern (on the skirt)",
     "back": "Il disegno (sulla gonna)",
@@ -6987,54 +6363,6 @@
     "ivl": 58,
     "ease": 2650,
     "reps": 15,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880592",
-    "front": "Territory",
-    "back": "Territorio",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20500,
-    "ivl": 57,
-    "ease": 2800,
-    "reps": 17,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880593",
-    "front": "The problem is that",
-    "back": "Il problema è che",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20518,
-    "ivl": 38,
-    "ease": 2800,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880594",
-    "front": "The latter one",
-    "back": "Quello/Quella più recente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20656,
-    "ivl": 168,
-    "ease": 2950,
-    "reps": 17,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -7072,22 +6400,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880597",
-    "front": "The incumbent",
-    "back": "L'incumbente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20507,
-    "ivl": 19,
-    "ease": 2700,
-    "reps": 32,
-    "lapses": 2,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880598",
     "front": "To illustrate how",
     "back": "illustrare come",
@@ -7097,70 +6409,6 @@
     "queue": 2,
     "due": 20529,
     "ivl": 72,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880599",
-    "front": "Elsewhere",
-    "back": "Altrove",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20503,
-    "ivl": 11,
-    "ease": 2650,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880600",
-    "front": "Rely on",
-    "back": "Fare affidamento su",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20505,
-    "ivl": 47,
-    "ease": 2500,
-    "reps": 31,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880601",
-    "front": "Just like",
-    "back": "Proprio come",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20501,
-    "ivl": 10,
-    "ease": 2650,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880602",
-    "front": "Imply that",
-    "back": "Implicare che",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 6,
     "ease": 2650,
     "reps": 10,
     "lapses": 0,
@@ -7216,22 +6464,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880606",
-    "front": "The pattern (on the skirt)",
-    "back": "Il disegno (sulla gonna)",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20520,
-    "ivl": 31,
-    "ease": 2600,
-    "reps": 23,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880607",
     "front": "The problem is that",
     "back": "Il problema è che",
@@ -7243,54 +6475,6 @@
     "ivl": 70,
     "ease": 2500,
     "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880608",
-    "front": "Puoi scegliere ____ per avere l'ultimo modello.",
-    "back": "Quello/Quella più recente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20504,
-    "ivl": 12,
-    "ease": 2500,
-    "reps": 16,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880609",
-    "front": "Ti sto aspettando ____ al parco.",
-    "back": "Proprio qui",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20500,
-    "ivl": 9,
-    "ease": 2650,
-    "reps": 19,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880610",
-    "front": "Dobbiamo iniziare ____ , non possiamo aspettare.",
-    "back": "Proprio ora",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20553,
-    "ivl": 60,
-    "ease": 2650,
-    "reps": 32,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -7312,22 +6496,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880612",
-    "front": "Per ____ l'importanza di questa legge, permettetemi di mostrarvi alcuni dati.",
-    "back": "Illustrare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20535,
-    "ivl": 47,
-    "ease": 2750,
-    "reps": 25,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880613",
     "front": "Si trova ____ , non qui in città.",
     "back": "Altrove",
@@ -7344,38 +6512,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1714491880614",
-    "front": "Puoi ____ sulla loro esperienza per questo progetto.",
-    "back": "Fare affidamento",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20505,
-    "ivl": 17,
-    "ease": 2300,
-    "reps": 24,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880615",
-    "front": "____ te, anche io ho pensato che fosse una buona idea all'inizio.",
-    "back": "Proprio come",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20535,
-    "ivl": 76,
-    "ease": 2650,
-    "reps": 18,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1714491880616",
     "front": "Questi indizi potrebbero ____ è coinvolto più di quanto pensiamo.",
     "back": "Implicare che",
@@ -7387,86 +6523,6 @@
     "ivl": 58,
     "ease": 2800,
     "reps": 37,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880617",
-    "front": "L'introduzione di nuove tecnologie può ____ significativamente l'industria.",
-    "back": "Impattare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20511,
-    "ivl": 18,
-    "ease": 2650,
-    "reps": 18,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880618",
-    "front": "Dobbiamo ____ una riunione per discutere il prossimo passo.",
-    "back": "Programmare",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20576,
-    "ivl": 115,
-    "ease": 2800,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880619",
-    "front": "____ mostra chiaramente la tendenza degli ultimi anni.",
-    "back": "Il modello (nei dati)",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20509,
-    "ivl": 16,
-    "ease": 2650,
-    "reps": 19,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880620",
-    "front": "Mi piace ____ di questa gonna, è molto originale.",
-    "back": "Il disegno (sulla gonna)",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20502,
-    "ivl": 10,
-    "ease": 2650,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1714491880621",
-    "front": "____ mancano le risorse necessarie per completare il progetto.",
-    "back": "Il problema è che",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 6,
-    "ease": 2650,
-    "reps": 24,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -7739,22 +6795,6 @@
     "ivl": 109,
     "ease": 2500,
     "reps": 29,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1715019388977",
-    "front": "Squishy",
-    "back": "Molle",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20526,
-    "ivl": 66,
-    "ease": 2500,
-    "reps": 30,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -8172,22 +7212,6 @@
     "ease": 2300,
     "reps": 23,
     "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1715164771221",
-    "front": "Half",
-    "back": "metà",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20578,
-    "ivl": 113,
-    "ease": 2800,
-    "reps": 14,
-    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -8738,7 +7762,7 @@
   {
     "id": "anki_1715557756332",
     "front": "single (male version)",
-    "back": "celibe",
+    "back": "celibe — (formale/anagrafico) single man; in conversazione si dice \"single\" o \"non sposato\"",
     "tags": [
       "anki-import"
     ],
@@ -9376,22 +8400,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1715899440384",
-    "front": "Single (female)",
-    "back": "Nubile",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20500,
-    "ivl": 11,
-    "ease": 2450,
-    "reps": 19,
-    "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1715899687022",
     "front": "The shoulder",
     "back": "La spalla",
@@ -9820,22 +8828,6 @@
     "ease": 2750,
     "reps": 30,
     "lapses": 1,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1716519105712",
-    "front": "To get by / scrape through something",
-    "back": "Cavarsela",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20554,
-    "ivl": 63,
-    "ease": 2800,
-    "reps": 13,
-    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -11090,7 +10082,7 @@
   {
     "id": "anki_1717190186947",
     "front": "she can't speak italian",
-    "back": "no sa parlare italian",
+    "back": "non sa parlare italiano",
     "tags": [
       "anki-import"
     ],
@@ -12043,22 +11035,6 @@
     "ivl": 12,
     "ease": 2650,
     "reps": 8,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1717855277929",
-    "front": "Il cliente ___ uscì dal negozio",
-    "back": "scocciato",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20499,
-    "ivl": 6,
-    "ease": 2500,
-    "reps": 15,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -15088,38 +14064,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1725626324738",
-    "front": "Thousand",
-    "back": "Mille",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 5,
-    "ease": 2500,
-    "reps": 8,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1725626349509",
-    "front": "Two thousand",
-    "back": "Duemila",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20584,
-    "ivl": 109,
-    "ease": 2800,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1725803904294",
     "front": "To turn love into hate",
     "back": "Trasformare l’amore in odio",
@@ -16288,22 +15232,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1726932467096",
-    "front": "Gravel",
-    "back": "ghiaia",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20516,
-    "ivl": 38,
-    "ease": 2650,
-    "reps": 19,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1726932467097",
     "front": "Meddle / interfere with",
     "back": "impicciarsi in",
@@ -17371,22 +16299,6 @@
     "ivl": 80,
     "ease": 2500,
     "reps": 12,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1727091041137",
-    "front": "The meat",
-    "back": "La carne",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20518,
-    "ivl": 28,
-    "ease": 2650,
-    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -19186,7 +18098,7 @@
   {
     "id": "anki_1727751224983",
     "front": "To sip",
-    "back": "Libare",
+    "back": "Libare — (letterario/poetico) to sip; in conversazione: sorseggiare",
     "tags": [
       "anki-import"
     ],
@@ -22176,22 +21088,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1731074736011",
-    "front": "put the pasta in",
-    "back": "Butta la pasta",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20731,
-    "ivl": 236,
-    "ease": 2950,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1731074736012",
     "front": "liver",
     "back": "Il fegato",
@@ -22336,22 +21232,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1731074736021",
-    "front": "the thermometer",
-    "back": "Termometro",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20535,
-    "ivl": 43,
-    "ease": 2800,
-    "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1731074736022",
     "front": "the tampon",
     "back": "Assorbente",
@@ -22411,22 +21291,6 @@
     "ivl": 52,
     "ease": 2800,
     "reps": 16,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1731074736026",
-    "front": "I have a fever",
-    "back": "Ho la febbre",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20497,
-    "ivl": 4,
-    "ease": 2500,
-    "reps": 8,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -22555,54 +21419,6 @@
     "ivl": 90,
     "ease": 2650,
     "reps": 14,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1731074736035",
-    "front": "pediatrician",
-    "back": "Pediatra",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20557,
-    "ivl": 96,
-    "ease": 2650,
-    "reps": 20,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1731074736036",
-    "front": "bacterium",
-    "back": "Batterio",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20542,
-    "ivl": 52,
-    "ease": 2800,
-    "reps": 14,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1731074736037",
-    "front": "i have my period",
-    "back": "Ho il ciclo",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 3,
-    "ease": 2500,
-    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -24192,22 +23008,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1732151001439",
-    "front": "three in the morning",
-    "back": "Tre Del mattino",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20514,
-    "ivl": 56,
-    "ease": 2650,
-    "reps": 20,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1732151001440",
     "front": "bruciarsi",
     "back": "scottarsi",
@@ -24635,54 +23435,6 @@
     "ivl": 45,
     "ease": 2800,
     "reps": 19,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732193657909",
-    "front": "Il tavolo della cucina è in legno ____",
-    "back": "Massiccio",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 3,
-    "ease": 2500,
-    "reps": 8,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732193674077",
-    "front": "Quel buttafuori è un tipo ___",
-    "back": "Massiccio",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20513,
-    "ivl": 34,
-    "ease": 2400,
-    "reps": 17,
-    "lapses": 2,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732193699376",
-    "front": "Il medico le ha prescritto una ____ dose di farmaci",
-    "back": "Massiccia",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 3,
-    "ease": 2500,
-    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -25936,22 +24688,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1732567567109",
-    "front": "ostrich",
-    "back": "lo struzzo",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20496,
-    "ivl": 3,
-    "ease": 2500,
-    "reps": 11,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1732567567110",
     "front": "fairy godmother",
     "back": "fata madrina",
@@ -26091,54 +24827,6 @@
     "ivl": 58,
     "ease": 2650,
     "reps": 10,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732567567119",
-    "front": "there are dogs in the street",
-    "back": "ci sono dei cani sulla strada",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20553,
-    "ivl": 92,
-    "ease": 2500,
-    "reps": 23,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732567567120",
-    "front": "their mother",
-    "back": "la loro madre",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20501,
-    "ivl": 25,
-    "ease": 2500,
-    "reps": 20,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732567567121",
-    "front": "his little brother",
-    "back": "il suo fratellino",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20513,
-    "ivl": 24,
-    "ease": 2650,
-    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -26292,7 +24980,8 @@
     "front": "lui è arrabiato __ me",
     "back": "con",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20524,
@@ -26308,7 +24997,8 @@
     "front": "un grappolo ___",
     "back": "d'uva",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20498,
@@ -26324,7 +25014,8 @@
     "front": "il ramo è caduto__ albero",
     "back": "dall'",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20546,
@@ -26340,7 +25031,8 @@
     "front": "un salvagente __ forma di dinosauro",
     "back": "a",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20502,
@@ -26356,7 +25048,8 @@
     "front": "voglio bene ___ mio cavallo",
     "back": "al",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20520,
@@ -26388,7 +25081,8 @@
     "front": "pasta __ pomodoro",
     "back": "al",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20498,
@@ -26436,7 +25130,8 @@
     "front": "le api si posano ___ alveare",
     "back": "sull'",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20529,
@@ -26452,7 +25147,8 @@
     "front": "senti il profumo ___ fiori",
     "back": "dei (specific flowers) di (flowers somewhere)",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20528,
@@ -26484,7 +25180,8 @@
     "front": "un assegno __",
     "back": "mille dollari",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20499,
@@ -26500,7 +25197,8 @@
     "front": "è un piatto tipico ___ georgia",
     "back": "della",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20591,
@@ -26532,7 +25230,8 @@
     "front": "l'ho letto _ libro",
     "back": "nel",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20596,
@@ -26548,7 +25247,8 @@
     "front": "l'ho letto _ giornale",
     "back": "sul",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20501,
@@ -26564,7 +25264,8 @@
     "front": "devo andare ____ psicologo",
     "back": "dallo",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20497,
@@ -27136,38 +25837,6 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1732568047871",
-    "front": "to go into orbit",
-    "back": "andare in orbita",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20498,
-    "ivl": 3,
-    "ease": 2500,
-    "reps": 13,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
-    "id": "anki_1732568047872",
-    "front": "tunnel",
-    "back": "galleria",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 2,
-    "due": 20505,
-    "ivl": 28,
-    "ease": 2650,
-    "reps": 12,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1732568047873",
     "front": "the male giraffe entered the office",
     "back": "la giraffa maschio è entrata nel ufficio",
@@ -27522,7 +26191,7 @@
   {
     "id": "anki_1732656149935",
     "front": "Sabbia",
-    "back": "Rena",
+    "back": "Rena — (poetico) sand; equivalente standard: sabbia",
     "tags": [
       "anki-import"
     ],
@@ -32322,7 +30991,7 @@
   {
     "id": "anki_1736278186379",
     "front": "di marmo",
-    "back": "marmoreo",
+    "back": "marmoreo — (letterario) of marble; la forma standard è \"di marmo\"",
     "tags": [
       "anki-import"
     ],
@@ -32434,7 +31103,7 @@
   {
     "id": "anki_1736278186386",
     "front": "felicità, gioia serena",
-    "back": "letizia",
+    "back": "letizia — (letterario/formale) joy, serene happiness; in conversazione: gioia, felicità",
     "tags": [
       "anki-import"
     ],
@@ -35616,25 +34285,9 @@
     "reviewedToday": null
   },
   {
-    "id": "anki_1746972018885",
-    "front": "depressing",
-    "back": "deprimente",
-    "tags": [
-      "anki-import"
-    ],
-    "queue": 0,
-    "due": 20496,
-    "ivl": 0,
-    "ease": 0,
-    "reps": 0,
-    "lapses": 0,
-    "created": "2024-04-16",
-    "reviewedToday": null
-  },
-  {
     "id": "anki_1746972035685",
     "front": "the coolant",
-    "back": "il callante",
+    "back": "il refrigerante",
     "tags": [
       "anki-import"
     ],
@@ -36018,7 +34671,7 @@
   {
     "id": "anki_1747100445854",
     "front": "Qualcosa di poco luminoso o poco definito.",
-    "back": "fiocho",
+    "back": "fioco",
     "tags": [
       "anki-import"
     ],
@@ -36034,7 +34687,7 @@
   {
     "id": "anki_1747100457331",
     "front": "La luce era così ___ che non riuscivo a leggere.",
-    "back": "fiocha",
+    "back": "fioca",
     "tags": [
       "anki-import"
     ],
@@ -49954,7 +48607,7 @@
   {
     "id": "anki_1769379833486",
     "front": "Definizione (IT): Divertimento leggero, spesso visto come frivolo.",
-    "back": "sollazzo — amusement (letterario)",
+    "back": "sollazzo — (letterario) divertimento, svago; equivalente moderno: svago, divertimento",
     "tags": [
       "anki-import"
     ],
@@ -51572,7 +50225,8 @@
     "front": "nuotare (passato remoto)",
     "back": "nuotai · nuotasti · nuotò · nuotammo · nuotaste · nuotarono",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51588,7 +50242,8 @@
     "front": "parlare (passato remoto)",
     "back": "parlai · parlasti · parlò · parlammo · parlaste · parlarono",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51604,7 +50259,8 @@
     "front": "partire (passato remoto)",
     "back": "partii · partisti · partì · partimmo · partiste · partirono",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20499,
@@ -51620,7 +50276,8 @@
     "front": "dormire (passato remoto)",
     "back": "dormii · dormisti · dormì · dormimmo · dormiste · dormirono",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51636,7 +50293,8 @@
     "front": "credere (passato remoto)",
     "back": "credetti · credesti · credette · credemmo · credeste · credettero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51652,7 +50310,8 @@
     "front": "prendere (passato remoto)",
     "back": "presi · prendesti · prese · prendemmo · prendeste · presero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51668,7 +50327,8 @@
     "front": "vedere (passato remoto)",
     "back": "vidi · vedesti · vide · vedemmo · vedeste · videro",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51684,7 +50344,8 @@
     "front": "vivere (passato remoto)",
     "back": "vissi · vivesti · visse · vivemmo · viveste · vissero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51700,7 +50361,8 @@
     "front": "sapere (passato remoto)",
     "back": "seppi · sapesti · seppe · sapemmo · sapeste · seppero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51716,7 +50378,8 @@
     "front": "bere (passato remoto)",
     "back": "bevvi · bevesti · bevve · bevemmo · beveste · bevvero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51732,7 +50395,8 @@
     "front": "conoscere (passato remoto)",
     "back": "conobbi · conoscesti · conobbe · conoscemmo · conosceste · conobbero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51748,7 +50412,8 @@
     "front": "mettere (passato remoto)",
     "back": "misi · mettesti · mise · mettemmo · metteste · misero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51764,7 +50429,8 @@
     "front": "rimanere (passato remoto)",
     "back": "rimasi · rimanesti · rimase · rimanemmo · rimaneste · rimasero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51780,7 +50446,8 @@
     "front": "scrivere (passato remoto)",
     "back": "scrissi · scrivesti · scrisse · scrivemmo · scriveste · scrissero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20516,
@@ -51796,7 +50463,8 @@
     "front": "leggere (passato remoto)",
     "back": "lessi · leggesti · lesse · leggemmo · leggeste · lessero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20501,
@@ -51812,7 +50480,8 @@
     "front": "dire (passato remoto)",
     "back": "dissi · dicesti · disse · dicemmo · diceste · dissero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20496,
@@ -51828,7 +50497,8 @@
     "front": "fare (passato remoto)",
     "back": "feci · facesti · fece · facemmo · faceste · fecero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 2,
     "due": 20498,
@@ -51844,7 +50514,8 @@
     "front": "stare (passato remoto)",
     "back": "stetti · stesti · stette · stemmo · steste · stettero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51860,7 +50531,8 @@
     "front": "dare",
     "back": "diedi / detti · desti · diede / dette · demmo · deste · diedero / dettero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51876,7 +50548,8 @@
     "front": "tenere",
     "back": "tenni · tenesti · tenne · tenemmo · teneste · tennero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51892,7 +50565,8 @@
     "front": "venire",
     "back": "venni · venisti · venne · venimmo · veniste · vennero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51908,7 +50582,8 @@
     "front": "potere",
     "back": "potei / potetti · potesti · poté / potette · potemmo · poteste · poterono / potettero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51924,7 +50599,8 @@
     "front": "dovere",
     "back": "dovetti · dovesti · dovette · dovemmo · doveste · dovettero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51940,7 +50616,8 @@
     "front": "volere",
     "back": "volli · volesti · volle · volemmo · voleste · vollero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51956,7 +50633,8 @@
     "front": "essere",
     "back": "fui · fosti · fu · fummo · foste · furono",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
@@ -51972,7 +50650,8 @@
     "front": "avere",
     "back": "ebbi · avesti · ebbe · avemmo · aveste · ebbero",
     "tags": [
-      "anki-import"
+      "anki-import",
+      "grammar"
     ],
     "queue": 0,
     "due": 20496,
