@@ -462,21 +462,18 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // Check if site should be locked
   checkSiteLock();
-  // Delegated click handler: Cmd/Ctrl+Click opens links inside contenteditable editors
-  // Regular click places cursor (normal contenteditable behavior)
-  // Also handles plain tap on mobile (no Cmd key) since there's no cursor placement intent
+  // Delegated click handler: always open links inside contenteditable editors
+  // Trade-off: can't place cursor inside link text (minor), but links are always clickable (major)
+  // To edit link text: select it from outside the link and type, or use Cmd+K to re-link
   document.addEventListener('click', function(e) {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const editor = link.closest('[contenteditable="true"]');
     if (!editor) return;
-    // On desktop: require Cmd/Ctrl modifier. On mobile/touch: always open (no modifier keys).
-    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    if (!isTouchDevice && !e.metaKey && !e.ctrlKey) return; // desktop: let normal cursor placement happen
     e.preventDefault();
     e.stopPropagation();
     window.open(link.href, '_blank', 'noopener');
-  }, true);
+  }, true); // capture phase to fire before contenteditable's cursor handling
   // Add CSS animation for celebration
   const style = document.createElement('style');
   style.textContent = '@keyframes sgFadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } }';
