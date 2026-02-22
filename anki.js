@@ -58,7 +58,7 @@ function updateAnkiHabitFromCards(totalReviewedToday) {
   const tgtEl = document.getElementById('anki-target');
   if (tgtEl) tgtEl.textContent = target;
   // Auto-check/uncheck habit: done when all due cards are completed
-  const chk = document.getElementById('h-anki');
+  const chk = document.getElementById('italian-check-anki');
   if (target > 0 && totalReviewedToday >= target) {
     if (chk) chk.checked = true;
     day.habits.anki = true;

@@ -243,6 +243,47 @@ function _parseCardsJSON(resp) {
   return [];
 }
 
+// ============ QUESTION-FORMAT CARD DETECTION & REWRITING ============
+const _QUESTION_PATTERNS = /^(come\s+si|cosa\s+(significa|vuol\s+dire|succede)|che\s+cosa|qual\s+è|quando\s+si|in\s+che\s+modo|perch[eé]\s+si|dove\s+si|chi\s+è|cosa\s+si\s+intende)/i;
+
+function _detectQuestionCards(cards) {
+  const dominated = [];
+  const clean = [];
+  for (const c of cards) {
+    const front = (c.front || '').trim();
+    if (front.endsWith('?') && _QUESTION_PATTERNS.test(front)) {
+      dominated.push(c);
+    } else {
+      clean.push(c);
+    }
+  }
+  return { clean, dominated };
+}
+
+async function _rewriteQuestionCards(questionCards, apiKey) {
+  if (!questionCards.length) return [];
+  const cardsJson = JSON.stringify(questionCards.map(c => ({ front: c.front, back: c.back })));
+  const prompt = `The following flashcard fronts are written as Italian questions (interrogative format). This violates the card rules: definition cards must be DECLARATIVE, never interrogative.
+
+Rewrite ONLY the "front" of each card as a declarative Italian paraphrase or definition. Keep the "back" exactly as-is. The front must NOT contain the target word from the back.
+
+Cards to fix:
+${cardsJson}
+
+Return ONLY a JSON array with the same number of objects, each with "front" and "back" fields.
+Example: [{"front":"declarative definition here","back":"original back unchanged"}]`;
+  try {
+    const resp = await callClaude(apiKey, prompt);
+    const fixed = _parseCardsJSON(resp);
+    if (fixed.length === questionCards.length) return fixed;
+    // If count mismatch, return originals rather than lose cards
+    return questionCards;
+  } catch(e) {
+    console.warn('Failed to rewrite question cards:', e);
+    return questionCards;
+  }
+}
+
 // ============ SHARED FEEDBACK PROMPT ============
 const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:
 
@@ -440,7 +481,15 @@ async function submitRefl() {
     // Now generate flashcards
     const cardPrompt = `You are generating flashcards from a corrected Italian composition exercise.\n\nOriginal student text:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections above, extract 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
-    const cards = _parseCardsJSON(cardResp);
+    let cards = _parseCardsJSON(cardResp);
+    // Auto-rewrite any question-format definition cards
+    if (cards.length > 0) {
+      const { clean, dominated } = _detectQuestionCards(cards);
+      if (dominated.length > 0) {
+        const fixed = await _rewriteQuestionCards(dominated, key);
+        cards = [...clean, ...fixed];
+      }
+    }
     if (cards.length > 0) {
       renderFlashcardReview('refl-card-review', cards, 'Daily composition:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'composition');
     }

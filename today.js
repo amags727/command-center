@@ -36,7 +36,7 @@ function initToday() {
   }
   if (artDirty) save(dd);
   ['anki','art1','art2'].forEach(h => {
-    const el = document.getElementById('h-' + h);
+    const el = document.getElementById('italian-check-' + h);
     if (el && day.habits[h]) el.checked = true;
     if (day.sealed) el && (el.disabled = true);
   });
@@ -104,7 +104,7 @@ function gateHabit(type) {
   } else if (type === 'art1' || type === 'art2') {
     const n = type === 'art1' ? 1 : 2;
     const thoughts = document.getElementById('art' + n + '-th').value.trim();
-    if (thoughts.length < 50) { document.getElementById('art' + n + '-w').style.display = 'block'; document.getElementById('h-' + type).checked = false; return; }
+    if (thoughts.length < 50) { document.getElementById('art' + n + '-w').style.display = 'block'; document.getElementById('italian-check-' + type).checked = false; return; }
     document.getElementById('art' + n + '-w').style.display = 'none';
     day.habits[type] = true; day.habits[type + 'Title'] = document.getElementById('art' + n + '-t').value; day.habits[type + 'Thoughts'] = thoughts;
   } else if (type === 'convo') {

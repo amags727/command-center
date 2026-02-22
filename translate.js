@@ -242,7 +242,14 @@ async function trSubmitWords() {
     const articleContext = article.title ? 'Article: "' + article.title + '" (' + (article.difficulty || '?') + ')\n' : '';
     const prompt = `You are generating flashcards for an Italian language learner at C1-C2 level.\n\n${articleContext}The student highlighted these words/phrases while reading:\n${trCollectedWords.map(w => '- ' + w).join('\n')}\n\n${FLASH_CARD_RULES}\n\nFor each word/phrase, generate the paired definition card and cloze card following the rules above.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields. Example:\n[{"front":"...","back":"..."},{"front":"...","back":"..."}]`;
     const resp = await callClaude(key, prompt);
-    const cards = _parseCardsJSON(resp);
+    let cards = _parseCardsJSON(resp);
+    if (cards.length > 0) {
+      const { clean, dominated } = _detectQuestionCards(cards);
+      if (dominated.length > 0) {
+        const fixed = await _rewriteQuestionCards(dominated, key);
+        cards = [...clean, ...fixed];
+      }
+    }
     if (cards.length > 0) {
       status.textContent = '✅ Generated ' + cards.length + ' cards. Review below.';
       renderFlashcardReview('tr-words-card-review', cards, articleContext + 'Collected words: ' + trCollectedWords.join(', '), 'reading');
@@ -318,7 +325,7 @@ async function trSubmitReflection(num) {
     const thoughtsEl = document.getElementById('art' + num + '-th');
     if (titleEl) titleEl.value = title + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     if (thoughtsEl) thoughtsEl.value = txt;
-    const chk = document.getElementById('h-art' + num);
+    const chk = document.getElementById('italian-check-art' + num);
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title;
@@ -339,7 +346,14 @@ async function trSubmitReflection(num) {
     // Now generate flashcards from the reflection corrections
     const cardPrompt = `You are generating flashcards from a corrected Italian reflection on an article.\n\nArticle: "${title}"\nStudent reflection:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
-    const cards = _parseCardsJSON(cardResp);
+    let cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      const { clean, dominated } = _detectQuestionCards(cards);
+      if (dominated.length > 0) {
+        const fixed = await _rewriteQuestionCards(dominated, key);
+        cards = [...clean, ...fixed];
+      }
+    }
     if (cards.length > 0) {
       renderFlashcardReview('tr-refl-card-review', cards, 'Article: ' + title + '\nReflection:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'reading');
     }
@@ -409,7 +423,7 @@ Sii diretto e fattuale. Niente incoraggiamenti.`;
     const thoughtsEl = document.getElementById('art' + num + '-th');
     if (titleEl) titleEl.value = title + ' [Summary]' + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     if (thoughtsEl) thoughtsEl.value = txt;
-    const chk = document.getElementById('h-art' + num);
+    const chk = document.getElementById('italian-check-art' + num);
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title + ' [Summary]';
@@ -429,7 +443,14 @@ Sii diretto e fattuale. Niente incoraggiamenti.`;
     // Generate flashcards
     const cardPrompt = `You are generating flashcards from a corrected Italian article summary.\n\nArticle: "${title}"\nStudent summary:\n"${txt}"\n\nClaude's corrections:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the corrections and the student's text, generate 5-8 flashcard items following the extraction and card construction rules. For each item, generate the paired definition card and cloze card.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
-    const cards = _parseCardsJSON(cardResp);
+    let cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      const { clean, dominated } = _detectQuestionCards(cards);
+      if (dominated.length > 0) {
+        const fixed = await _rewriteQuestionCards(dominated, key);
+        cards = [...clean, ...fixed];
+      }
+    }
     if (cards.length > 0) {
       renderFlashcardReview('tr-summary-card-review', cards, 'Article: ' + title + '\nSummary:\n' + txt + '\n\nCorrections:\n' + feedbackResp, 'summary');
     }
@@ -545,7 +566,7 @@ async function trSubmitRepro() {
     const thoughtsEl = document.getElementById('art' + num + '-th');
     if (titleEl) titleEl.value = title + ' [Reproduction]' + (article.difficulty ? ' [' + article.difficulty + ']' : '');
     if (thoughtsEl) thoughtsEl.value = paragraphs.map(p => p.reproduction).join('\n\n');
-    const chk = document.getElementById('h-art' + num);
+    const chk = document.getElementById('italian-check-art' + num);
     if (chk) chk.checked = true;
     const st = document.getElementById('art' + num + '-status');
     if (st) st.textContent = '✅ ' + title + ' [Reproduction]';
@@ -565,7 +586,14 @@ async function trSubmitRepro() {
     // Generate flashcards from reproduction errors
     const cardPrompt = `You are generating flashcards from a prose reproduction exercise.\n\nThe student read an Italian article and attempted to reproduce key paragraphs from memory.\n\nClaude's evaluation:\n${feedbackResp}\n\n${COMPOSITION_EXTRACTION_RULES}\n\n${FLASH_CARD_RULES}\n\nBased on the errors and interference patterns identified above, generate 5-8 flashcard items following the extraction and card construction rules. Focus on constructions where the student's reproduction diverged from native Italian patterns.\n\nReturn ONLY a JSON array of objects with "front" and "back" string fields.\n[{"front":"...","back":"..."}]`;
     const cardResp = await callClaude(key, cardPrompt);
-    const cards = _parseCardsJSON(cardResp);
+    let cards = _parseCardsJSON(cardResp);
+    if (cards.length > 0) {
+      const { clean, dominated } = _detectQuestionCards(cards);
+      if (dominated.length > 0) {
+        const fixed = await _rewriteQuestionCards(dominated, key);
+        cards = [...clean, ...fixed];
+      }
+    }
     if (cards.length > 0) {
       renderFlashcardReview('tr-repro-card-review', cards, 'Reproduction exercise: ' + title + '\n\nEvaluation:\n' + feedbackResp, 'reproduction');
     }
