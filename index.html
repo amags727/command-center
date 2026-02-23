@@ -473,13 +473,14 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
   <div id="daily-summary-content" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:60px;font-size:var(--font-sm)"></div>
 </div>
 </div>
-<div class="card"><h3>🔍 Weekly Review</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Complete all prompts to unlock next week's planning.</p>
-<div class="rprompt"><label>What went well this week?</label><textarea id="weekly-review-well" class="fin"></textarea></div>
-<div class="rprompt"><label>What didn't go as planned?</label><textarea id="weekly-review-bad" class="fin"></textarea></div>
-<div class="rprompt"><label>What's the #1 thing to improve next week?</label><textarea id="weekly-review-improve" class="fin"></textarea></div>
-<div class="rprompt"><label>Push Goal result — did you complete it? Evidence:</label><textarea id="weekly-review-push" class="fin"></textarea></div>
-<button class="btn btn-p mt8" onclick="submitWR()">Submit Weekly Review</button>
-<div id="weekly-review-result" class="mt8" style="display:none"></div>
+<div class="card"><h3>📓 Weekly Reflection</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:8px">Write freely throughout the week. Minimum 200 words required before next week's goals.</p>
+<div id="weekly-reflection" contenteditable="true" class="wg-editor" style="min-height:120px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="saveWeeklyReflection()"></div>
+<div id="weekly-reflection-wordcount" style="font-size:var(--font-sm);color:var(--muted);margin-top:4px">0 / 200 words</div>
+<div style="margin-top:10px">
+<label style="font-size:var(--font-sm);font-weight:600;color:var(--muted);display:block;margin-bottom:6px">📷 Photos</label>
+<input type="file" id="reflection-photo-input" accept="image/*" multiple onchange="reflectionPhotosSelected(this)" style="font-size:var(--font-sm);margin-bottom:6px">
+<div id="reflection-photo-preview" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+</div>
 </div>
 </div>
 
@@ -901,13 +902,14 @@ h1{font-size:1.12em}h2{font-size:0.95em}h3{font-size:0.8em}
 </div>
 
 <div class="tab" id="tab-log">
-<h1>📋 Activity Log</h1>
-<div class="card"><h3>🔍 Filter</h3><div class="flex"><select class="fin" id="log-filter" onchange="renderLog()" style="width:150px"><option value="all">All</option><option value="action">Actions</option><option value="warning">Warnings</option><option value="sealed">Sealed Days</option><option value="confession">Confessions</option></select><input type="date" class="fin" id="log-date-filter" onchange="renderLog()" style="width:150px"></div></div>
-<div class="card"><h3>📖 Confession / Note</h3><div class="flex"><textarea class="fin flex-1" id="confess-in" placeholder="Honest note to future self..." rows="2"></textarea><button class="btn btn-s" onclick="addConfession()">Log</button></div></div>
-<div class="card"><h3>🎯 Memory List</h3><p style="font-size:var(--font-sm);color:var(--muted);margin-bottom:10px">Your weekly stretch goals — the experiences worth remembering.</p><div id="memory-list-container"></div></div>
-<div id="log-entries" style="max-height:500px;overflow-y:auto"></div>
-<div class="card" style="margin-top:12px"><h3>📦 Weekly Archives</h3><button class="btn btn-s" onclick="manualArchiveWeek()" style="margin-bottom:8px">📸 Archive Current Week + Email</button><div id="week-archives"></div></div>
-<div class="card mt8" style="text-align:center"><button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button><span style="margin:0 8px">|</span><label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div>
+<h1>📓 Journal</h1>
+<div id="week-archives"></div>
+<div class="card mt8" style="text-align:center">
+<button class="btn btn-s" onclick="manualArchiveWeek()" style="margin-right:8px">📸 Archive Current Week</button>
+<button class="btn btn-s" onclick="exportData()">⬇ Export All Data (JSON)</button>
+<span style="margin:0 8px">|</span>
+<label class="btn btn-s" style="display:inline-block">⬆ Import Data <input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+</div>
 </div>
 
 <!-- SITE LOCK MODAL -->

@@ -40,9 +40,9 @@ Shared flashcard review modal, card rules constants, correction prompts:
 Today tab orchestration:
 `renderToday()`, `initToday()`, `getWeeklyGoalsForToday()`, `populateFromWeeklyGoals()`
 
-### week.js (~150 lines)
-Week tab + Weekly Goals (Work/School/Life):
-`renderWeek()`, `addCWG()`, `submitWR()`, `switchWeekGoalTab()`, `saveWeekGoals()`, `loadWeekGoals()`, `weekGoalAssignDay()`, `weekGoalClearHighlights()`, `populateSchoolWeeklyGoals()`, `populateDissWeeklyGoals()`
+### week.js (~1300 lines)
+Week tab + Weekly Goals (Work/School/Life) + Stretch Goals + Weekly Reflection:
+`renderWeek()`, `saveWeekGoals()`, `loadWeekGoals()`, `weekGoalAssignDay()`, `weekGoalClearHighlights()`, `populateSchoolWeeklyGoals()`, `populateDissWeeklyGoals()`, `syncWeekGoalsDoneState()`, `renderStretchGoals()`, `submitStretchGoals()`, `openCompleteGoalModal()`, `submitExperientialCompletion()`, `submitMediaCompletion()`, `celebrateGoalCompletion()`, `saveWeeklyReflection()`, `loadWeeklyReflection()`, `reflectionPhotosSelected()`, `removeReflectionPhoto()`, `_checkPriorWeekReflection()`, `_renderPriorWeekReflectionGate()`, `_submitPriorWeekReflection()`
 
 ### dissertation.js (~200 lines)
 Dissertation tab:
@@ -68,12 +68,11 @@ Book mode translation (Read tab — book mode):
 Article of the Day:
 `renderAOTD()`, `fetchArticle()`, `generateQuestions()`, `submitAnswers()`
 
-### week-archive.js (~200 lines)
-- `archiveWeek(wid)` — snapshot week data into `d.weekArchives[wid]`
-- `buildArchiveEmail(wid, archive)` — generate Gmail-friendly HTML summary
-- `sendArchiveEmail(wid)` — send via EmailJS
-- `manualArchiveWeek()` — button handler for manual archive+email
-- `renderWeekArchives()` — collapsible Year→Month→Week tree on Log tab
+### week-archive.js (~280 lines)
+- `archiveWeek(wid)` — snapshot week data (incl. weeklyReflection + stretchGoals) into `d.weekArchives[wid]`
+- `manualArchiveWeek()` — button handler for manual archive
+- `renderWeekArchives()` — collapsible Year→Month→Week diary tree on Log/Journal tab
+- `renderDiaryEntry(snap)` — renders a single week as a readable diary entry (reflection, completed stretch goals w/ evidence, daily entries)
 - `checkWeekTransition()` — auto-archive on week rollover
 
 ### progress.js (~440 lines)
@@ -109,7 +108,7 @@ Firebase sync layer (loaded last):
 | Claude | chat.js + flashcard-review.js | tab-claude |
 | Meals | meals.js | tab-meals |
 | Progress | progress.js | tab-progress |
-| Log | app.js (renderLog, addConfession, export/import), week-archive.js (renderWeekArchives) | tab-log |
+| Log/Journal | week-archive.js (renderWeekArchives, renderDiaryEntry), app.js (export/import) | tab-log |
 
 ## Backup
 `app.js.bak` contains the original 2,568-line monolith. Safe to delete once satisfied with the modularization.

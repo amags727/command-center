@@ -1,4 +1,4 @@
-// ============ WEEK-ARCHIVE: Snapshot, Email, Log Rendering ============
+// ============ WEEK-ARCHIVE: Snapshot, Email, Log/Diary Rendering ============
 
 // --- Archive a week's data into a frozen snapshot ---
 function archiveWeek(wk) {
@@ -56,6 +56,9 @@ function archiveWeek(wk) {
     dissWeeklyGoals: dissGoals,
     dailySummaries,
     actuals: { dissHours: +(totalDissMin/60).toFixed(1), gymDays, ankiDone, articlesDone, convoDone, reflDone, socialDone },
+    // New: capture weekly reflection + stretch goals
+    weeklyReflection: wd.weeklyReflection || null,
+    stretchGoals: wd.stretchGoals || null,
     archivedAt: new Date().toISOString()
   };
 
@@ -84,45 +87,6 @@ function generateWeekEmailBody(snapshot) {
   lines.push(`Social: ${s.actuals.socialDone}/7 days`);
   lines.push('');
 
-  // Custom goals
-  if (s.customGoals.length) {
-    lines.push('═══ WEEKLY GOALS ═══');
-    s.customGoals.forEach(g => {
-      lines.push(`[${g.done ? 'X' : ' '}] (${g.cat}) ${g.text}`);
-    });
-    lines.push('');
-  }
-
-  // Rich goals (strip HTML)
-  const strip = html => { const tmp = document.createElement('div'); tmp.innerHTML = html; return tmp.textContent || tmp.innerText || ''; };
-  if (s.richGoals.work) { lines.push('═══ WORK GOALS ═══'); lines.push(strip(s.richGoals.work)); lines.push(''); }
-  if (s.richGoals.school) { lines.push('═══ SCHOOL GOALS ═══'); lines.push(strip(s.richGoals.school)); lines.push(''); }
-  if (s.richGoals.life) { lines.push('═══ LIFE GOALS ═══'); lines.push(strip(s.richGoals.life)); lines.push(''); }
-
-  // Review
-  if (s.review) {
-    lines.push('═══ WEEKLY REVIEW ═══');
-    if (s.review.well) lines.push(`What went well: ${s.review.well}`);
-    if (s.review.bad) lines.push(`What didn't go well: ${s.review.bad}`);
-    if (s.review.imp) lines.push(`To improve: ${s.review.imp}`);
-    if (s.review.push) lines.push(`Push goal: ${s.review.push}`);
-    lines.push('');
-  }
-
-  // Daily summaries
-  lines.push('═══ DAILY SNAPSHOTS ═══');
-  s.dates.forEach(date => {
-    const ds = s.dailySummaries[date];
-    if (!ds) { lines.push(`${date}: no data`); return; }
-    const habits = Object.entries(ds.habits || {}).filter(([,v])=>v).map(([k])=>k).join(', ');
-    lines.push(`${date}: ${habits || 'no habits'} | diss: ${ds.dissTime||0}m | ${ds.sealed ? 'sealed' : 'open'}`);
-    if (ds.notes) {
-      const noteText = strip(ds.notes).trim();
-      if (noteText) lines.push(`  daily notes: ${noteText.substring(0,200)}${noteText.length>200?'...':''}`);
-    }
-    if (ds.reflection) lines.push(`  reflection: ${ds.reflection.substring(0,120)}${ds.reflection.length>120?'...':''}`);
-  });
-
   return lines.join('\n');
 }
 
@@ -132,7 +96,6 @@ function emailWeekSummary(wk) {
   const snapshot = d.weekArchives[wk];
   const body = generateWeekEmailBody(snapshot);
   const subject = encodeURIComponent(`Weekly Summary: ${wk} (${snapshot.dates[0]} to ${snapshot.dates[6]})`);
-  // mailto has ~2000 char limit in some browsers, but modern ones handle more
   const mailBody = encodeURIComponent(body.substring(0, 8000));
   window.open(`mailto:xmagnuson@gmail.com?subject=${subject}&body=${mailBody}`, '_blank');
 }
@@ -140,10 +103,9 @@ function emailWeekSummary(wk) {
 // --- Manual archive (from Log tab button) ---
 function manualArchiveWeek() {
   const wk = weekId();
-  const snapshot = archiveWeek(wk);
-  emailWeekSummary(wk);
+  archiveWeek(wk);
   renderWeekArchives();
-  alert(`Week ${wk} archived and email prepared.`);
+  alert(`Week ${wk} archived.`);
 }
 
 // --- Auto-archive check (called on app init) ---
@@ -151,12 +113,9 @@ function checkWeekTransition() {
   const d = load();
   const currentWk = weekId();
   if (d.lastActiveWeek && d.lastActiveWeek !== currentWk) {
-    // Previous week ended — archive it if not already
     if (!d.weekArchives || !d.weekArchives[d.lastActiveWeek]) {
       archiveWeek(d.lastActiveWeek);
-      // Don't auto-email — just archive silently
     }
-    // Clear old week's daily notes so they don't appear on the new week page
     const oldDates = weekDates(d.lastActiveWeek);
     oldDates.forEach(date => {
       if (d.days && d.days[date] && d.days[date].notes) {
@@ -170,7 +129,7 @@ function checkWeekTransition() {
   }
 }
 
-// --- Log page: collapsible Year → Month → Week rendering ---
+// --- Diary page: collapsible Year → Month → Week rendering ---
 function renderWeekArchives() {
   const el = document.getElementById('week-archives');
   if (!el) return;
@@ -178,14 +137,14 @@ function renderWeekArchives() {
   const archives = d.weekArchives || {};
   const weeks = Object.keys(archives).sort().reverse();
 
-  if (!weeks.length) { el.innerHTML = '<p style="color:#aaa;text-align:center;">No archived weeks yet.</p>'; return; }
+  if (!weeks.length) { el.innerHTML = '<p style="color:#888;text-align:center;padding:20px;font-style:italic">No journal entries yet. Weeks are archived automatically.</p>'; return; }
 
   // Group by year → month
   const tree = {};
   weeks.forEach(wk => {
     const mon = weekMonday(wk);
     const yr = mon.getFullYear();
-    const mo = mon.getMonth(); // 0-11
+    const mo = mon.getMonth();
     if (!tree[yr]) tree[yr] = {};
     if (!tree[yr][mo]) tree[yr][mo] = [];
     tree[yr][mo].push(wk);
@@ -196,13 +155,13 @@ function renderWeekArchives() {
   const years = Object.keys(tree).sort().reverse();
 
   years.forEach(yr => {
-    html += `<details class="archive-year"><summary style="font-size:1.1em;font-weight:bold;cursor:pointer;padding:8px 0;color:#ffd700;">📅 ${yr}</summary>`;
+    html += `<details class="archive-year" open><summary style="font-size:1.1em;font-weight:bold;cursor:pointer;padding:10px 0;color:var(--blue)">📅 ${yr}</summary>`;
     const months = Object.keys(tree[yr]).sort((a,b)=>b-a);
     months.forEach(mo => {
-      html += `<details class="archive-month" style="margin-left:16px;"><summary style="cursor:pointer;padding:4px 0;color:#90caf9;">${monthNames[mo]}</summary>`;
+      html += `<details class="archive-month" open style="margin-left:12px;"><summary style="cursor:pointer;padding:6px 0;color:var(--muted);font-weight:600">${monthNames[mo]}</summary>`;
       tree[yr][mo].forEach(wk => {
         const snap = archives[wk];
-        html += renderArchiveWeekCard(snap);
+        html += renderDiaryEntry(snap);
       });
       html += '</details>';
     });
@@ -212,65 +171,111 @@ function renderWeekArchives() {
   el.innerHTML = html;
 }
 
-function renderArchiveWeekCard(snap) {
+// --- Render a single week as a diary entry ---
+function renderDiaryEntry(snap) {
   const s = snap;
-  const strip = html => { const tmp = document.createElement('div'); tmp.innerHTML = html; return (tmp.textContent || '').substring(0,200); };
+  const strip = html => { const tmp = document.createElement('div'); tmp.innerHTML = html; return tmp.textContent || ''; };
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-  // Count completed custom goals
-  const done = (s.customGoals||[]).filter(g=>g.done).length;
-  const total = (s.customGoals||[]).length;
+  // Date range header
+  const startDate = new Date(s.dates[0] + 'T00:00:00');
+  const endDate = new Date(s.dates[6] + 'T00:00:00');
+  const fmtDate = d => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  const dateRange = fmtDate(startDate) + ' – ' + fmtDate(endDate) + ', ' + startDate.getFullYear();
 
-  let html = `<details class="archive-week" style="margin-left:32px;margin-bottom:8px;">
-    <summary style="cursor:pointer;padding:4px 0;color:#e0e0e0;">
-      <strong>Week of ${s.weekId}</strong> &nbsp; 
-      <span style="color:#888;font-size:0.85em;">${s.dates[0]} → ${s.dates[6]} | Goals: ${done}/${total} | Diss: ${s.actuals.dissHours}h | Gym: ${s.actuals.gymDays}/7</span>
+  let html = `<details class="card" style="margin-bottom:16px;">
+    <summary style="cursor:pointer;font-weight:700;font-size:1em;padding:4px 0">
+      📓 ${dateRange}
     </summary>
-    <div style="padding:8px 12px;background:#1a1a2e;border-radius:6px;margin:4px 0;">`;
+    <div style="padding:8px 0;">`;
 
-  // Actuals
-  html += `<div style="margin-bottom:8px;"><strong style="color:#ffd700;">Actuals</strong><br>
-    Dissertation: ${s.actuals.dissHours}h | Gym: ${s.actuals.gymDays}/7 | Anki: ${s.actuals.ankiDone}/7 | Articles: ${s.actuals.articlesDone}/7 | Convo: ${s.actuals.convoDone}/7 | Reflection: ${s.actuals.reflDone}/7 | Social: ${s.actuals.socialDone}/7
-  </div>`;
-
-  // Custom goals
-  if (total) {
-    html += `<div style="margin-bottom:8px;"><strong style="color:#ffd700;">Custom Goals</strong><ul style="margin:4px 0;padding-left:20px;">`;
-    s.customGoals.forEach(g => {
-      html += `<li style="color:${g.done?'#4caf50':'#ef5350'};">[${g.done?'✓':'○'}] (${escHtml(g.cat)}) ${escHtml(g.text)}</li>`;
-    });
-    html += '</ul></div>';
-  }
-
-  // Rich goals
-  ['work','school','life'].forEach(cat => {
-    if (s.richGoals[cat]) {
-      html += `<div style="margin-bottom:6px;"><strong style="color:#90caf9;">${cat.charAt(0).toUpperCase()+cat.slice(1)} Goals:</strong> <span style="color:#ccc;">${strip(s.richGoals[cat])}${s.richGoals[cat].length>200?'...':''}</span></div>`;
+  // ── Weekly Reflection ──
+  const refl = s.weeklyReflection;
+  if (refl && refl.text && strip(refl.text).trim()) {
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:var(--font-md);line-height:1.8;color:var(--text)">${refl.text}</div>`;
+    // Reflection photos
+    if (refl.photos && refl.photos.length) {
+      html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">`;
+      refl.photos.forEach(img => {
+        html += `<img src="${img}" style="max-width:200px;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="this.style.maxWidth=this.style.maxWidth==='200px'?'100%':'200px'">`;
+      });
+      html += `</div>`;
     }
-  });
-
-  // Review
-  if (s.review) {
-    html += `<div style="margin-bottom:6px;"><strong style="color:#ffd700;">Review</strong><br>`;
-    if (s.review.well) html += `<span style="color:#4caf50;">✓ ${escHtml(s.review.well)}</span><br>`;
-    if (s.review.bad) html += `<span style="color:#ef5350;">✗ ${escHtml(s.review.bad)}</span><br>`;
-    if (s.review.imp) html += `<span style="color:#ff9800;">↑ ${escHtml(s.review.imp)}</span><br>`;
-    if (s.review.push) html += `<span style="color:#2196f3;">→ ${escHtml(s.review.push)}</span>`;
-    html += '</div>';
+    html += `</div>`;
+  } else {
+    html += `<p style="color:var(--muted);font-style:italic;margin-bottom:16px">No reflection recorded for this week.</p>`;
   }
 
-  // Daily snapshots
-  html += `<details style="margin-top:6px;"><summary style="cursor:pointer;color:#888;font-size:0.9em;">Daily Details</summary><div style="padding:4px 8px;">`;
+  // ── Completed Stretch Goals ──
+  const sg = s.stretchGoals;
+  if (sg && sg.goals) {
+    const completed = sg.goals.filter(g => g.completed);
+    if (completed.length) {
+      html += `<div style="margin-bottom:16px;">
+        <h4 style="font-size:var(--font-sm);font-weight:600;color:var(--green);margin-bottom:8px">✅ Completed Experiences</h4>`;
+      completed.forEach(g => {
+        const icon = g.type === 'italian-media' ? '📚' : '🎯';
+        html += `<div style="margin-bottom:10px;padding:8px 12px;background:var(--gl);border-radius:6px;border-left:3px solid var(--green)">
+          <div style="font-weight:600;font-size:var(--font-md)">${icon} ${escHtml(g.text)}</div>`;
+        // Evidence
+        const ev = g.completionEvidence;
+        if (ev) {
+          // Reflection text from experiential or composition from media
+          if (ev.reflection && ev.reflection.trim()) {
+            html += `<p style="margin-top:6px;font-size:var(--font-sm);line-height:1.6;color:var(--text);font-style:italic">"${escHtml(ev.reflection)}"</p>`;
+          }
+          if (ev.composition && ev.composition.trim()) {
+            html += `<details style="margin-top:6px"><summary style="font-size:var(--font-sm);cursor:pointer;color:var(--muted)">View composition</summary>
+              <p style="font-size:var(--font-sm);line-height:1.6;white-space:pre-wrap;margin-top:4px">${escHtml(ev.composition)}</p></details>`;
+          }
+          // Photos
+          if (ev.images && ev.images.length) {
+            html += `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">`;
+            ev.images.forEach(img => {
+              html += `<img src="${img}" style="width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer" onclick="this.style.width=this.style.width==='100px'?'300px':'100px';this.style.height='auto'">`;
+            });
+            html += `</div>`;
+          }
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  // ── Daily Entries ──
+  let hasDailyContent = false;
+  let dailyHtml = '';
   s.dates.forEach(date => {
     const ds = s.dailySummaries[date];
-    if (!ds) { html += `<div style="color:#555;">${date}: no data</div>`; return; }
-    const habits = Object.entries(ds.habits||{}).filter(([,v])=>v).map(([k])=>k).join(', ');
-    html += `<div style="margin:2px 0;color:#bbb;"><strong>${date}</strong>: ${habits||'—'} | diss:${ds.dissTime||0}m ${ds.sealed?'🔒':''}</div>`;
-    if (ds.notes && ds.notes.replace(/<[^>]*>/g,'').trim()) {
-      html += `<div style="margin:2px 0 8px 12px;padding:6px 10px;background:#222;border-left:3px solid #555;border-radius:4px;color:#ccc;font-size:0.9em;">${ds.notes}</div>`;
-    }
-  });
-  html += '</div></details>';
+    if (!ds) return;
+    const reflText = (ds.reflection || '').trim();
+    const notesText = ds.notes ? strip(ds.notes).trim() : '';
+    if (!reflText && !notesText) return;
 
-  html += '</div></details>';
+    hasDailyContent = true;
+    const dt = new Date(date + 'T00:00:00');
+    const dayLabel = dayNames[dt.getDay()] + ', ' + dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    dailyHtml += `<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--border)">
+      <div style="font-weight:600;font-size:var(--font-sm);color:var(--blue);margin-bottom:4px">${dayLabel}</div>`;
+    if (reflText) {
+      dailyHtml += `<div style="margin-bottom:6px;padding:6px 10px;background:var(--ol);border-radius:4px;font-size:var(--font-sm);line-height:1.6;font-style:italic">📝 ${escHtml(reflText)}</div>`;
+    }
+    if (ds.notes && notesText) {
+      dailyHtml += `<div style="font-size:var(--font-sm);line-height:1.6">${ds.notes}</div>`;
+    }
+    dailyHtml += `</div>`;
+  });
+
+  if (hasDailyContent) {
+    html += `<details style="margin-top:8px">
+      <summary style="cursor:pointer;font-size:var(--font-sm);font-weight:600;color:var(--muted)">📅 Daily Entries</summary>
+      <div style="padding:8px 0">${dailyHtml}</div>
+    </details>`;
+  }
+
+  html += `</div></details>`;
   return html;
 }

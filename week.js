@@ -16,6 +16,7 @@ function renderWeek() {
   renderStretchGoals();
   renderDailySummaries();
   loadWeekGoals();
+  loadWeeklyReflection();
   syncWeekGoalsDoneState();
 }
 function renderDailySummaries() {
@@ -548,12 +549,18 @@ let _sgCompletingGoalId = null;
 function renderStretchGoals() {
   // Don't nuke an active completion form during background sync/re-render
   if (_sgCompletingGoalId) return;
+  if (_priorWeekReflectionGateActive) return;
   const wk = weekId();
   const sg = getStretchGoals(wk);
   const container = document.getElementById('stretch-goals-container');
   if (!container) return;
   
   if (!sg || !sg.submitted) {
+    // Check if prior-week reflection is needed first
+    if (!_checkPriorWeekReflection()) {
+      _renderPriorWeekReflectionGate();
+      return;
+    }
     // Show compact submission form
     container.innerHTML = `
       <div style="padding:10px 0;border-bottom:1px dashed var(--border);margin-bottom:12px">
@@ -1012,6 +1019,237 @@ ${text}`;
   } catch (e) {
     result.innerHTML = '<p style="color:var(--red)">Error: ' + escHtml(e.message) + '</p>';
   }
+}
+
+// ============ WEEKLY REFLECTION ============
+let _reflectionPendingPhotos = [];
+
+function saveWeeklyReflection() {
+  const el = document.getElementById('weekly-reflection');
+  if (!el) return;
+  const d = getGlobal();
+  const wk = weekId();
+  if (!d.weeks) d.weeks = {};
+  if (!d.weeks[wk]) d.weeks[wk] = {};
+  if (!d.weeks[wk].weeklyReflection) d.weeks[wk].weeklyReflection = {};
+  d.weeks[wk].weeklyReflection.text = el.innerHTML;
+  save(d);
+  _updateReflectionWordCount(el.innerHTML);
+}
+
+function loadWeeklyReflection() {
+  const el = document.getElementById('weekly-reflection');
+  if (!el) return;
+  const d = getGlobal();
+  const wk = weekId();
+  const refl = d.weeks && d.weeks[wk] && d.weeks[wk].weeklyReflection;
+  el.innerHTML = (refl && refl.text) || '';
+  _reflectionPendingPhotos = (refl && refl.photos) || [];
+  _updateReflectionWordCount(el.innerHTML);
+  _renderReflectionPhotoPreview();
+}
+
+function _updateReflectionWordCount(html) {
+  const wcEl = document.getElementById('weekly-reflection-wordcount');
+  if (!wcEl) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = (tmp.textContent || '').trim();
+  const words = text ? text.split(/\s+/).filter(w => w).length : 0;
+  wcEl.textContent = words + ' / 200 words';
+  wcEl.style.color = words >= 200 ? 'var(--green)' : 'var(--muted)';
+}
+
+function _getReflectionWordCount(wk) {
+  const d = load();
+  const refl = d.weeks && d.weeks[wk] && d.weeks[wk].weeklyReflection;
+  if (!refl || !refl.text) return 0;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = refl.text;
+  const text = (tmp.textContent || '').trim();
+  return text ? text.split(/\s+/).filter(w => w).length : 0;
+}
+
+function reflectionPhotosSelected(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const preview = document.getElementById('reflection-photo-preview');
+  if (preview) preview.innerHTML = '<p style="font-size:11px;color:var(--muted)">⏳ Compressing...</p>';
+  let processed = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const compressed = await _resizeImage(e.target.result, 1024, 0.7);
+      _reflectionPendingPhotos.push(compressed);
+      processed++;
+      if (processed === files.length) {
+        _saveReflectionPhotos();
+        _renderReflectionPhotoPreview();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function _saveReflectionPhotos() {
+  const d = getGlobal();
+  const wk = weekId();
+  if (!d.weeks) d.weeks = {};
+  if (!d.weeks[wk]) d.weeks[wk] = {};
+  if (!d.weeks[wk].weeklyReflection) d.weeks[wk].weeklyReflection = {};
+  d.weeks[wk].weeklyReflection.photos = _reflectionPendingPhotos;
+  save(d);
+}
+
+function removeReflectionPhoto(idx) {
+  _reflectionPendingPhotos.splice(idx, 1);
+  _saveReflectionPhotos();
+  _renderReflectionPhotoPreview();
+}
+
+function _renderReflectionPhotoPreview() {
+  const preview = document.getElementById('reflection-photo-preview');
+  if (!preview) return;
+  if (!_reflectionPendingPhotos.length) { preview.innerHTML = ''; return; }
+  preview.innerHTML = _reflectionPendingPhotos.map((img, i) => `
+    <div style="position:relative;display:inline-block;margin-bottom:4px">
+      <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+      <button onclick="removeReflectionPhoto(${i})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
+    </div>
+  `).join('') + `<p style="font-size:11px;color:var(--muted)">${_reflectionPendingPhotos.length} photo(s)</p>`;
+}
+
+// ============ PRIOR-WEEK REFLECTION GATING ============
+let _priorWeekReflectionGateActive = false;
+
+function _checkPriorWeekReflection() {
+  const currentWk = weekId();
+  const priorWk = offsetWeekId(currentWk, -1);
+  const d = load();
+  // No prior week data at all? Skip gating (first week)
+  if (!d.weeks || !d.weeks[priorWk]) return true;
+  // Check if prior week has >= 200 word reflection
+  return _getReflectionWordCount(priorWk) >= 200;
+}
+
+function _renderPriorWeekReflectionGate() {
+  const currentWk = weekId();
+  const priorWk = offsetWeekId(currentWk, -1);
+  const d = load();
+  const refl = d.weeks && d.weeks[priorWk] && d.weeks[priorWk].weeklyReflection;
+  const existingText = (refl && refl.text) || '';
+  const existingPhotos = (refl && refl.photos) || [];
+  
+  const container = document.getElementById('stretch-goals-container');
+  if (!container) return;
+  _priorWeekReflectionGateActive = true;
+  
+  container.innerHTML = `
+    <div style="padding:10px 0;border-bottom:1px dashed var(--border);margin-bottom:12px">
+      <h4 style="font-size:13px;font-weight:600;color:var(--orange);margin-bottom:8px">📓 Complete Last Week's Reflection <span style="color:var(--muted);font-weight:400;font-size:12px">(Required before setting new goals)</span></h4>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Your reflection for week ${priorWk} needs at least 200 words. Write about what happened, what you learned, how you felt.</p>
+      <div id="prior-week-reflection" contenteditable="true" class="wg-editor" style="min-height:120px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:var(--font-md);line-height:1.7;outline:none;background:#fff;resize:vertical;overflow:auto" oninput="_savePriorWeekReflection()">${existingText}</div>
+      <div id="prior-week-reflection-wc" style="font-size:var(--font-sm);color:var(--muted);margin-top:4px">0 / 200 words</div>
+      <div style="margin-top:10px">
+        <label style="font-size:var(--font-sm);font-weight:600;color:var(--muted);display:block;margin-bottom:6px">📷 Photos</label>
+        <input type="file" accept="image/*" multiple onchange="_priorWeekPhotosSelected(this)" style="font-size:var(--font-sm);margin-bottom:6px">
+        <div id="prior-week-photo-preview" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <button class="btn btn-p mt8" onclick="_submitPriorWeekReflection()" style="font-size:12px">✅ Submit Reflection & Continue</button>
+      <div id="prior-week-gate-result" style="margin-top:8px"></div>
+    </div>
+  `;
+  
+  // Render existing photos
+  _priorWeekGatePhotos = existingPhotos.slice();
+  _renderPriorWeekGatePhotos();
+  // Update word count
+  _updatePriorWeekWC(existingText);
+}
+
+let _priorWeekGatePhotos = [];
+
+function _savePriorWeekReflection() {
+  const el = document.getElementById('prior-week-reflection');
+  if (!el) return;
+  const priorWk = offsetWeekId(weekId(), -1);
+  const d = getGlobal();
+  if (!d.weeks) d.weeks = {};
+  if (!d.weeks[priorWk]) d.weeks[priorWk] = {};
+  if (!d.weeks[priorWk].weeklyReflection) d.weeks[priorWk].weeklyReflection = {};
+  d.weeks[priorWk].weeklyReflection.text = el.innerHTML;
+  save(d);
+  _updatePriorWeekWC(el.innerHTML);
+}
+
+function _updatePriorWeekWC(html) {
+  const wcEl = document.getElementById('prior-week-reflection-wc');
+  if (!wcEl) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = (tmp.textContent || '').trim();
+  const words = text ? text.split(/\s+/).filter(w => w).length : 0;
+  wcEl.textContent = words + ' / 200 words';
+  wcEl.style.color = words >= 200 ? 'var(--green)' : 'var(--muted)';
+}
+
+function _priorWeekPhotosSelected(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  let processed = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const compressed = await _resizeImage(e.target.result, 1024, 0.7);
+      _priorWeekGatePhotos.push(compressed);
+      processed++;
+      if (processed === files.length) {
+        _savePriorWeekGatePhotos();
+        _renderPriorWeekGatePhotos();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function _savePriorWeekGatePhotos() {
+  const priorWk = offsetWeekId(weekId(), -1);
+  const d = getGlobal();
+  if (!d.weeks[priorWk].weeklyReflection) d.weeks[priorWk].weeklyReflection = {};
+  d.weeks[priorWk].weeklyReflection.photos = _priorWeekGatePhotos;
+  save(d);
+}
+
+function _removePriorWeekGatePhoto(idx) {
+  _priorWeekGatePhotos.splice(idx, 1);
+  _savePriorWeekGatePhotos();
+  _renderPriorWeekGatePhotos();
+}
+
+function _renderPriorWeekGatePhotos() {
+  const preview = document.getElementById('prior-week-photo-preview');
+  if (!preview) return;
+  if (!_priorWeekGatePhotos.length) { preview.innerHTML = ''; return; }
+  preview.innerHTML = _priorWeekGatePhotos.map((img, i) => `
+    <div style="position:relative;display:inline-block;margin-bottom:4px">
+      <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+      <button onclick="_removePriorWeekGatePhoto(${i})" style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer">×</button>
+    </div>
+  `).join('');
+}
+
+function _submitPriorWeekReflection() {
+  const priorWk = offsetWeekId(weekId(), -1);
+  const wc = _getReflectionWordCount(priorWk);
+  const result = document.getElementById('prior-week-gate-result');
+  if (wc < 200) {
+    if (result) result.innerHTML = '<p style="color:var(--red);font-size:12px">Need at least 200 words. Currently: ' + wc + '</p>';
+    return;
+  }
+  _priorWeekReflectionGateActive = false;
+  addLog('action', 'Prior week reflection submitted for ' + priorWk);
+  // Now re-render stretch goals (which will show the submission form)
+  renderStretchGoals();
 }
 
 function celebrateGoalCompletion() {
