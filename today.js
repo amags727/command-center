@@ -167,7 +167,10 @@ function carryForwardTasks() {
         var key = cat + '::' + (chip.text || '').trim();
         if (!key || existingTexts[key]) return; // already exists in today
         existingTexts[key] = true;
-        var newChip = { text: chip.text, id: _t3GenId(cat[0]), overdue: true, originalDate: chip.originalDate || pastDate };
+        // Deterministic ID so all devices produce the same chip ID for the same source
+        var srcId = chip.id || (cat[0] + '_' + (chip.text || '').trim().replace(/\s+/g,'_').slice(0,20));
+        var carryId = 'carry_' + (chip.originalDate || pastDate) + '_' + srcId;
+        var newChip = { text: chip.text, id: carryId, overdue: true, originalDate: chip.originalDate || pastDate };
         if (chip.dissLinked) {
           // Move diss span to today's day color
           var oldDayKey = _dayKeyForDate(pastDate);
@@ -254,6 +257,25 @@ function _t3MakeChip(chipData, containerId, prefix) {
     const isDone = chip.classList.contains('done');
     chip.dataset.done = isDone ? 'true' : '';
     saveT3Intentions();
+    // Write-back to source day so carry-forward won't re-carry completed overdue chips
+    if (chipData.overdue && chipData.originalDate) {
+      try {
+        const srcDd = dayData(chipData.originalDate);
+        const srcDay = srcDd.days[chipData.originalDate];
+        if (srcDay && srcDay.t3intentions) {
+          ['work','school','life'].forEach(function(cat) {
+            var arr = srcDay.t3intentions[cat];
+            if (!Array.isArray(arr)) return;
+            arr.forEach(function(srcChip) {
+              if ((srcChip.text || '').trim() === (chipData.text || '').trim()) {
+                srcChip.done = isDone;
+              }
+            });
+          });
+          save(srcDd);
+        }
+      } catch(e) { /* ignore write-back errors */ }
+    }
     // Cross out on dissertation page if linked
     if (chipData.dissLinked && typeof toggleDissGoalDone === 'function' && typeof getTodayDayKey === 'function') {
       toggleDissGoalDone(getTodayDayKey(), chipData.spanIndex, isDone);
@@ -355,8 +377,16 @@ function _t3Deduplicate() {
     const deduped = [];
     arr.forEach(function(chip) {
       const key = (chip.text || '').trim();
-      if (!key || seen[key]) { changed = true; return; }
-      seen[key] = true;
+      if (!key) { changed = true; return; }
+      if (seen[key] !== undefined) {
+        // Duplicate — prefer the done version
+        if (chip.done && !deduped[seen[key]].done) {
+          deduped[seen[key]] = chip;
+        }
+        changed = true;
+        return;
+      }
+      seen[key] = deduped.length;
       deduped.push(chip);
     });
     t[cat] = deduped;
