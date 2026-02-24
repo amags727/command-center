@@ -310,7 +310,7 @@ Example: [{"front":"declarative definition here","back":"original back unchanged
 }
 
 // ============ SHARED FEEDBACK PROMPT ============
-const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente ha scritto questa composizione giornaliera:
+const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha scritto questa composizione giornaliera:
 
 "${txt}"${_getTopInterferenceContext()}
 
@@ -348,7 +348,7 @@ Elenca i pattern di interferenza L1 rilevati in questo testo (calchi sintattici,
 
 Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
 
-const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:
+const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:
 
 "${txt}"${_getTopInterferenceContext()}
 
@@ -389,7 +389,7 @@ Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammor
 const CORRECTION_PROMPT_REPRODUCTION = (paragraphs) => {
   // paragraphs is an array of {original, reproduction} objects
   const aligned = paragraphs.map((p, i) => `--- Paragrafo ${i + 1} ---\nORIGINALE:\n${p.original}\n\nRIPRODUZIONE DELLO STUDENTE:\n${p.reproduction}`).join('\n\n');
-  return `Sei un valutatore esperto di italiano a livello C1-C2. Lo studente ha letto un articolo italiano e poi ha tentato di riprodurre a memoria alcuni paragrafi chiave senza guardare il testo originale.
+  return `Sei un valutatore esperto di italiano a livello C1-C2. Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha letto un articolo italiano e poi ha tentato di riprodurre a memoria alcuni paragrafi chiave senza guardare il testo originale.
 
 L'obiettivo NON è la riproduzione parola per parola, ma dimostrare di aver interiorizzato la sintassi, il registro, le collocazioni e il ritmo del testo originale.
 
