@@ -65,7 +65,7 @@
   },
   {
     "id": "anki_1713266082714",
-    "front": "Rip-off, bad deal (informal — you got cheated; \"che fregatura!\")",
+    "front": "Scam, rip-off",
     "back": "Fregatura",
     "tags": [
       "anki-import"
@@ -273,7 +273,7 @@
   },
   {
     "id": "anki_1713266082728",
-    "front": "Horrifying (visceral revulsion — makes your skin crawl)",
+    "front": "Horrifying",
     "back": "Orripilante",
     "tags": [
       "anki-import"
@@ -417,7 +417,7 @@
   },
   {
     "id": "anki_1713266082738",
-    "front": "Fraud, scam (criminal deception for financial gain — formal/legal)",
+    "front": "Fraud, scam",
     "back": "Truffa",
     "tags": [
       "anki-import"
@@ -481,7 +481,7 @@
   },
   {
     "id": "anki_1713266082742",
-    "front": "Rude, impolite (lacking garbo/grace — poor manners, brusque; opposite of garbato)",
+    "front": "Rude",
     "back": "Sgarbato",
     "tags": [
       "anki-import"
@@ -561,7 +561,7 @@
   },
   {
     "id": "anki_1713266082748",
-    "front": "To be upset/hurt (emotional disappointment — \"ci è rimasto male quando ha scoperto\")",
+    "front": "To be upset",
     "back": "Rimanerci male",
     "tags": [
       "anki-import"
@@ -689,7 +689,7 @@
   },
   {
     "id": "anki_1713266082758",
-    "front": "Astonishing, amazing (beauty or quality that leaves you stunned)",
+    "front": "Amazing, astonishing",
     "back": "Strabiliante",
     "tags": [
       "anki-import"
@@ -849,7 +849,7 @@
   },
   {
     "id": "anki_1713266082768",
-    "front": "Off-putting, aggravating (describes the thing/person causing annoyance, not the person feeling it)",
+    "front": "upsetting / aggravating",
     "back": "Indisponente",
     "tags": [
       "anki-import"
@@ -1392,6 +1392,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1713266082804",
+    "front": "To tear off",
+    "back": "Strappare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20548,
+    "ivl": 61,
+    "ease": 2800,
+    "reps": 12,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1713266082805",
     "front": "Puoi ______ questo foglio dal quaderno?",
     "back": "Strappare",
@@ -1441,7 +1457,7 @@
   },
   {
     "id": "anki_1713266082808",
-    "front": "Shelving unit, bookcase (freestanding furniture with multiple shelves)",
+    "front": "The set of shelves",
     "back": "Lo scaffale",
     "tags": [
       "anki-import"
@@ -1473,7 +1489,7 @@
   },
   {
     "id": "anki_1713266082810",
-    "front": "Shelf bracket (single decorative shelf mounted on a wall — smaller, often ornamental)",
+    "front": "The shelf (smaller, often decorative)",
     "back": "La mensola",
     "tags": [
       "anki-import"
@@ -1825,7 +1841,7 @@
   },
   {
     "id": "anki_1713266082834",
-    "front": "Boorish, uncouth (crude, culturally unrefined — stronger than sgarbato)",
+    "front": "Boorish, uncouth",
     "back": "Buzzurro",
     "tags": [
       "anki-import"
@@ -1842,7 +1858,7 @@
   {
     "id": "anki_1713266082835",
     "front": "Quel tipo al bar era davvero ______.",
-    "back": "Buzzurro",
+    "back": "Buzurro",
     "tags": [
       "anki-import"
     ],
@@ -2849,7 +2865,7 @@
   },
   {
     "id": "anki_1713445469411",
-    "front": "Bachelor (conversational — unmarried man, more natural than \"celibe\")",
+    "front": "Bachelor",
     "back": "Scapolo",
     "tags": [
       "anki-import"
@@ -3185,7 +3201,7 @@
   },
   {
     "id": "anki_1713445469435",
-    "front": "Exhausting (adj. for the activity, not the person — \"un viaggio estenuante\")",
+    "front": "Exhausting",
     "back": "Estenuante",
     "tags": [
       "anki-import"
@@ -4370,7 +4386,7 @@
   {
     "id": "anki_1713782768648",
     "front": "She tells it like it is",
-    "back": "Dice le cose come stanno",
+    "back": "Dice le cose some stanno",
     "tags": [
       "anki-import"
     ],
@@ -4385,7 +4401,7 @@
   },
   {
     "id": "anki_1713791928288",
-    "front": "Abrupt, curt (rough in manner — not necessarily mean, just blunt and sharp)",
+    "front": "Abrupt, rough",
     "back": "Brusco",
     "tags": [
       "anki-import"
@@ -4667,6 +4683,22 @@
     "ivl": 95,
     "ease": 2500,
     "reps": 19,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1713791928306",
+    "front": "Realistic",
+    "back": "Realistico",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20546,
+    "ivl": 86,
+    "ease": 2650,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -5329,7 +5361,7 @@
   },
   {
     "id": "anki_1713813318976",
-    "front": "Melancholic (quiet, lingering sadness — often with an aesthetic quality)",
+    "front": "melancholic",
     "back": "malinconico",
     "tags": [
       "anki-import"
@@ -5361,7 +5393,7 @@
   },
   {
     "id": "anki_1713813318978",
-    "front": "Horrifying (shudder-inducing — deeply disturbing; stronger than orripilante)",
+    "front": "horrifying (r)",
     "back": "raccapricciante",
     "tags": [
       "anki-import"
@@ -6657,7 +6689,7 @@
   },
   {
     "id": "anki_1715019388970",
-    "front": "Cunning, street-smart (neutral-positive — knows how to get what they want; everyday cleverness)",
+    "front": "Cunning",
     "back": "Furbo",
     "tags": [
       "anki-import"
@@ -7090,7 +7122,7 @@
   {
     "id": "anki_1715095149405",
     "front": "the sharpest wit",
-    "back": "l'ingegno più acuto",
+    "back": "l'ignegno più acuto",
     "tags": [
       "anki-import"
     ],
@@ -7266,7 +7298,7 @@
   {
     "id": "anki_1715170302276",
     "front": "misogynist",
-    "back": "Misogino",
+    "back": "Misognistico",
     "tags": [
       "anki-import"
     ],
@@ -7408,6 +7440,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1715170302285",
+    "front": "tactile",
+    "back": "Tattile",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20533,
+    "ivl": 71,
+    "ease": 2500,
+    "reps": 16,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1715170302286",
     "front": "to air (TV)",
     "back": "Andare in onda",
@@ -7441,7 +7489,7 @@
   },
   {
     "id": "anki_1715170302288",
-    "front": "Annoying (adj. for the source, not the person — \"quel rumore è fastidioso\")",
+    "front": "annoying",
     "back": "Fastidioso",
     "tags": [
       "anki-import"
@@ -7745,7 +7793,7 @@
   },
   {
     "id": "anki_1715594430368",
-    "front": "Single/unmarried woman (formal-bureaucratic — anagrafico only; in conversation say \"single\")",
+    "front": "Single (for women)",
     "back": "Nubile",
     "tags": [
       "anki-import"
@@ -8177,7 +8225,7 @@
   },
   {
     "id": "anki_1715865264739",
-    "front": "Annoyed (dry, mild irritation — like being bothered by a minor inconvenience; \"seccato dalla pioggia\")",
+    "front": "Annoyed, bothered",
     "back": "Seccato",
     "tags": [
       "anki-import"
@@ -8241,7 +8289,7 @@
   },
   {
     "id": "anki_1715865264743",
-    "front": "Graceful (elegant in movement — controlled, fluid; \"una ballerina aggraziata\")",
+    "front": "Graceful or gracious (also with manners)",
     "back": "aggraziato",
     "tags": [
       "anki-import"
@@ -8593,7 +8641,7 @@
   },
   {
     "id": "anki_1716518419192",
-    "front": "Well-off, affluent (neutral — has financial means; \"una famiglia abbiente\")",
+    "front": "Rich (starting with a)",
     "back": "Abbiente",
     "tags": [
       "anki-import"
@@ -8769,7 +8817,7 @@
   },
   {
     "id": "anki_1716519025390",
-    "front": "Eye-catching, flashy (stands out visually — not necessarily tasteful)",
+    "front": "Eye catching",
     "back": "Appariscente",
     "tags": [
       "anki-import"
@@ -9170,7 +9218,7 @@
   {
     "id": "anki_1716826870950",
     "front": "the lit fuse",
-    "back": "la miccia accesa",
+    "back": "la Miccia accessa",
     "tags": [
       "anki-import"
     ],
@@ -9346,7 +9394,7 @@
   {
     "id": "anki_1716826870961",
     "front": "to distract",
-    "back": "Distrarre",
+    "back": "Distraire",
     "tags": [
       "anki-import"
     ],
@@ -9378,7 +9426,7 @@
   {
     "id": "anki_1716826870963",
     "front": "human remains",
-    "back": "Le spoglie umane",
+    "back": "Le spoglie umani",
     "tags": [
       "anki-import"
     ],
@@ -9394,7 +9442,7 @@
   {
     "id": "anki_1716826870964",
     "front": "betrayed",
-    "back": "Tradito",
+    "back": "Traditto",
     "tags": [
       "anki-import"
     ],
@@ -10113,7 +10161,7 @@
   },
   {
     "id": "anki_1717537602615",
-    "front": "Fluff, nonsense (not serious content — empty, substanceless; \"questa è solo fuffa\")",
+    "front": "fluff / something not serious",
     "back": "Fuffa",
     "tags": [
       "anki-import"
@@ -10177,7 +10225,7 @@
   },
   {
     "id": "anki_1717537602619",
-    "front": "Tall tale, whopper (an obviously exaggerated or ridiculous lie)",
+    "front": "bugia esagerata",
     "back": "Panzana",
     "tags": [
       "anki-import"
@@ -10353,7 +10401,7 @@
   },
   {
     "id": "anki_1717537602630",
-    "front": "Determined, resolute (positive — clear goal, strong will; \"una donna determinata\")",
+    "front": "deciso, risoluto",
     "back": "Determinato",
     "tags": [
       "anki-import"
@@ -10530,7 +10578,7 @@
   {
     "id": "anki_1717537602641",
     "front": "Ho ____ uno strano odore",
-    "back": "Percepito",
+    "back": "Perceptio",
     "tags": [
       "anki-import"
     ],
@@ -10689,7 +10737,7 @@
   },
   {
     "id": "anki_1717589426436",
-    "front": "Lie (standard, neutral — any deliberate untruth)",
+    "front": "The lie",
     "back": "La bugia",
     "tags": [
       "anki-import"
@@ -10737,7 +10785,7 @@
   },
   {
     "id": "anki_1717589605147",
-    "front": "Unwillingly (doing something against your wishes — \"lo faceva controvoglia\")",
+    "front": "Unwillingly",
     "back": "controvoglia",
     "tags": [
       "anki-import"
@@ -10827,6 +10875,22 @@
     "ivl": 52,
     "ease": 2650,
     "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1717591577638",
+    "front": "___ che potremo andare in vacanza insieme.",
+    "back": "Spero",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20507,
+    "ivl": 74,
+    "ease": 2800,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -10977,7 +11041,7 @@
   },
   {
     "id": "anki_1717855292499",
-    "front": "Annoyed (nagged, pestered — someone or something won't leave you alone; \"scocciato dalle domande\")",
+    "front": "Seccato, infastidito (s synonym)",
     "back": "scocciato",
     "tags": [
       "anki-import"
@@ -11297,7 +11361,7 @@
   },
   {
     "id": "anki_1718806175738",
-    "front": "Sign, placard (for a business, on a door — \"il cartello diceva: chiuso\")",
+    "front": "The sign (for a business)",
     "back": "Il cartello",
     "tags": [
       "anki-import"
@@ -11313,7 +11377,7 @@
   },
   {
     "id": "anki_1718806201344",
-    "front": "Signal, traffic sign (road/safety — \"il segnale indicava di fermarsi\")",
+    "front": "The sign (for traffic)",
     "back": "Il segnale",
     "tags": [
       "anki-import"
@@ -12129,7 +12193,7 @@
   },
   {
     "id": "anki_1719387590384",
-    "front": "Abyss, precipice (deep drop — literal or metaphorical; \"sull'orlo del baratro\")",
+    "front": "On the edge of the cliff",
     "back": "Sull’orlo del baratro",
     "tags": [
       "anki-import"
@@ -12155,6 +12219,22 @@
     "ivl": 91,
     "ease": 2800,
     "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1719935258082",
+    "front": "___ il norovirus alla conferenza",
+    "back": "ho preso",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20637,
+    "ivl": 164,
+    "ease": 2800,
+    "reps": 16,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -12257,7 +12337,7 @@
   },
   {
     "id": "anki_1723242276061",
-    "front": "Abyss, precipice (deep drop — literal or metaphorical; \"sull'orlo del baratro\")",
+    "front": "L’abisso, lo strapiombo",
     "back": "Il baratro",
     "tags": [
       "anki-import"
@@ -13793,7 +13873,7 @@
   },
   {
     "id": "anki_1725384969308",
-    "front": "To scare, frighten (general — cause acute fear)",
+    "front": "i let myself get scared",
     "back": "Io mi faccio spaventare",
     "tags": [
       "anki-import"
@@ -13889,7 +13969,7 @@
   },
   {
     "id": "anki_1725384969314",
-    "front": "Filthy, disgusting (physically dirty or morally repugnant — strong; \"questa casa è lurida\")",
+    "front": "Sudicio / schifoso",
     "back": "Lurido",
     "tags": [
       "anki-import"
@@ -13921,7 +14001,7 @@
   },
   {
     "id": "anki_1725384969316",
-    "front": "Scary, frightening (adj. — causes fear; less visceral than orripilante)",
+    "front": "Scary",
     "back": "Spaventoso",
     "tags": [
       "anki-import"
@@ -13953,7 +14033,7 @@
   },
   {
     "id": "anki_1725384969318",
-    "front": "Petty, mean-spirited (morally small; also: meager — \"guadagna una cifra meschina\")",
+    "front": "Scarso / limitato",
     "back": "Meschino",
     "tags": [
       "anki-import"
@@ -14737,7 +14817,7 @@
   },
   {
     "id": "anki_1726364630959",
-    "front": "Agonizing, harrowing (physical or emotional pain — \"uno spettacolo straziante\")",
+    "front": "che causa dolore fisico",
     "back": "Straziante",
     "tags": [
       "anki-import"
@@ -14763,6 +14843,22 @@
     "ivl": 123,
     "ease": 2800,
     "reps": 15,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726364689343",
+    "front": "Vedere il figlio in quelle condizioni era ____",
+    "back": "Straziante",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20538,
+    "ivl": 81,
+    "ease": 2650,
+    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -14817,7 +14913,7 @@
   },
   {
     "id": "anki_1726425412257",
-    "front": "Tool (physical implement — wrench, hammer; \"tengo gli attrezzi in officina\")",
+    "front": "The tool",
     "back": "attrezzo",
     "tags": [
       "anki-import"
@@ -14833,7 +14929,7 @@
   },
   {
     "id": "anki_1726425434694",
-    "front": "Tool/instrument (method or means — also musical; \"strumenti di gestione\")",
+    "front": "Tool (method)",
     "back": "Strumento",
     "tags": [
       "anki-import"
@@ -14987,6 +15083,22 @@
     "ivl": 5,
     "ease": 2500,
     "reps": 8,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726671482988",
+    "front": "Affrontare con successo",
+    "back": "Reggere",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20547,
+    "ivl": 86,
+    "ease": 2500,
+    "reps": 14,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -15184,8 +15296,24 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1726932467101",
+    "front": "ridotto come una bestia (dehumanized)",
+    "back": "imbestialito",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20506,
+    "ivl": 11,
+    "ease": 2500,
+    "reps": 13,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1726932467102",
-    "front": "Fatigued (neutral, slightly formal — tired from sustained effort)",
+    "front": "fatigued",
     "back": "affaticato",
     "tags": [
       "anki-import"
@@ -15201,7 +15329,7 @@
   },
   {
     "id": "anki_1726932467103",
-    "front": "Sickly, delicate (chronic poor health — constitutionally fragile)",
+    "front": "fragile, debole, malandato",
     "back": "cagionevole",
     "tags": [
       "anki-import"
@@ -15217,7 +15345,7 @@
   },
   {
     "id": "anki_1726932467104",
-    "front": "Elegant, upper-class (noble bearing or style — \"un palazzo signorile\")",
+    "front": "nobiliare",
     "back": "signorile",
     "tags": [
       "anki-import"
@@ -15243,6 +15371,22 @@
     "ivl": 42,
     "ease": 2800,
     "reps": 15,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467106",
+    "front": "delicate , sickly",
+    "back": "cagionevole",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20500,
+    "ivl": 6,
+    "ease": 2500,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -15313,7 +15457,7 @@
   },
   {
     "id": "anki_1726932467111",
-    "front": "Furious (intense, explosive anger — may or may not act on it)",
+    "front": "furious",
     "back": "furioso",
     "tags": [
       "anki-import"
@@ -15329,7 +15473,7 @@
   },
   {
     "id": "anki_1726932467112",
-    "front": "Irritated (sharper, more visible — your patience is visibly wearing thin; \"irritato dal ritardo\")",
+    "front": "irritated",
     "back": "Irritato",
     "tags": [
       "anki-import"
@@ -15345,7 +15489,7 @@
   },
   {
     "id": "anki_1726932467113",
-    "front": "Livid, enraged (informal — anger so strong it's dehumanizing; also literally \"reduced to a beast\")",
+    "front": "figurato, informale (arrabbiato, furioso)",
     "back": "imbestialito",
     "tags": [
       "anki-import"
@@ -15370,6 +15514,38 @@
     "due": 20556,
     "ivl": 93,
     "ease": 2650,
+    "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467115",
+    "front": "Wanted by the police",
+    "back": "ricercato",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20502,
+    "ivl": 27,
+    "ease": 2650,
+    "reps": 12,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467116",
+    "front": "Dopo tanti ___, finalmente Gaetano si è laureato",
+    "back": "sforzi",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20556,
+    "ivl": 97,
+    "ease": 2800,
     "reps": 11,
     "lapses": 0,
     "created": "2024-04-16",
@@ -15520,6 +15696,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1726932467127",
+    "front": "macchina per tessere",
+    "back": "telaio",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20499,
+    "ivl": 24,
+    "ease": 2800,
+    "reps": 15,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1726932467128",
     "front": "Alessio era così  ____, ma crescendo si è fortificato",
     "back": "cagionevole",
@@ -15579,6 +15771,22 @@
     "ivl": 55,
     "ease": 2800,
     "reps": 14,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467132",
+    "front": "immischiarsi in affari altrui",
+    "back": "impicciarsi in",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20504,
+    "ivl": 10,
+    "ease": 2650,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -15665,7 +15873,7 @@
   },
   {
     "id": "anki_1726932467138",
-    "front": "Refined, sophisticated (elegant taste in culture, food, style)",
+    "front": "elegante, di alta classe",
     "back": "Raffinato",
     "tags": [
       "anki-import"
@@ -15681,7 +15889,7 @@
   },
   {
     "id": "anki_1726932467139",
-    "front": "Haughty (looks down on others — cold superiority; \"Giovanni è altezzoso\")",
+    "front": "haughty",
     "back": "altezzoso",
     "tags": [
       "anki-import"
@@ -15696,8 +15904,24 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1726932467140",
+    "front": "Fishing",
+    "back": "la pesca",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20530,
+    "ivl": 71,
+    "ease": 2650,
+    "reps": 12,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1726932467141",
-    "front": "Distinguished, well-bred (polished appearance and bearing; \"un signore distinto\")",
+    "front": "raffinato, alto livello",
     "back": "distinto",
     "tags": [
       "anki-import"
@@ -15707,6 +15931,22 @@
     "ivl": 51,
     "ease": 2650,
     "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467142",
+    "front": "molto richiesto",
+    "back": "ricercato",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20532,
+    "ivl": 49,
+    "ease": 2800,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -15809,7 +16049,7 @@
   },
   {
     "id": "anki_1726932467149",
-    "front": "Limp, worn out (low energy, sluggish — can be temporary or temperamental)",
+    "front": "limp/ weak / worn out",
     "back": "fiacco",
     "tags": [
       "anki-import"
@@ -15820,6 +16060,22 @@
     "ease": 2450,
     "reps": 32,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1726932467150",
+    "front": "Strain (mechanical)",
+    "back": "sforzo",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20545,
+    "ivl": 87,
+    "ease": 2650,
+    "reps": 18,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -15841,7 +16097,7 @@
   },
   {
     "id": "anki_1726932467153",
-    "front": "Jolly/easygoing plump person (affectionate — personality + body type combined)",
+    "front": "plump and easy-going person",
     "back": "pacioccone",
     "tags": [
       "anki-import"
@@ -15937,7 +16193,7 @@
   },
   {
     "id": "anki_1726932467159",
-    "front": "Agitated, on edge (nervousness-driven irritation, fidgety frustration; \"innervosito dal rumore\")",
+    "front": "infastidito (I synonym)",
     "back": "innervosito",
     "tags": [
       "anki-import"
@@ -16401,7 +16657,7 @@
   },
   {
     "id": "anki_1727647579045",
-    "front": "Tenacious, tough (refuses to give up — persistence through adversity)",
+    "front": "Tough",
     "back": "Tenace",
     "tags": [
       "anki-import"
@@ -16817,7 +17073,7 @@
   },
   {
     "id": "anki_1727747676658",
-    "front": "Nuisance, hassle (a persistent minor annoyance — \"le tasse sono una seccatura\")",
+    "front": "disturbo, fastidio",
     "back": "Seccatura",
     "tags": [
       "anki-import"
@@ -17041,7 +17297,7 @@
   },
   {
     "id": "anki_1727747676672",
-    "front": "Small-minded, petty (stingy in thought and action — \"un atteggiamento gretto\")",
+    "front": "Small minded / petty",
     "back": "gretto",
     "tags": [
       "anki-import"
@@ -17264,6 +17520,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1727747676686",
+    "front": "​​tagliare parti dei rami",
+    "back": "Potare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20515,
+    "ivl": 57,
+    "ease": 2650,
+    "reps": 14,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1727747676687",
     "front": "rusted",
     "back": "Arrugginito",
@@ -17329,7 +17601,7 @@
   },
   {
     "id": "anki_1727747676691",
-    "front": "Shrewd, cunning (strategic — plans ahead with cleverness)",
+    "front": "acuto, ingegnoso",
     "back": "Astuto",
     "tags": [
       "anki-import"
@@ -17377,7 +17649,7 @@
   },
   {
     "id": "anki_1727747676694",
-    "front": "Perceptive, shrewd (sees through things — analytical sharpness)",
+    "front": "perceptive, shrew",
     "back": "Perspicace",
     "tags": [
       "anki-import"
@@ -17553,7 +17825,7 @@
   },
   {
     "id": "anki_1727747676705",
-    "front": "Ingenious (creative problem-solver — inventive approach)",
+    "front": "ingenious (person)",
     "back": "Ingegnoso",
     "tags": [
       "anki-import"
@@ -17617,7 +17889,7 @@
   },
   {
     "id": "anki_1727747676709",
-    "front": "Awning, canopy (built structure providing overhead cover)",
+    "front": "the canopy awning",
     "back": "Tettoia",
     "tags": [
       "anki-import"
@@ -17729,7 +18001,7 @@
   },
   {
     "id": "anki_1727750769923",
-    "front": "Ostentatious, showy (excessively lavish — pejorative; implies showing off wealth)",
+    "front": "peggiorativo (ostentatamente ricco)",
     "back": "Sfarzoso",
     "tags": [
       "anki-import"
@@ -17777,7 +18049,7 @@
   },
   {
     "id": "anki_1727750924866",
-    "front": "Self-righteous conformist (smugly conventional — thinks they're morally superior)",
+    "front": "Conformist",
     "back": "Benpensante",
     "tags": [
       "anki-import"
@@ -17835,6 +18107,22 @@
     "ivl": 71,
     "ease": 2800,
     "reps": 20,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1727751390950",
+    "front": "To goof around",
+    "back": "Folleggiare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 5,
+    "ease": 2500,
+    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -17937,7 +18225,7 @@
   },
   {
     "id": "anki_1727789212191",
-    "front": "Restless, uneasy (low-grade anxiety — agitated, can't settle; not necessarily about one thing)",
+    "front": "agitato, scosso",
     "back": "inquieto",
     "tags": [
       "anki-import"
@@ -18433,7 +18721,7 @@
   },
   {
     "id": "anki_1728105156802",
-    "front": "Miserly, stingy (won't spend money — \"è un taccagno incredibile\")",
+    "front": "Miser (noun and adj)",
     "back": "Taccagno",
     "tags": [
       "anki-import"
@@ -18753,7 +19041,7 @@
   },
   {
     "id": "anki_1728745640462",
-    "front": "Regret, remorse (for something done or not done — reflective; \"senza rammarichi\")",
+    "front": "Regret, repentance",
     "back": "Rammarico",
     "tags": [
       "anki-import"
@@ -18817,7 +19105,7 @@
   },
   {
     "id": "anki_1728746033698",
-    "front": "Bruise (subcutaneous — from impact; discoloration)",
+    "front": "The bruise",
     "back": "Il livido",
     "tags": [
       "anki-import"
@@ -19552,6 +19840,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1728870066009",
+    "front": "Aggiungi sale .",
+    "back": "quanto basta",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20504,
+    "ivl": 9,
+    "ease": 2650,
+    "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1728870066010",
     "front": "\"not really\" or \"not that much\"",
     "back": "mica tanto",
@@ -19825,7 +20129,7 @@
   },
   {
     "id": "anki_1728870066027",
-    "front": "Brazen, cheeky (impudent — pushes boundaries shamelessly; \"ha saltato la fila\")",
+    "front": "impudente, sfrontato",
     "back": "Sfacciato",
     "tags": [
       "anki-import"
@@ -20416,6 +20720,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1730756505573",
+    "front": "Tariff",
+    "back": "Tariffa",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20523,
+    "ivl": 35,
+    "ease": 2650,
+    "reps": 10,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1730756505574",
     "front": "Welfare",
     "back": "Il Benessere",
@@ -20754,7 +21074,7 @@
   {
     "id": "anki_1731074736010",
     "front": "the kangaroo",
-    "back": "Canguro",
+    "back": "Kanguro",
     "tags": [
       "anki-import"
     ],
@@ -21265,7 +21585,7 @@
   },
   {
     "id": "anki_1731074736048",
-    "front": "Lesion, injury (medical — no blood necessarily; tissue damage; \"una lesione al legamento\")",
+    "front": "the injury (no blood)",
     "back": "Una lesione",
     "tags": [
       "anki-import"
@@ -21281,7 +21601,7 @@
   },
   {
     "id": "anki_1731074736049",
-    "front": "Wound (with blood — open cut or gash; \"la ferita sanguinava\")",
+    "front": "The injury (but with blood)",
     "back": "La ferita",
     "tags": [
       "anki-import"
@@ -21553,7 +21873,7 @@
   },
   {
     "id": "anki_1731350375810",
-    "front": "Lesion, injury (medical — no blood necessarily; tissue damage; \"una lesione al legamento\")",
+    "front": "Injury (not necessarily bloody)",
     "back": "La lesione",
     "tags": [
       "anki-import"
@@ -21632,6 +21952,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1731680132474",
+    "front": "i can't complain",
+    "back": "Non posso lamentarmi",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20505,
+    "ivl": 22,
+    "ease": 2650,
+    "reps": 9,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1731806854969",
     "front": "Brother in law",
     "back": "Cognato",
@@ -21675,6 +22011,22 @@
     "ivl": 38,
     "ease": 2800,
     "reps": 23,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732135079623",
+    "front": "Spine (of a book)",
+    "back": "La costola",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20501,
+    "ivl": 58,
+    "ease": 2500,
+    "reps": 20,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -21745,7 +22097,7 @@
   },
   {
     "id": "anki_1732151001382",
-    "front": "Gangly, lanky (tall and awkwardly thin — slightly comic connotation)",
+    "front": "gangly, lanky",
     "back": "allampanato",
     "tags": [
       "anki-import"
@@ -21777,7 +22129,7 @@
   },
   {
     "id": "anki_1732151001384",
-    "front": "Slim and elegant (see Thin cluster — positive proportions)",
+    "front": "thin, slim, slender (s version)",
     "back": "slanciato",
     "tags": [
       "anki-import"
@@ -21809,7 +22161,7 @@
   },
   {
     "id": "anki_1732151001386",
-    "front": "Slender, streamlined (positive — light and efficient; also used for processes)",
+    "front": "slanciato (s synonym)",
     "back": "snello",
     "tags": [
       "anki-import"
@@ -21825,7 +22177,7 @@
   },
   {
     "id": "anki_1732151001387",
-    "front": "Well-fed, plump (literary — implies prosperity/good nourishment; \"maiali pasciuti\")",
+    "front": "well-fed / plump",
     "back": "pasciuto",
     "tags": [
       "anki-import"
@@ -21888,6 +22240,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1732151001391",
+    "front": "glowing / ruddy",
+    "back": "florido",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 4,
+    "ease": 2500,
+    "reps": 8,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1732151001392",
     "front": "Il ___ giovanotto sembrava non stancarsi mai",
     "back": "florido",
@@ -21920,8 +22288,24 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1732151001394",
+    "front": "Il business dell'e-commerce è ancora ___",
+    "back": "florido",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 3,
+    "ease": 2500,
+    "reps": 11,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1732151001395",
-    "front": "Squat, stumpy (short and compact — describes shape more than weight)",
+    "front": "basso e massiccio",
     "back": "tozzo",
     "tags": [
       "anki-import"
@@ -21985,7 +22369,7 @@
   },
   {
     "id": "anki_1732151001399",
-    "front": "Stocky, burly (short and solidly built — suggests strength, not fat)",
+    "front": "burly, stocky, portly (ta )",
     "back": "tarchiato",
     "tags": [
       "anki-import"
@@ -22001,7 +22385,7 @@
   },
   {
     "id": "anki_1732151001400",
-    "front": "Squat, dumpy (short and thickset — potentially offensive; pejorative)",
+    "front": "potenzialmente offensivo (basso e grassoccio)",
     "back": "tracagnotto",
     "tags": [
       "anki-import"
@@ -22017,7 +22401,7 @@
   },
   {
     "id": "anki_1732151001401",
-    "front": "Tiny, petite (small in frame — neutral, often for women; \"una donna minuta\")",
+    "front": "tiny (for a person)",
     "back": "minuto",
     "tags": [
       "anki-import"
@@ -22033,7 +22417,7 @@
   },
   {
     "id": "anki_1732151001402",
-    "front": "Slight, delicate (fragile thinness — implies vulnerability; \"un fisico esile\")",
+    "front": "gracile, minuto",
     "back": "esile",
     "tags": [
       "anki-import"
@@ -22065,7 +22449,7 @@
   },
   {
     "id": "anki_1732151001404",
-    "front": "Frail, weak (thinness from poor health or constitution — negative; \"era gracile da bambino\")",
+    "front": "frail, weak , undernourished",
     "back": "gracile",
     "tags": [
       "anki-import"
@@ -22081,7 +22465,7 @@
   },
   {
     "id": "anki_1732151001405",
-    "front": "Gaunt, drawn (visible deprivation — sunken features from hunger/illness/exhaustion)",
+    "front": "gaunt, pinched, emaciated",
     "back": "smunto",
     "tags": [
       "anki-import"
@@ -22113,7 +22497,7 @@
   },
   {
     "id": "anki_1732151001407",
-    "front": "Emaciated (extreme thinness from starvation or severe illness — medical/literary)",
+    "front": "emaciated",
     "back": "emaciato",
     "tags": [
       "anki-import"
@@ -22193,7 +22577,7 @@
   },
   {
     "id": "anki_1732151001412",
-    "front": "Chubby (endearing — round cheeks, often for children; \"il paffuto bambino\")",
+    "front": "chubby",
     "back": "paffuto",
     "tags": [
       "anki-import"
@@ -22241,7 +22625,7 @@
   },
   {
     "id": "anki_1732151001415",
-    "front": "Drained, spent (fiber-by-fiber exhaustion — utterly depleted; \"sfibrato dal lavoro\")",
+    "front": "Sono __. Appena arrivo a casa mi butto a letto.",
     "back": "sfibrato",
     "tags": [
       "anki-import"
@@ -22609,7 +22993,7 @@
   },
   {
     "id": "anki_1732151001438",
-    "front": "Shady, sketchy (of a person — morally suspect; \"un tipo losco\")",
+    "front": "shady (of a person)",
     "back": "Losco",
     "tags": [
       "anki-import"
@@ -22673,7 +23057,7 @@
   },
   {
     "id": "anki_1732151001443",
-    "front": "Dark, gloomy (heavy, oppressive — metaphorical; \"un'atmosfera cupa\")",
+    "front": "dark metamorphical",
     "back": "cupo",
     "tags": [
       "anki-import"
@@ -23424,8 +23808,24 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1732384393215",
+    "front": "Sparse / small",
+    "back": "Sparuto",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 4,
+    "ease": 2500,
+    "reps": 7,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1732385522613",
-    "front": "Crowd, gathering (neutral — people collected in one place; \"un grande assembramento\")",
+    "front": "Group / gathering / crowd",
     "back": "assembramento",
     "tags": [
       "anki-import"
@@ -23609,6 +24009,22 @@
     "queue": 2,
     "due": 20497,
     "ivl": 4,
+    "ease": 2500,
+    "reps": 10,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732387116055",
+    "front": "To deploy",
+    "back": "Schierare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20498,
+    "ivl": 5,
     "ease": 2500,
     "reps": 10,
     "lapses": 0,
@@ -24299,6 +24715,22 @@
     "ivl": 3,
     "ease": 2500,
     "reps": 19,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732567567112",
+    "front": "apartheid",
+    "back": "apartheid",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20516,
+    "ivl": 34,
+    "ease": 2800,
+    "reps": 10,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -25182,7 +25614,7 @@
   },
   {
     "id": "anki_1732568047857",
-    "front": "Destroyed, wiped out (informal — extreme exhaustion; \"sono distrutto dal lavoro\")",
+    "front": "it was a gift that they destroyed it",
     "back": "è stato un regalo che lo abbiano distrutto",
     "tags": [
       "anki-import"
@@ -25208,6 +25640,22 @@
     "ivl": 91,
     "ease": 2650,
     "reps": 20,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732568047859",
+    "front": "fare legittimo",
+    "back": "sdoganare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20496,
+    "ivl": 17,
+    "ease": 2650,
+    "reps": 12,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -25550,7 +25998,7 @@
   },
   {
     "id": "anki_1732655483654",
-    "front": "To sparkle, glisten (many small reflections — \"l'oro luccica\")",
+    "front": "Sparkle / glisten / shine",
     "back": "Luccicare",
     "tags": [
       "anki-import"
@@ -25582,7 +26030,7 @@
   },
   {
     "id": "anki_1732655695215",
-    "front": "To shine, glow (steady bright light — also figurative: \"brillare negli studi\")",
+    "front": "To shine or glow",
     "back": "Brillare",
     "tags": [
       "anki-import"
@@ -25741,6 +26189,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1732656149935",
+    "front": "Sabbia",
+    "back": "Rena — (poetico) sand; equivalente standard: sabbia",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20521,
+    "ivl": 62,
+    "ease": 2650,
+    "reps": 14,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1732656164055",
     "front": "Rana",
     "back": "Frog",
@@ -25758,7 +26222,7 @@
   },
   {
     "id": "anki_1732656215700",
-    "front": "To tremble with emotion (excitement, rage, anticipation — internal shaking; \"fremeva di rabbia\")",
+    "front": "scuotersi per l'emozione",
     "back": "Fremere",
     "tags": [
       "anki-import"
@@ -25769,6 +26233,22 @@
     "ease": 2600,
     "reps": 32,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732656221917",
+    "front": "Tremble",
+    "back": "Fremere",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20498,
+    "ivl": 16,
+    "ease": 2650,
+    "reps": 13,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -25817,6 +26297,22 @@
     "ease": 2600,
     "reps": 14,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1732727934996",
+    "front": "Rena/ Rana",
+    "back": "Sand / frog",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20554,
+    "ivl": 96,
+    "ease": 2800,
+    "reps": 14,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -26206,7 +26702,7 @@
   },
   {
     "id": "anki_1733195321649",
-    "front": "Bony, gaunt (very thin with visible bones — also figurative: \"uno stile scarno\" = bare/stripped)",
+    "front": "Gaunt, skinny, bony",
     "back": "Scarno",
     "tags": [
       "anki-import"
@@ -26217,6 +26713,22 @@
     "ease": 2750,
     "reps": 33,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1733195329001",
+    "front": "Troppo magro",
+    "back": "Scarno",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 3,
+    "ease": 2500,
+    "reps": 15,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -26285,6 +26797,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1733196321308",
+    "front": "Curva / incurvatura",
+    "back": "Flessione",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20535,
+    "ivl": 46,
+    "ease": 2800,
+    "reps": 10,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1733196343368",
     "front": "Il vento costante che soffia nella vallata ha causato la ____ del tronco di questi alberi",
     "back": "Flessione",
@@ -26312,6 +26840,22 @@
     "ivl": 47,
     "ease": 2800,
     "reps": 14,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1733196376460",
+    "front": "Dopo anni di crescita esponenziale, l'economia cinese inizia a dare segni di ____",
+    "back": "Flessione",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20535,
+    "ivl": 77,
+    "ease": 2650,
+    "reps": 11,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -26493,6 +27037,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1733252904999",
+    "front": "il generale ha ___ le truppe.",
+    "back": "schierato",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20520,
+    "ivl": 31,
+    "ease": 2500,
+    "reps": 9,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1733252931487",
     "front": "Dobbiamo ___ ogni strategia possibile se vogliamo avere successo.",
     "back": "attuare/implementare",
@@ -26590,7 +27150,7 @@
   },
   {
     "id": "anki_1733528439244",
-    "front": "Plump (neutral-affectionate — a bit overweight but not negatively; synonym of paffuto)",
+    "front": "Paffuto (g synonym)",
     "back": "grassoccio",
     "tags": [
       "anki-import"
@@ -26632,6 +27192,22 @@
     "ivl": 5,
     "ease": 2500,
     "reps": 7,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1733528721590",
+    "front": "Largely (as in mostly; broadly)",
+    "back": "Largamente",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 3,
+    "ease": 2500,
+    "reps": 8,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -27646,7 +28222,7 @@
   },
   {
     "id": "anki_1734056075962",
-    "front": "Fatso (offensive — pejorative term for someone very overweight)",
+    "front": "informale, offensivo(chi è in sovrappeso)",
     "back": "Ciccione",
     "tags": [
       "anki-import"
@@ -27854,7 +28430,7 @@
   },
   {
     "id": "anki_1734205100602",
-    "front": "Slander (false accusation made to damage reputation — legal/formal)",
+    "front": "Slander",
     "back": "La Calunnia",
     "tags": [
       "anki-import"
@@ -27918,7 +28494,7 @@
   },
   {
     "id": "anki_1734208276787",
-    "front": "Verge, roadside edge (literal edge of road/cliff; also: eyelash; \"sul ciglio della strada\")",
+    "front": "Without batting an eyelid",
     "back": "Senza batter ciglio",
     "tags": [
       "anki-import"
@@ -28045,6 +28621,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1734208619009",
+    "front": "meteo: leggermente nebbioso",
+    "back": "Fosco",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20518,
+    "ivl": 28,
+    "ease": 2600,
+    "reps": 20,
+    "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1734208645047",
     "front": "Pur essendo una giornata ____ riuscivamo a distinguere le montagne all'orizzonte",
     "back": "Fosca",
@@ -28078,7 +28670,7 @@
   },
   {
     "id": "anki_1734208722121",
-    "front": "Hazy, murky (weather: slightly foggy; figurative: threatening, resentful; \"uno sguardo fosco\")",
+    "front": "Figurato: minaccioso risentito",
     "back": "Fosco",
     "tags": [
       "anki-import"
@@ -28494,7 +29086,7 @@
   },
   {
     "id": "anki_1734318862926",
-    "front": "Tough, hard-nosed (informal — resilient and no-nonsense; \"un personaggio tosto\")",
+    "front": "Risoluto, duro (comincia con t)",
     "back": "Tosto",
     "tags": [
       "anki-import"
@@ -28606,7 +29198,7 @@
   },
   {
     "id": "anki_1734365966893",
-    "front": "Skittish, suspicious (easily startled or distrustful — originally for horses)",
+    "front": "suspicious, untrusting",
     "back": "ombroso",
     "tags": [
       "anki-import"
@@ -28622,7 +29214,7 @@
   },
   {
     "id": "anki_1734374886627",
-    "front": "To stun, daze (temporarily disorient — physical or mental; \"stordito dal colpo\")",
+    "front": "To stun / daze",
     "back": "Stordire",
     "tags": [
       "anki-import"
@@ -28654,7 +29246,7 @@
   },
   {
     "id": "anki_1734375334429",
-    "front": "Gang, clique (group of friends or suspects — slightly suspicious; \"la solita combriccola\")",
+    "front": "Gang (of friends or suspects)",
     "back": "Combriccola",
     "tags": [
       "anki-import"
@@ -28925,6 +29517,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1734969746570",
+    "front": "To harvest",
+    "back": "Raccogliere",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20590,
+    "ivl": 102,
+    "ease": 2650,
+    "reps": 9,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1735050271339",
     "front": "Warm jacket not formal",
     "back": "Giubbotto",
@@ -28974,7 +29582,7 @@
   },
   {
     "id": "anki_1735165365004",
-    "front": "Pretty, charming (pleasant, delicate beauty — \"che bambino grazioso\")",
+    "front": "Bello (g synonym)",
     "back": "grazioso",
     "tags": [
       "anki-import"
@@ -29128,6 +29736,22 @@
     "ivl": 165,
     "ease": 2800,
     "reps": 13,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1735171694268",
+    "front": "mettere un sigillo",
+    "back": "sigillare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20552,
+    "ivl": 59,
+    "ease": 2650,
+    "reps": 9,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -29560,6 +30184,22 @@
     "ivl": 96,
     "ease": 2650,
     "reps": 16,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1735172705379",
+    "front": "hover / hang around (figurative)",
+    "back": "ronzare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20498,
+    "ivl": 3,
+    "ease": 2500,
+    "reps": 8,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -30349,6 +30989,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1736278186379",
+    "front": "di marmo",
+    "back": "marmoreo — (letterario) of marble; la forma standard è \"di marmo\"",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20499,
+    "ivl": 17,
+    "ease": 2650,
+    "reps": 9,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1736278186380",
     "front": "Nel giardino della villa c'è una grande statua ____ di Venere",
     "back": "marmorea",
@@ -30445,8 +31101,40 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1736278186386",
+    "front": "felicità, gioia serena",
+    "back": "letizia — (letterario/formale) joy, serene happiness; in conversazione: gioia, felicità",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20496,
+    "ivl": 1,
+    "ease": 2500,
+    "reps": 13,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1736278186387",
+    "front": "La nascita del loro primogenito portò grande ___ a tutta la famiglia",
+    "back": "letizia",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20496,
+    "ivl": 1,
+    "ease": 2500,
+    "reps": 10,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1736278186388",
-    "front": "Gone soft (figurative — lost vigor or backbone; somewhat pejorative)",
+    "front": "fiacco, weake (synonym r)",
     "back": "rammollito",
     "tags": [
       "anki-import"
@@ -30478,7 +31166,7 @@
   },
   {
     "id": "anki_1736278186390",
-    "front": "Beggar, wretch (pejorative — extremely poor; used as insult)",
+    "front": "spregiativo (molto povero)",
     "back": "il pezzente",
     "tags": [
       "anki-import"
@@ -31327,7 +32015,7 @@
   {
     "id": "anki_1737044687995",
     "front": "groin",
-    "back": "Inguine",
+    "back": "Inguino",
     "tags": [
       "anki-import"
     ],
@@ -31806,7 +32494,7 @@
   },
   {
     "id": "anki_1737770366607",
-    "front": "Crush, throng (pressing crowd — often at entrances; \"c'era una gran ressa\")",
+    "front": "Crowd / throng (like at a party)",
     "back": "La Ressa",
     "tags": [
       "anki-import"
@@ -32046,7 +32734,7 @@
   },
   {
     "id": "anki_1737776513905",
-    "front": "Lanky, long-limbed (formal — tall with elongated proportions; medical/descriptive)",
+    "front": "fisico slanciato (Formale)",
     "back": "Longilineo",
     "tags": [
       "anki-import"
@@ -32413,6 +33101,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1737915289214",
+    "front": "to be going smoothly (adverb)",
+    "back": "su rotaia",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1737915300816",
     "front": "Il progetto procede ___, senza intoppi o ritardi.",
     "back": "su rotaia",
@@ -32461,6 +33165,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1739748348762",
+    "front": "fare schifo",
+    "back": "rivoltare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1739748362748",
     "front": "Il tuo attaccamento verso il denaro ____",
     "back": "fa rivoltare",
@@ -32504,6 +33224,22 @@
     "ivl": 36,
     "ease": 2650,
     "reps": 12,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1739748453709",
+    "front": "to tear or rend",
+    "back": "squarciare",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20536,
+    "ivl": 93,
+    "ease": 2650,
+    "reps": 14,
     "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
@@ -33087,7 +33823,7 @@
   {
     "id": "anki_1746971519761",
     "front": "to follow the procedure",
-    "back": "seguire la prassi",
+    "back": "segurie la prassi",
     "tags": [
       "anki-import"
     ],
@@ -33103,7 +33839,7 @@
   {
     "id": "anki_1746971535397",
     "front": "Per ottenere il permesso, bisogna ____ correttamente.",
-    "back": "seguire la prassi",
+    "back": "segurie la prassi",
     "tags": [
       "anki-import"
     ],
@@ -33262,7 +33998,7 @@
   },
   {
     "id": "anki_1746971663775",
-    "front": "Sneaky, underhanded (negative — acts with hidden malice behind apparent innocence)",
+    "front": "Persona che agisce in modo astuto e ingannevole per ottenere ciò che vuole.",
     "back": "subdolo",
     "tags": [
       "anki-import"
@@ -33294,7 +34030,7 @@
   },
   {
     "id": "anki_1746971712185",
-    "front": "Quick-witted (pragmatic — reacts fast and effectively)",
+    "front": "Persona astuta, perspicace, e capace di trovare soluzioni rapide e vantaggiose.",
     "back": "scaltro",
     "tags": [
       "anki-import"
@@ -33567,7 +34303,7 @@
   {
     "id": "anki_1746972048500",
     "front": "media literacy",
-    "back": "Alfabetizzazione mediatica",
+    "back": "Alfabetizzazione letteraria",
     "tags": [
       "anki-import"
     ],
@@ -34621,6 +35357,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1748201058296",
+    "front": "metaphorically to become unhinged",
+    "back": "Uscire fuori dai gangheri",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1748201076361",
     "front": "the hinge",
     "back": "il ganghere",
@@ -34702,7 +35454,7 @@
   },
   {
     "id": "anki_1748201159865",
-    "front": "Lump in the throat (intense sadness that tightens the throat — colloquial; \"mi è venuto un magone\")",
+    "front": "Sensazione di tristezza intensa o di commozione che stringe la gola; spesso difficile da esprimere a parole.",
     "back": "magone",
     "tags": [
       "anki-import"
@@ -34845,6 +35597,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1748223671114",
+    "front": "foresight",
+    "back": "lungimiranza",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1748223690213",
     "front": "flush the toilet!",
     "back": "Tira lo sciacquone!",
@@ -34973,6 +35741,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1748223856438",
+    "front": "on their own / on their part",
+    "back": "per conto loro",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1748223865191",
     "front": "Hanno deciso di partire ____, senza dirlo a nessuno.",
     "back": "per conto loro",
@@ -35008,6 +35792,22 @@
     "id": "anki_1748223902697",
     "front": "_____se sei nervoso per il lavoro.",
     "back": "Non prendertela con me",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1748225428852",
+    "front": "Che agisce in modo nascosto o ingannevole, con astuzia e senza mostrarsi apertamente. Spesso riferito a comportamenti che sembrano innocui ma che hanno secondi fini.",
+    "back": "subdolo",
     "tags": [
       "anki-import"
     ],
@@ -35775,7 +36575,7 @@
   {
     "id": "anki_1749201475209",
     "front": "Pheasant",
-    "back": "fagiano",
+    "back": "faggiano",
     "tags": [
       "anki-import"
     ],
@@ -36125,6 +36925,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1749214935007",
+    "front": "visceral",
+    "back": "viscerale",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20530,
+    "ivl": 42,
+    "ease": 2800,
+    "reps": 3,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1749943646660",
     "front": "Banish",
     "back": "Bandire",
@@ -36222,7 +37038,7 @@
   },
   {
     "id": "anki_1762805522637",
-    "front": "Mild, gentle-natured (temperamental softness — not weakness; \"un uomo mite\")",
+    "front": "Gentle, mild-mannered, kind-spirited (temperament rather than weakness).",
     "back": "Mite",
     "tags": [
       "anki-import"
@@ -36718,7 +37534,7 @@
   },
   {
     "id": "anki_1763409856366",
-    "front": "Moody (frequent sudden mood swings — \"un momento ride, quello dopo è di pessimo umore\")",
+    "front": "moody, with frequent and sudden changes of mood",
     "back": "lunatico",
     "tags": [
       "anki-import"
@@ -37694,7 +38510,7 @@
   },
   {
     "id": "anki_1763409856427",
-    "front": "Relentless, dogged (won't let go — can be positive or obsessive; \"un accanito sostenitore\")",
+    "front": "Stubborn, relentless, dogged",
     "back": "Accanito",
     "tags": [
       "anki-import"
@@ -37837,6 +38653,38 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1763662524353",
+    "front": "The dregs / the sediment — carries the sense of what settles at the bottom; figuratively, “the worst part of something.”",
+    "back": "Le fecce",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20507,
+    "ivl": 12,
+    "ease": 2600,
+    "reps": 6,
+    "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1763662524354",
+    "front": "Little patches of muck / little muddy spots — diminutive; mildly vivid, slightly comic.",
+    "back": "Melmosetti",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 39,
+    "ease": 2100,
+    "reps": 18,
+    "lapses": 2,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1763662524355",
     "front": "The container / the vessel.",
     "back": "Il recipiente",
@@ -37886,7 +38734,7 @@
   },
   {
     "id": "anki_1763662524358",
-    "front": "Erudite, learned (bookish — deep knowledge; slightly old-fashioned)",
+    "front": "Erudite, learned — slightly old-fashioned, can feel a bit self-consciously scholarly.",
     "back": "Dotto",
     "tags": [
       "anki-import"
@@ -38105,6 +38953,22 @@
     "ease": 2450,
     "reps": 10,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1763662524372",
+    "front": "Dopo la pioggia il sentiero era pieno di _____, e bisognava scegliere bene dove mettere i piedi.",
+    "back": "melmosetti",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20497,
+    "ivl": 23,
+    "ease": 2650,
+    "reps": 5,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -39469,6 +40333,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1763997033067",
+    "front": "“Per capire questo testo ___ un po’ di attenzione.”",
+    "back": "ci va",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20500,
+    "ivl": 18,
+    "ease": 2600,
+    "reps": 7,
+    "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1763997033069",
     "front": "“Ha detto che è facile, facile ___: è complicatissimo.”",
     "back": "un corno",
@@ -39646,7 +40526,7 @@
   },
   {
     "id": "anki_1763997033080",
-    "front": "Fickle (easily changes mood or opinion — unreliable in consistency)",
+    "front": "Fickle; easily changing mood/opinion",
     "back": "Volubile",
     "tags": [
       "anki-import"
@@ -40477,6 +41357,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1764175275102",
+    "front": "Termine oggi arcaico o solenne, usato soprattutto in contesti religiosi o storici",
+    "back": "la mercede — wage, recompense (archaic / biblical)",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1764175275104",
     "front": "«Dopo la consulenza, le fu versato ___ concordato.»",
     "back": "l’emolumento",
@@ -40665,6 +41561,38 @@
     "ease": 0,
     "reps": 0,
     "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1764175275117",
+    "front": "«In quel racconto biblico il lavoratore riceve la sua ___.»",
+    "back": "mercede",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1764175275118",
+    "front": "«Nel romanzo medievaleggiante ottiene infine il sospirato ___.»",
+    "back": "guiderdone",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20506,
+    "ivl": 29,
+    "ease": 2400,
+    "reps": 24,
+    "lapses": 2,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -41198,7 +42126,7 @@
   },
   {
     "id": "anki_1764180064285",
-    "front": "Haggard, wrecked (visibly altered by exhaustion — face/expression distorted)",
+    "front": "Distorted, thrown off, turned upside down; exhausted to the point of being altered.",
     "back": "stravolto",
     "tags": [
       "anki-import"
@@ -41421,6 +42349,38 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1764865761202",
+    "front": "«Piccolo tumulo di terra, descrittivo o scherzoso…»",
+    "back": "tumulozzo — “small mound”",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1764865761203",
+    "front": "È comparso un ___ vicino al sentiero.",
+    "back": "tumulozzo",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1764865761204",
     "front": "«Massa eterogenea e informe senza ordine…»",
     "back": "ammasso — “mass, cluster”",
@@ -41504,6 +42464,22 @@
     "id": "anki_1764865761209",
     "front": "È ___ nella conversazione all’improvviso.",
     "back": "entrato in scivolata",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1764865761210",
+    "front": "«Di stile estremamente elevato, aulico…»",
+    "back": "alatissimo — “very lofty”",
     "tags": [
       "anki-import"
     ],
@@ -42032,6 +43008,22 @@
     "id": "anki_1764865761244",
     "front": "«Processo di dialogo per raggiungere un accordo…»",
     "back": "trattativa — “negotiation”",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1764865761245",
+    "front": "La ___ è durata ore.",
+    "back": "trattativa",
     "tags": [
       "anki-import"
     ],
@@ -44813,6 +45805,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1768351561697",
+    "front": "Quando ha proposto di cambiare tutto all’ultimo minuto, gli ho risposto: “___”, cercando di frenare l’entusiasmo fuori luogo.",
+    "back": "Cosa mi dici mai!",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20502,
+    "ivl": 21,
+    "ease": 2500,
+    "reps": 5,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1768351561698",
     "front": "Prendere in giro con ironia o sarcasmo, spesso in modo pungente ma non apertamente offensivo.",
     "back": "moteggiare — to mock, to jest at (registro: letterario)",
@@ -46141,6 +47149,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1768568829617",
+    "front": "La ____ della sedia è scomoda dopo qualche ora.",
+    "back": "seduta",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1768568829618",
     "front": "Comportarsi in modo meschino, egoista o offensivo (volgare).",
     "back": "essere uno stronzo — to be a jerk (vulgar, very colloquial)",
@@ -46528,6 +47552,22 @@
     "id": "anki_1768568829642",
     "front": "Azione moralmente scorretta o trucco sleale.",
     "back": "porcata — dirty trick",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1768568829643",
+    "front": "Licenziarlo in quel modo è stata una vera ____.",
+    "back": "porcata",
     "tags": [
       "anki-import"
     ],
@@ -47565,6 +48605,38 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1769379833486",
+    "front": "Definizione (IT): Divertimento leggero, spesso visto come frivolo.",
+    "back": "sollazzo — (letterario) divertimento, svago; equivalente moderno: svago, divertimento",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1769379833487",
+    "front": "Considerava il riso solo un ____ per animi deboli.",
+    "back": "sollazzo",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20496,
+    "ivl": 1,
+    "ease": 2300,
+    "reps": 11,
+    "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1769379833488",
     "front": "Definizione (IT): Invertire completamente una situazione o un rapporto.",
     "back": "ribaltare — to overturn",
@@ -47789,6 +48861,22 @@
     "reviewedToday": null
   },
   {
+    "id": "anki_1769379833502",
+    "front": "Definizione (IT): Brillare intensamente, in senso fisico o figurato.",
+    "back": "rifulgere — to shine forth (letterario)",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 2,
+    "due": 20499,
+    "ivl": 6,
+    "ease": 2050,
+    "reps": 16,
+    "lapses": 3,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
     "id": "anki_1769379833503",
     "front": "La sua idea ____ per un istante, prima di spegnersi.",
     "back": "rifulgere",
@@ -47920,6 +49008,22 @@
     "id": "anki_1769434723724",
     "front": "Ha stipato cappotti e valigie nell’____ dell’ingresso per liberare la camera.",
     "back": "armadio",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1769434723725",
+    "front": "Era sul ____ del burrone, fermo a un passo dal cadere, indeciso se fare marcia indietro.",
+    "back": "ciglio",
     "tags": [
       "anki-import"
     ],
@@ -48457,6 +49561,22 @@
     "ease": 2300,
     "reps": 9,
     "lapses": 1,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1769434723759",
+    "front": "Con una sola ____ al budget, il progetto è stato drasticamente ridimensionato.",
+    "back": "sforbiciata",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
     "created": "2024-04-16",
     "reviewedToday": null
   },
@@ -50938,6 +52058,22 @@
     "id": "anki_1770037930022",
     "front": "Espressione che introduce un’ipotesi inattesa o un sospetto ironico (“e se fosse che…”).",
     "back": "vuoi vedere che — what if / wouldn’t it be that",
+    "tags": [
+      "anki-import"
+    ],
+    "queue": 0,
+    "due": 20496,
+    "ivl": 0,
+    "ease": 0,
+    "reps": 0,
+    "lapses": 0,
+    "created": "2024-04-16",
+    "reviewedToday": null
+  },
+  {
+    "id": "anki_1770037930023",
+    "front": "È in ritardo da due ore: ___ ha perso il treno.",
+    "back": "vuoi vedere che",
     "tags": [
       "anki-import"
     ],
