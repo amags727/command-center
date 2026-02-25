@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Deck Audit — Review</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --text-dim: #8b949e; --text-bright: #f0f6fc;
+    --red: #f85149; --green: #3fb950; --yellow: #d29922; --blue: #58a6ff;
+    --orange: #db6d28; --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--bg); color: var(--text); padding: 20px; }
+
+  /* ── header ── */
+  .header { margin-bottom: 24px; }
+  .header h1 { color: var(--text-bright); font-size: 1.6rem; margin-bottom: 8px; }
+  .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border);
+               border-radius: 8px; padding: 12px 18px; min-width: 120px; }
+  .stat-card .label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
+  .stat-card .value { font-size: 1.4rem; font-weight: 700; color: var(--text-bright); }
+  .stat-card.delete .value { color: var(--red); }
+  .stat-card.fix .value { color: var(--yellow); }
+  .stat-card.review .value { color: var(--orange); }
+  .stat-card.keep .value { color: var(--green); }
+
+  /* ── controls ── */
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .controls select, .controls input, .controls button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 12px; border-radius: 6px; font-size: 0.85rem;
+  }
+  .controls input { width: 260px; }
+  .controls button { cursor: pointer; font-weight: 600; }
+  .controls button:hover { border-color: var(--blue); color: var(--blue); }
+  .controls button.primary { background: var(--blue); color: #000; border-color: var(--blue); }
+  .controls button.primary:hover { opacity: 0.9; }
+  .controls button.danger { background: var(--red); color: #fff; border-color: var(--red); }
+  .controls button.danger:hover { opacity: 0.9; }
+  .controls .spacer { flex: 1; }
+  .controls .count { color: var(--text-dim); font-size: 0.85rem; }
+
+  /* ── table ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { background: var(--surface); color: var(--text-dim); font-weight: 600;
+       text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;
+       padding: 10px 8px; text-align: left; border-bottom: 2px solid var(--border);
+       position: sticky; top: 0; z-index: 2; cursor: pointer; user-select: none; }
+  th:hover { color: var(--blue); }
+  td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover { background: rgba(88,166,255,0.04); }
+  tr.row-delete { background: rgba(248,81,73,0.06); }
+  tr.row-fix { background: rgba(210,153,34,0.06); }
+
+  /* decision column */
+  .decision-cell { text-align: center; }
+  .decision-btn { width: 36px; height: 36px; border-radius: 6px; border: 2px solid var(--border);
+                  background: transparent; color: var(--text-dim); font-size: 1rem;
+                  cursor: pointer; font-weight: 700; transition: all 0.15s; }
+  .decision-btn.keep { border-color: var(--green); color: var(--green); background: rgba(63,185,80,0.1); }
+  .decision-btn.remove { border-color: var(--red); color: var(--red); background: rgba(248,81,73,0.1); }
+
+  /* flags */
+  .flag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;
+          font-weight: 600; margin: 1px 2px; }
+  .flag-COGNATE { background: rgba(248,81,73,0.15); color: var(--red); }
+  .flag-TOO_EASY { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .flag-VERY_EASY { background: rgba(219,109,40,0.15); color: var(--orange); }
+  .flag-SPELLING_ERROR { background: rgba(188,140,255,0.15); color: var(--purple); }
+  .flag-ARCHAIC { background: rgba(248,81,73,0.2); color: var(--red); }
+  .flag-BASIC_VOCAB { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .flag-GRAMMAR { background: rgba(88,166,255,0.15); color: var(--blue); }
+  .flag-DUPLICATE { background: rgba(139,148,158,0.15); color: var(--text-dim); }
+  .flag-SYNONYM_CLUSTER { background: rgba(188,140,255,0.1); color: var(--purple); }
+  .flag-NEVER_SEEN { background: rgba(139,148,158,0.1); color: var(--text-dim); }
+
+  .action-DELETE { color: var(--red); font-weight: 700; }
+  .action-FIX { color: var(--yellow); font-weight: 700; }
+  .action-REVIEW { color: var(--orange); font-weight: 600; }
+  .action-KEEP { color: var(--green); }
+
+  .notes-cell { font-size: 0.75rem; color: var(--text-dim); max-width: 300px; }
+  .front-cell, .back-cell { max-width: 280px; word-wrap: break-word; }
+  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ── toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green);
+           color: #000; padding: 12px 20px; border-radius: 8px; font-weight: 600;
+           transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 100; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔍 Flashcard Deck Audit</h1>
+  <div class="summary" id="summary"></div>
+</div>
+
+<div class="controls">
+  <select id="filterAction">
+    <option value="ALL">All actions</option>
+    <option value="DELETE">Suggested: DELETE</option>
+    <option value="FIX">Suggested: FIX</option>
+    <option value="REVIEW">Suggested: REVIEW</option>
+    <option value="KEEP">Suggested: KEEP</option>
+  </select>
+  <select id="filterFlag">
+    <option value="ALL">All flags</option>
+    <option value="COGNATE">Cognate</option>
+    <option value="TOO_EASY">Too Easy</option>
+    <option value="VERY_EASY">Very Easy</option>
+    <option value="SPELLING_ERROR">Spelling Error</option>
+    <option value="ARCHAIC">Archaic</option>
+    <option value="BASIC_VOCAB">Basic Vocab</option>
+    <option value="GRAMMAR">Grammar</option>
+    <option value="DUPLICATE">Duplicate</option>
+    <option value="SYNONYM_CLUSTER">Synonym Cluster</option>
+    <option value="NEVER_SEEN">Never Seen</option>
+    <option value="FLAGGED">Any Flag</option>
+    <option value="UNFLAGGED">No Flags</option>
+  </select>
+  <select id="filterDecision">
+    <option value="ALL">All decisions</option>
+    <option value="UNDECIDED">Undecided</option>
+    <option value="1">Decided: KEEP (1)</option>
+    <option value="0">Decided: REMOVE (0)</option>
+  </select>
+  <input type="text" id="searchBox" placeholder="Search front/back text...">
+  <span class="count" id="visibleCount"></span>
+  <span class="spacer"></span>
+  <button onclick="bulkAcceptSuggested()">Accept all DELETE suggestions</button>
+  <button onclick="markAllVisible(1)">Mark visible KEEP</button>
+  <button onclick="markAllVisible(0)" class="danger">Mark visible REMOVE</button>
+  <button onclick="exportDecisions()" class="primary">💾 Export Decisions</button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th data-sort="decision" style="width:50px">Keep?</th>
+        <th data-sort="suggestedAction" style="width:70px">Suggested</th>
+        <th data-sort="front">Front</th>
+        <th data-sort="back">Back</th>
+        <th>Flags</th>
+        <th data-sort="ivl" style="width:50px">IVL</th>
+        <th data-sort="ease" style="width:50px">Ease</th>
+        <th data-sort="reps" style="width:45px">Reps</th>
+        <th data-sort="lapses" style="width:50px">Lapse</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let data = null;
+let decisions = {}; // id → 1 (keep) or 0 (remove)
+let sortCol = 'suggestedAction';
+let sortDir = 1;
+
+// Load report
+fetch('audit-report.json')
+  .then(r => r.json())
+  .then(d => { data = d; init(); })
+  .catch(e => document.body.innerHTML = `<h2 style="color:var(--red)">Error loading audit-report.json: ${e.message}</h2>`);
+
+function init() {
+  // Pre-fill decisions from suggested actions
+  for (const card of data.cards) {
+    if (card.suggestedAction === 'DELETE') decisions[card.id] = 0;
+    else decisions[card.id] = undefined; // undecided
+  }
+  renderSummary();
+  renderTable();
+  setupControls();
+}
+
+function renderSummary() {
+  const s = data.summary;
+  const decided = Object.values(decisions).filter(v => v !== undefined).length;
+  const keeps = Object.values(decisions).filter(v => v === 1).length;
+  const removes = Object.values(decisions).filter(v => v === 0).length;
+  const undecided = s.totalCards - decided;
+
+  document.getElementById('summary').innerHTML = `
+    <div class="stat-card"><div class="label">Total</div><div class="value">${s.totalCards}</div></div>
+    <div class="stat-card"><div class="label">Flagged</div><div class="value">${s.flagged}</div></div>
+    <div class="stat-card delete"><div class="label">Sug. Delete</div><div class="value">${s.byAction.DELETE}</div></div>
+    <div class="stat-card fix"><div class="label">Sug. Fix</div><div class="value">${s.byAction.FIX}</div></div>
+    <div class="stat-card review"><div class="label">Sug. Review</div><div class="value">${s.byAction.REVIEW}</div></div>
+    <div class="stat-card keep"><div class="label">Keeping</div><div class="value">${keeps}</div></div>
+    <div class="stat-card delete"><div class="label">Removing</div><div class="value">${removes}</div></div>
+    <div class="stat-card"><div class="label">Undecided</div><div class="value">${undecided}</div></div>
+  `;
+}
+
+function getFilteredCards() {
+  const actionFilter = document.getElementById('filterAction').value;
+  const flagFilter = document.getElementById('filterFlag').value;
+  const decFilter = document.getElementById('filterDecision').value;
+  const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  return data.cards.filter(c => {
+    if (actionFilter !== 'ALL' && c.suggestedAction !== actionFilter) return false;
+    if (flagFilter === 'FLAGGED' && c.flags.length === 0) return false;
+    if (flagFilter === 'UNFLAGGED' && c.flags.length > 0) return false;
+    if (flagFilter !== 'ALL' && flagFilter !== 'FLAGGED' && flagFilter !== 'UNFLAGGED' && !c.flags.includes(flagFilter)) return false;
+    if (decFilter === 'UNDECIDED' && decisions[c.id] !== undefined) return false;
+    if (decFilter === '1' && decisions[c.id] !== 1) return false;
+    if (decFilter === '0' && decisions[c.id] !== 0) return false;
+    if (search && !c.front.toLowerCase().includes(search) && !c.back.toLowerCase().includes(search)) return false;
+    return true;
+  });
+}
+
+function sortCards(cards) {
+  return cards.sort((a, b) => {
+    let va, vb;
+    if (sortCol === 'decision') {
+      va = decisions[a.id] ?? -1;
+      vb = decisions[b.id] ?? -1;
+    } else {
+      va = a[sortCol] ?? '';
+      vb = b[sortCol] ?? '';
+    }
+    if (typeof va === 'string') return va.localeCompare(vb) * sortDir;
+    return (va - vb) * sortDir;
+  });
+}
+
+function renderTable() {
+  const filtered = sortCards(getFilteredCards());
+  document.getElementById('visibleCount').textContent = `${filtered.length} cards shown`;
+
+  const tbody = document.getElementById('tbody');
+  // For performance, limit to 500 visible rows
+  const show = filtered.slice(0, 500);
+  
+  tbody.innerHTML = show.map(c => {
+    const dec = decisions[c.id];
+    const btnClass = dec === 1 ? 'keep' : dec === 0 ? 'remove' : '';
+    const btnText = dec === 1 ? '1' : dec === 0 ? '0' : '?';
+    const rowClass = c.suggestedAction === 'DELETE' ? 'row-delete' : c.suggestedAction === 'FIX' ? 'row-fix' : '';
+    
+    return `<tr class="${rowClass}" data-id="${c.id}">
+      <td class="decision-cell">
+        <button class="decision-btn ${btnClass}" onclick="toggleDecision('${c.id}')">${btnText}</button>
+      </td>
+      <td><span class="action-${c.suggestedAction}">${c.suggestedAction}</span></td>
+      <td class="front-cell">${esc(c.front)}</td>
+      <td class="back-cell">${esc(c.back)}</td>
+      <td>${c.flags.map(f => `<span class="flag flag-${f}">${f}</span>`).join('')}</td>
+      <td class="num-cell">${c.ivl}</td>
+      <td class="num-cell">${c.ease}</td>
+      <td class="num-cell">${c.reps}</td>
+      <td class="num-cell">${c.lapses}</td>
+      <td class="notes-cell">${c.notes.join('<br>')}</td>
+    </tr>`;
+  }).join('');
+
+  if (filtered.length > 500) {
+    tbody.innerHTML += `<tr><td colspan="10" style="text-align:center;color:var(--text-dim);padding:16px">
+      Showing first 500 of ${filtered.length} cards. Use filters to narrow down.</td></tr>`;
+  }
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function toggleDecision(id) {
+  const cur = decisions[id];
+  if (cur === undefined || cur === 0) decisions[id] = 1;
+  else if (cur === 1) decisions[id] = 0;
+  renderTable();
+  renderSummary();
+}
+
+function bulkAcceptSuggested() {
+  for (const c of data.cards) {
+    if (c.suggestedAction === 'DELETE') decisions[c.id] = 0;
+  }
+  renderTable();
+  renderSummary();
+  showToast(`Marked ${data.summary.byAction.DELETE} cards for removal`);
+}
+
+function markAllVisible(val) {
+  const filtered = getFilteredCards();
+  for (const c of filtered) {
+    decisions[c.id] = val;
+  }
+  renderTable();
+  renderSummary();
+  showToast(`Marked ${filtered.length} cards as ${val === 1 ? 'KEEP' : 'REMOVE'}`);
+}
+
+function exportDecisions() {
+  const output = {
+    exportedAt: new Date().toISOString(),
+    totalCards: data.cards.length,
+    decisions: {},
+    stats: { keep: 0, remove: 0, undecided: 0 }
+  };
+  
+  for (const c of data.cards) {
+    const d = decisions[c.id];
+    output.decisions[c.id] = d ?? null;
+    if (d === 1) output.stats.keep++;
+    else if (d === 0) output.stats.remove++;
+    else output.stats.undecided++;
+  }
+  
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'audit-decisions.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported: ${output.stats.keep} keep, ${output.stats.remove} remove, ${output.stats.undecided} undecided`);
+}
+
+function setupControls() {
+  document.getElementById('filterAction').addEventListener('change', renderTable);
+  document.getElementById('filterFlag').addEventListener('change', renderTable);
+  document.getElementById('filterDecision').addEventListener('change', renderTable);
+  
+  let searchTimeout;
+  document.getElementById('searchBox').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(renderTable, 200);
+  });
+  
+  // Column sorting
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (sortCol === col) sortDir *= -1;
+      else { sortCol = col; sortDir = 1; }
+      renderTable();
+    });
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
