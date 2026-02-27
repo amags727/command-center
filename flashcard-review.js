@@ -103,8 +103,9 @@ function renderFlashcardReview(containerId, cards, context, tags) {
       <h4 style="font-size:18px;margin-bottom:8px">🃏 Review Flashcards (${cards.length} cards)</h4>
       <p style="font-size:18px;color:var(--muted);margin-bottom:10px">Edit front/back, delete unwanted cards, then submit approved ones to your deck.</p>
       <div id="${containerId}-list" class="fc-review-list" style="border:1px solid var(--border);border-radius:6px;padding:6px;margin-bottom:8px"></div>
-      <div class="flex mt8" style="gap:8px">
+      <div class="flex mt8" style="gap:8px;flex-wrap:wrap">
         <button class="btn btn-p" onclick="fcSubmitAll('${containerId}')">✅ Submit All to Deck</button>
+        <button class="btn btn-s" onclick="fcAddManual('${containerId}')" style="font-size:16px">➕ Add Card</button>
         <span id="${containerId}-submit-status" style="font-size:18px;color:var(--muted)"></span>
       </div>
       <div class="fc-chat-section" style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px">
@@ -151,6 +152,17 @@ function fcDeleteCard(containerId, idx) {
     _fcReviews[containerId].cards.splice(idx, 1);
     _fcRenderCards(containerId);
   }
+}
+
+function fcAddManual(containerId) {
+  const rev = _fcReviews[containerId];
+  if (!rev) return;
+  rev.cards.push({ front: '', back: '' });
+  _fcRenderCards(containerId);
+  // Scroll to and focus the new card's front textarea
+  const idx = rev.cards.length - 1;
+  const ta = document.getElementById(containerId + '-f-' + idx);
+  if (ta) { ta.scrollIntoView({ behavior: 'smooth', block: 'center' }); ta.focus(); }
 }
 
 function fcSubmitAll(containerId) {
