@@ -387,8 +387,8 @@ Riassunto dello studente:
 
 Istruzioni — segui questo formato ESATTAMENTE:
 
-1. TESTO CORRETTO
-Riscrivi COMPLETAMENTE il riassunto corretto. Correggi TUTTI gli errori. Presta particolare attenzione alla COERENZA DI REGISTRO: se l'articolo originale usa un linguaggio giornalistico formale, il riassunto deve mantenerlo. Se usa gergo parlamentare, tecnico, accademico ecc., il riassunto deve riflettere lo stesso livello.
+1. TESTO RISCRITTO A LIVELLO C2
+Riscrivi COMPLETAMENTE il riassunto a livello C2. NON limitarti a correggere gli errori — riscrivi il testo come lo scriverebbe un madrelingua colto, mantenendo lo STESSO contenuto sostanziale e la STESSA lunghezza approssimativa. Il risultato deve riflettere il registro dell'articolo originale (giornalistico formale, tecnico, accademico ecc.) e leggere come prosa italiana naturale e fluida, non come una versione "aggiustata" del testo dello studente.
 
 2. ERRORI MECCANICI
 Sviste di genere/numero/concordanza. Una riga per errore: originale → corretto.

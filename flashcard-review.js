@@ -316,8 +316,8 @@ const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a liv
 
 Istruzioni — segui questo formato ESATTAMENTE:
 
-1. TESTO CORRETTO
-Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
+1. TESTO RISCRITTO A LIVELLO C2
+Riscrivi COMPLETAMENTE il testo a livello C2 dall'inizio alla fine. NON limitarti a correggere gli errori — riscrivi il testo come lo scriverebbe un madrelingua colto, mantenendo lo STESSO contenuto sostanziale, la STESSA lunghezza approssimativa e lo STESSO tono/registro dell'originale dello studente. Il risultato deve essere prosa italiana naturale e fluida a livello C2, non una versione "aggiustata" del testo originale. Correggi anche errori tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography).
 
 2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
 Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
@@ -338,8 +338,6 @@ Fasce di calibrazione (usale come riferimento stabile):
 - 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
 - 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
 - Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
-
-REGOLA IMPORTANTE: Nelle correzioni, preferisci interventi minimi. NON riscrivere per gusto stilistico. Correggi solo ciò che è effettivamente errato o inadeguato.
 
 5. PATTERN DI INTERFERENZA
 Scrivi su una riga separata nel formato esatto:
@@ -354,8 +352,8 @@ const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente è un uomo — us
 
 Istruzioni — segui questo formato ESATTAMENTE:
 
-1. TESTO CORRETTO
-Riscrivi COMPLETAMENTE il testo corretto dall'inizio alla fine. Correggi TUTTI gli errori, inclusi quelli tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography). Segnala solo errori di punteggiatura/maiuscole specifici dell'italiano.
+1. TESTO RISCRITTO A LIVELLO C2
+Riscrivi COMPLETAMENTE il testo a livello C2 dall'inizio alla fine. NON limitarti a correggere gli errori — riscrivi il testo come lo scriverebbe un madrelingua colto, mantenendo lo STESSO contenuto sostanziale, la STESSA lunghezza approssimativa e lo STESSO tono/registro dell'originale dello studente. Il risultato deve essere prosa italiana naturale e fluida a livello C2, non una versione "aggiustata" del testo originale. Correggi anche errori tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography).
 
 2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
 Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
@@ -376,8 +374,6 @@ Fasce di calibrazione (usale come riferimento stabile):
 - 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
 - 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
 - Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
-
-REGOLA IMPORTANTE: Nelle correzioni, preferisci interventi minimi. NON riscrivere per gusto stilistico. Correggi solo ciò che è effettivamente errato o inadeguato.
 
 5. PATTERN DI INTERFERENZA
 Scrivi su una riga separata nel formato esatto:
