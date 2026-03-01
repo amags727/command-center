@@ -16,7 +16,7 @@ async function trFetchURL() {
   const key = localStorage.getItem('cc_apikey');
   if (!key) { alert('Set your Anthropic API key in the Claude tab first.'); switchTab('claude'); return; }
   const status = document.getElementById('tr-status');
-  status.textContent = '⏳ Fetching article...';
+  status.textContent = '⏳ Fetching article...';n
   try {
     // Try multiple CORS proxies in order
     const proxies = [
@@ -393,22 +393,19 @@ Riscrivi COMPLETAMENTE il riassunto a livello C2. NON limitarti a correggere gli
 2. ERRORI MECCANICI
 Sviste di genere/numero/concordanza. Una riga per errore: originale → corretto.
 
-3. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, registro inadeguato, scelta stilistica che tradisce il registro dell'originale: originale → corretto + spiegazione IN ITALIANO. Segnala in particolare dove lo studente ha abbassato il registro rispetto all'originale o ha usato costruzioni troppo semplici/anglofone dove l'originale avrebbe usato una struttura più elaborata.
+3A. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese, tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché.
+REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
 
-4. VALUTAZIONE DEL REGISTRO
-Valuta specificamente se lo studente ha mantenuto:
-- Il livello di formalità dell'originale
-- Il gergo/lessico specialistico appropriato
-- I tempi verbali coerenti con il genere (passato remoto per narrativa giornalistica, ecc.)
-- La complessità sintattica adeguata
+3B. INADEGUATEZZE DI REGISTRO
+Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo rispetto all'originale — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
 
-5. PUNTEGGIO
+4. PUNTEGGIO
 SCORE: XX/100 (LIVELLO)
-
+Il punteggio deve riflettere gli errori meccanici (sez. 2) e sostanziali (sez. 3A) a peso pieno. Le inadeguatezze di registro (sez. 3B) contano a peso ridotto (circa metà).
 Fasce: 90-100 (C2), 80-89 (C1+), 70-79 (C1/B2+), 60-69 (B2), sotto 60 (B1 o meno).
 
-6. PATTERN DI INTERFERENZA
+5. PATTERN DI INTERFERENZA
 INTERFERENCE: pattern1 | pattern2 | pattern3
 
 Sii diretto e fattuale. Niente incoraggiamenti.`;

@@ -336,13 +336,17 @@ Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — svis
 
 ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
-3. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+3A. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più per il punteggio.
+REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
+
+3B. INADEGUATEZZE DI REGISTRO
+Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
 
 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
-Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+Il punteggio deve riflettere gli errori meccanici (sez. 2) e sostanziali (sez. 3A) a peso pieno. Le inadeguatezze di registro (sez. 3B) contano a peso ridotto (circa metà). NON contare errori tipografici banali.
 
 Fasce di calibrazione (usale come riferimento stabile):
 - 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
@@ -372,13 +376,17 @@ Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — svis
 
 ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
-3. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, o scelta stilistica inadeguata: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più.
+3A. ERRORI SOSTANZIALI
+Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più per il punteggio.
+REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
+
+3B. INADEGUATEZZE DI REGISTRO
+Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
 
 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
-Il punteggio deve riflettere TUTTI gli errori (meccanici + sostanziali), ma NON gli errori tipografici banali.
+Il punteggio deve riflettere gli errori meccanici (sez. 2) e sostanziali (sez. 3A) a peso pieno. Le inadeguatezze di registro (sez. 3B) contano a peso ridotto (circa metà). NON contare errori tipografici banali.
 
 Fasce di calibrazione (usale come riferimento stabile):
 - 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
