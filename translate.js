@@ -394,11 +394,18 @@ Riscrivi COMPLETAMENTE il riassunto a livello C2. NON limitarti a correggere gli
 Sviste di genere/numero/concordanza. Una riga per errore: originale → corretto.
 
 3A. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese, tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché.
-REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
+Segnala SOLO ciò che farebbe fermare un lettore madrelingua: costrutti che non funzionano in italiano, calchi strutturali dall'inglese, falsi amici, preposizioni sbagliate, collocazioni inesistenti, verbi usati con reggenza sbagliata, omissioni di articoli su nomi generici.
+
+Per ogni errore: originale → corretto + spiegazione IN ITALIANO.
+
+NON SONO ERRORI SOSTANZIALI (non segnalarli qui):
+- Scelte lessicali ugualmente valide ("vicenda" vs "eventualità", "nazioni" vs "potenze")
+- Varianti sintattiche naturali ("cosa facciamo" vs "che facciamo")
+- Formulazioni che appaiono regolarmente nella prosa italiana corrente
+Se una correzione contiene sia un errore reale sia una preferenza stilistica, separa le due cose: l'errore va qui, la preferenza in 3B.
 
 3B. INADEGUATEZZE DI REGISTRO
-Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo rispetto all'originale — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
+Segnala SOLO dove lo studente ha abbassato significativamente il registro rispetto all'originale — cioè dove un lettore madrelingua noterebbe una rottura di registro nel contesto di un riassunto giornalistico. NON segnalare sinonimi ugualmente validi nello stesso registro. Queste inadeguatezze contano per il punteggio ma a peso ridotto (circa metà).
 
 4. PUNTEGGIO
 SCORE: XX/100 (LIVELLO)

@@ -322,85 +322,109 @@ Example: [{"front":"declarative definition here","back":"original back unchanged
 }
 
 // ============ SHARED FEEDBACK PROMPT ============
-const CORRECTION_PROMPT_DAILY = (txt) => `Sei un tutor esperto di italiano a livello C1-C2. Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha scritto questa composizione giornaliera:
+const CORRECTION_PROMPT_DAILY = (txt) => `Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha scritto questa composizione giornaliera in italiano:
 
 "${txt}"${_getTopInterferenceContext()}
 
+CONTESTO: Questo è un testo di scrittura personale — lo studente esprime pensieri propri nel proprio stile. Non esiste un registro "corretto" da imitare. Il tono informale-argomentativo è perfettamente appropriato.
+
 Istruzioni — segui questo formato ESATTAMENTE:
 
-1. TESTO RISCRITTO A LIVELLO C2
-Riscrivi COMPLETAMENTE il testo a livello C2 dall'inizio alla fine. NON limitarti a correggere gli errori — riscrivi il testo come lo scriverebbe un madrelingua colto, mantenendo lo STESSO contenuto sostanziale, la STESSA lunghezza approssimativa e lo STESSO tono/registro dell'originale dello studente. Il risultato deve essere prosa italiana naturale e fluida a livello C2, non una versione "aggiustata" del testo originale. Correggi anche errori tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography).
+## 1. TESTO RISCRITTO
+Riscrivi COMPLETAMENTE il testo come lo scriverebbe un madrelingua colto che esprime le stesse idee nello stesso tono. Mantieni lo STESSO contenuto, la STESSA lunghezza approssimativa e lo STESSO livello di formalità scelto dallo studente. Il risultato deve suonare naturale e fluido — non più formale, non più elevato, semplicemente più nativo. Correggi errori tipografici (virgole, maiuscole, ecc.) senza segnalarli separatamente.
 
-2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
-Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
+## 2. ERRORI MECCANICI
+Sviste di genere/numero/concordanza — errori che lo studente conosce ma ha applicato male. Una riga per errore: originale → corretto.
 
 ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
-3A. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più per il punteggio.
-REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
+## 3. ERRORI SOSTANZIALI
+Segnala SOLO ciò che farebbe fermare un lettore madrelingua: costrutti che non funzionano in italiano, calchi strutturali dall'inglese, falsi amici, preposizioni sbagliate, collocazioni inesistenti, verbi usati con reggenza sbagliata, omissioni di articoli su nomi generici.
 
-3B. INADEGUATEZZE DI REGISTRO
-Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
+Per ogni errore: originale → corretto + spiegazione IN ITALIANO.
 
-4. PUNTEGGIO
+CRITERIO DI INCLUSIONE: L'espressione dello studente è sbagliata, innaturale, o incomprensibile — non semplicemente meno elegante di un'alternativa.
+
+NON SONO ERRORI (non segnalarli):
+- Scelte lessicali ugualmente valide ("vicenda" vs "eventualità", "nazioni" vs "potenze")
+- Varianti sintattiche naturali ("cosa facciamo" vs "che facciamo")
+- Registro informale in un testo informale
+- Formulazioni che appaiono regolarmente nella prosa italiana corrente
+- Preferenze di stile del correttore
+
+QUANDO HAI DUBBI: Se devi giustificare perché qualcosa è un errore con "registro inadeguato" o "formulazione meno elegante", probabilmente non è un errore. Non segnalarlo.
+
+## 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
-Il punteggio deve riflettere gli errori meccanici (sez. 2) e sostanziali (sez. 3A) a peso pieno. Le inadeguatezze di registro (sez. 3B) contano a peso ridotto (circa metà). NON contare errori tipografici banali.
 
-Fasce di calibrazione (usale come riferimento stabile):
-- 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
-- 80-89 (C1+): Pochi errori, tutti minori. Buon controllo del registro. Qualche calco residuo.
-- 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
-- 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
-- Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
+Il punteggio riflette SOLO gli errori delle sezioni 2 e 3. Non penalizzare il registro informale. Non penalizzare scelte stilistiche.
 
-5. PATTERN DI INTERFERENZA
+Fasce di calibrazione:
+- 90-100 (C2): Nessun errore sostanziale. La prosa suona nativa.
+- 80-89 (C1+): 1-2 errori minori. Comunicazione fluida, qualche calco residuo.
+- 70-79 (C1/B2+): Errori presenti ma il testo comunica efficacemente. Interferenze L1 visibili.
+- 60-69 (B2): Errori frequenti che disturbano la lettura. Calchi ricorrenti.
+- Sotto 60 (B1 o meno): Errori strutturali che compromettono la comprensione.
+
+## 5. PATTERN DI INTERFERENZA
 Scrivi su una riga separata nel formato esatto:
 INTERFERENCE: pattern1 | pattern2 | pattern3
-Elenca i pattern di interferenza L1 rilevati in questo testo (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
+Elenca i pattern di interferenza L1 rilevati (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
 
-Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
+Sii diretto e fattuale.`;
 
-const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione in italiano:
+const CORRECTION_PROMPT_ARTICLE = (title, txt) => `Lo studente è un uomo — usa sempre aggettivi, participi e pronomi al maschile quando si riferiscono a lui. Lo studente ha letto un articolo italiano intitolato "${title}" e ha scritto questa riflessione personale:
 
 "${txt}"${_getTopInterferenceContext()}
 
+CONTESTO: Questo è un testo di riflessione personale — lo studente esprime le proprie opinioni sull'articolo nel proprio stile. Non esiste un registro "corretto" da imitare. Il tono informale-argomentativo è perfettamente appropriato.
+
 Istruzioni — segui questo formato ESATTAMENTE:
 
-1. TESTO RISCRITTO A LIVELLO C2
-Riscrivi COMPLETAMENTE il testo a livello C2 dall'inizio alla fine. NON limitarti a correggere gli errori — riscrivi il testo come lo scriverebbe un madrelingua colto, mantenendo lo STESSO contenuto sostanziale, la STESSA lunghezza approssimativa e lo STESSO tono/registro dell'originale dello studente. Il risultato deve essere prosa italiana naturale e fluida a livello C2, non una versione "aggiustata" del testo originale. Correggi anche errori tipografici (virgole, maiuscole, ecc.), ma non segnalarli separatamente se sarebbero errori anche in inglese (lazy typography).
+## 1. TESTO RISCRITTO
+Riscrivi COMPLETAMENTE il testo come lo scriverebbe un madrelingua colto che esprime le stesse opinioni nello stesso tono. Mantieni lo STESSO contenuto, la STESSA lunghezza approssimativa e lo STESSO livello di formalità scelto dallo studente. Il risultato deve suonare naturale e fluido — non più formale, non più elevato, semplicemente più nativo. Correggi errori tipografici (virgole, maiuscole, ecc.) senza segnalarli separatamente.
 
-2. ERRORI MECCANICI (sviste di genere/numero/concordanza)
-Solo errori in cui lo studente CONOSCE la regola ma l'ha applicata male — sviste, lapsus, disattenzioni. Esempi: "la problema" (genere sbagliato), "le casa" (numero sbagliato), concordanza aggettivo-nome errata. Elencali in modo sintetico, una riga per errore: originale → corretto. Niente spiegazioni elaborate. Questi contano per il punteggio ma sono meno diagnostici.
+## 2. ERRORI MECCANICI
+Sviste di genere/numero/concordanza — errori che lo studente conosce ma ha applicato male. Una riga per errore: originale → corretto.
 
 ATTENZIONE: L'omissione di articoli su nomi generici/astratti (es. "regole non funzionano" invece di "le regole non funzionano") NON è un errore meccanico — è un calco strutturale dall'inglese e va in categoria 3.
 
-3A. ERRORI SOSTANZIALI
-Per ogni errore di vocabolario, costruzione, anglicismo, calco strutturale dall'inglese (incluse omissioni di articoli su nomi generici), tempo/modo verbale sbagliato, preposizione sbagliata, collocazione rotta: originale → corretto + spiegazione IN ITALIANO del perché. Questi sono gli errori che contano di più per il punteggio.
-REGOLA DI ESCLUSIONE: Se l'espressione dello studente è grammaticalmente corretta, collocazionalmente naturale, e compare nella prosa italiana corrente, NON è un errore sostanziale, anche se esiste una formulazione più elevata o elegante. Le formulazioni alternative vanno in 3B.
+## 3. ERRORI SOSTANZIALI
+Segnala SOLO ciò che farebbe fermare un lettore madrelingua: costrutti che non funzionano in italiano, calchi strutturali dall'inglese, falsi amici, preposizioni sbagliate, collocazioni inesistenti, verbi usati con reggenza sbagliata, omissioni di articoli su nomi generici.
 
-3B. INADEGUATEZZE DI REGISTRO
-Segnala SOLO dove lo studente ha usato una formulazione che, pur essendo italiano corretto, crea un divario di registro significativo — cioè dove un lettore madrelingua noterebbe una rottura di registro o una formulazione innaturale per il contesto. NON segnalare semplici preferenze stilistiche o sinonimi ugualmente validi. Queste inadeguatezze contano per il punteggio ma a peso ridotto rispetto agli errori sostanziali.
+Per ogni errore: originale → corretto + spiegazione IN ITALIANO.
 
-4. PUNTEGGIO
+CRITERIO DI INCLUSIONE: L'espressione dello studente è sbagliata, innaturale, o incomprensibile — non semplicemente meno elegante di un'alternativa.
+
+NON SONO ERRORI (non segnalarli):
+- Scelte lessicali ugualmente valide ("vicenda" vs "eventualità", "nazioni" vs "potenze")
+- Varianti sintattiche naturali ("cosa facciamo" vs "che facciamo")
+- Registro informale in un testo informale
+- Formulazioni che appaiono regolarmente nella prosa italiana corrente
+- Preferenze di stile del correttore
+
+QUANDO HAI DUBBI: Se devi giustificare perché qualcosa è un errore con "registro inadeguato" o "formulazione meno elegante", probabilmente non è un errore. Non segnalarlo.
+
+## 4. PUNTEGGIO
 Scrivi su una riga separata nel formato esatto: SCORE: XX/100 (LIVELLO)
 dove XX è un numero da 0 a 100 e LIVELLO è A2/B1/B2/B2+/C1/C1+/C2.
-Il punteggio deve riflettere gli errori meccanici (sez. 2) e sostanziali (sez. 3A) a peso pieno. Le inadeguatezze di registro (sez. 3B) contano a peso ridotto (circa metà). NON contare errori tipografici banali.
 
-Fasce di calibrazione (usale come riferimento stabile):
-- 90-100 (C2): Prosa praticamente nativa. Nessun anglicismo. Registro, collocazioni e ritmo impeccabili.
-- 80-89 (C1+): Pochi errori, tutti minori. Buon controllo del registro. Qualche calco residuo.
-- 70-79 (C1/B2+): Errori sostanziali presenti ma non frequenti. Struttura argomentativa solida ma con interferenze L1 visibili.
-- 60-69 (B2): Errori sostanziali frequenti. Calchi dall'inglese ricorrenti. Registro spesso piatto o inadeguato.
-- Sotto 60 (B1 o meno): Errori strutturali gravi, comprensione compromessa, sintassi elementare.
+Il punteggio riflette SOLO gli errori delle sezioni 2 e 3. Non penalizzare il registro informale. Non penalizzare scelte stilistiche.
 
-5. PATTERN DI INTERFERENZA
+Fasce di calibrazione:
+- 90-100 (C2): Nessun errore sostanziale. La prosa suona nativa.
+- 80-89 (C1+): 1-2 errori minori. Comunicazione fluida, qualche calco residuo.
+- 70-79 (C1/B2+): Errori presenti ma il testo comunica efficacemente. Interferenze L1 visibili.
+- 60-69 (B2): Errori frequenti che disturbano la lettura. Calchi ricorrenti.
+- Sotto 60 (B1 o meno): Errori strutturali che compromettono la comprensione.
+
+## 5. PATTERN DI INTERFERENZA
 Scrivi su una riga separata nel formato esatto:
 INTERFERENCE: pattern1 | pattern2 | pattern3
-Elenca i pattern di interferenza L1 rilevati in questo testo (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
+Elenca i pattern di interferenza L1 rilevati (calchi sintattici, ordine delle parole, preposizioni, articoli, ecc.). Separa con |. Se nessuno, scrivi INTERFERENCE: nessuno.
 
-Sii diretto e fattuale. Niente incoraggiamenti, niente complimenti, niente ammorbidimenti.`;
+Sii diretto e fattuale.`;
 
 const CORRECTION_PROMPT_REPRODUCTION = (paragraphs) => {
   // paragraphs is an array of {original, reproduction} objects
